@@ -17,7 +17,7 @@
         margin: 0;
         padding: 0;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+        background: #ffffff;
         height: 100vh;
         display: flex;
         justify-content: center;
@@ -57,11 +57,6 @@
         box-sizing: border-box;
     }
 
-    .login-container input:focus {
-        border-color: #6c63ff;
-        outline: none;
-        box-shadow: 0 0 8px rgba(108,99,255,0.4);
-    }
 
     .login-container button {
         width: 100%;
@@ -71,7 +66,7 @@
         border-radius: 10px;
         font-size: 1rem;
         cursor: pointer;
-        background: linear-gradient(45deg, #6c63ff, #5146d9);
+        background: #000;
         color: white;
         font-weight: bold;
         transition: all 0.3s ease;
@@ -100,6 +95,7 @@
         text-decoration: underline;
         color: #5146d9;
     }
+    
 </style>
 </head>
 <body>
@@ -114,7 +110,7 @@
     </form>
 
     <div class="signup-link">
-        계정이 없으신가요? <a href="signup.jsp">회원가입</a><br>
+        계정이 없으신가요? <a href="signupForm.do">회원가입</a><br>
         <a href="find-id.jsp">아이디 찾기</a> | 
         <a href="find-password.jsp">비밀번호 찾기</a>
     </div>
