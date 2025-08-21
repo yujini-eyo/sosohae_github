@@ -1,2 +1,2 @@
 # sample_github
-깃허브 사용 test
+전국 맛집 저장소
