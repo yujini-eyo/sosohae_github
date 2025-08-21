@@ -110,7 +110,7 @@
     </form>
 
     <div class="signup-link">
-        계정이 없으신가요? <a href="signupForm.do">회원가입</a><br>
+        계정이 없으신가요? <a href="/member/signupForm.do">회원가입</a><br>
         <a href="find-id.jsp">아이디 찾기</a> | 
         <a href="find-password.jsp">비밀번호 찾기</a>
     </div>

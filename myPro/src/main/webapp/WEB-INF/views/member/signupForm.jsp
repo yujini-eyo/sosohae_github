@@ -82,7 +82,7 @@
 <body>
 
 <div class="signup-container">
-    <h2>회원가입</h2>
+    <h3>회원가입</h3>
     <form id="signupPage" action="${contextPath}/member/signupForm.do" method="post">
         아이디: <input type="text" name="id" required><br>
         비밀번호: <input type="password" name="pwd" required><br>
