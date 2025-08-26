@@ -69,9 +69,9 @@
   </style>
 
   <!-- 헤더·네비·드로어 전용 스타일 -->
-  <link rel="stylesheet" href="header.css">
+  <link rel="stylesheet" href="css/header.css">
   <!-- 푸터 전용 스타일 -->
-  <link rel="stylesheet" href="footer.css">
+  <link rel="stylesheet" href="css/footer.css">
 </head>
 <body>
 
@@ -82,17 +82,8 @@
       <b>메뉴</b>
       <button id="drawerClose" aria-label="메뉴 닫기">✕</button>
     </header>
-    <nav>
-      <a href="about.html">서비스 소개</a>
-      <a href="guide.html">이용방법</a>
-      <a href="login.html">로그인</a>
-      <a href="notice.html">공지</a>
-      <a href="mypage.html">내정보</a>
-      <a href="points.html">포인트</a>
-      <a href="help.html">도움 요청하기</a>
-      <a href="give.html">도움 주기</a>
-      <a href="#" onclick="alert('로그아웃 처리')">로그아웃</a>
-    </nav>
+    <!-- JS가 로그인 여부에 따라 채웁니다 -->
+    <nav id="drawerNav"></nav>
   </aside>
 
   <!-- 헤더 -->
@@ -112,10 +103,7 @@
         <div class="logo"><a href="index.html">소소한 도움</a></div>
         <!-- 우: 사용자 -->
         <div class="header-right" id="rightArea">
-          <span class="user-name">홍길동 님</span>
-          <button class="icon-btn" id="notifyBtn" aria-label="알림">🔔</button>
-          <button class="info-btn" onclick="location.href='mypage.html'">내정보</button>
-          <button class="auth-btn btn-ghost" onclick="alert('로그아웃 처리')">로그아웃</button>
+        
         </div>
       </div>
     </div>
@@ -160,8 +148,8 @@
   <div id="footer-root"></div>
 
   <!-- ✅ 헤더/푸터 스크립트만 로드 (중복 로직 제거) -->
-  <script src="header.js"></script>
-  <script src="footer.js"></script>
+  <script src="js/header.js"></script>
+  <script src="js/footer.js"></script>
   <script>
     renderFooter({
       mount: '#footer-root',
