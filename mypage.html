@@ -1136,6 +1136,80 @@
       document.querySelector('.tab-btn[data-tab="rules"]').click();
     });
   </script>
+
+  <script>
+/* ========== mypage.html 전용 로그인 연동( login.html 그대로, mypage만 수정 ) ========== */
+(function () {
+  // --- util ---
+  const $ = (id) => document.getElementById(id);
+  function getUsers(){ try { return JSON.parse(localStorage.getItem('users') || '{}'); } catch { return {}; } }
+  function setUsers(u){ localStorage.setItem('users', JSON.stringify(u)); }
+
+  // 로그인 가드: 없으면 로그인 페이지로
+  const uid = localStorage.getItem('loggedInUser');
+  if (!uid) {
+    const back = encodeURIComponent('mypage.html');
+    location.replace(`login.html?next=${back}`);
+    return;
+  }
+
+  // 헤더 표시명 교체(있으면)
+  const nameSpan = document.querySelector('.user-name');
+  if (nameSpan) {
+    const u = getUsers()[uid];
+    nameSpan.textContent = ((u && (u.name || u.nickname)) || uid) + ' 님';
+  }
+
+  // 폼/읽기 데이터 채우기
+  const users = getUsers();
+  const me = users[uid] || {};
+  const map = {
+    name:  me.name  ?? '',
+    email: me.email ?? '',
+    phone: me.phone ?? '',
+    birth: me.birthday ?? me.birth ?? '',
+    addr:  me.address ?? me.addr ?? '',
+    note:  me.note ?? ''
+  };
+  Object.entries(map).forEach(([k,val])=>{
+    const readEl = $('v_'+k), editEl = $(k);
+    if (readEl) readEl.textContent = val;
+    if (editEl) editEl.value = val;
+  });
+
+  // 저장 버튼: 기존 UI 업데이트 후, 로컬 스토리지에도 영속
+  $('saveBtn')?.addEventListener('click', function () {
+    const u = getUsers();
+    u[uid] = u[uid] || {};
+    u[uid].name    = $('name')?.value?.trim()  || '';
+    u[uid].email   = $('email')?.value?.trim() || '';
+    u[uid].phone   = $('phone')?.value?.trim() || '';
+    u[uid].birth   = $('birth')?.value || '';
+    u[uid].address = $('addr')?.value?.trim()  || '';
+    u[uid].note    = $('note')?.value?.trim()  || '';
+    setUsers(u);
+  });
+
+  // 비밀번호 변경: 현재 비번 일치 시 교체(로컬 기준)
+  $('pwSave')?.addEventListener('click', function () {
+    const cur = $('curPw')?.value || '';
+    const a = $('newPw')?.value || '', b = $('newPw2')?.value || '';
+    const u = getUsers(); u[uid] = u[uid] || {};
+    if (u[uid].password && u[uid].password !== cur) return; // 현재 비번 틀리면 무시(원래 경고는 기존 스크립트가 처리)
+    if (a && a === b) { u[uid].password = a; setUsers(u); }
+  });
+
+  // (선택) 로그아웃 버튼이 있다면 실제 로그아웃 동작 연결
+  document.querySelectorAll('[onclick*="로그아웃"]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault?.();
+      localStorage.removeItem('loggedInUser');
+      location.replace('login.html');
+    }, { once:true });
+  });
+})();
+</script>
+
   <!-- 푸터 마운트 -->
   <div id="footer-root"></div>
 
@@ -1149,7 +1223,6 @@
       tagline: '따뜻한 연결, 함께 만드는 우리 동네'
     });
   </script>
-
 
 </body>
 
