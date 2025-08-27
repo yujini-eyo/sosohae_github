@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>도움 요청</title>
+<link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#FFF8F2; --card:#fff; --ink:#59463E; --muted:#86756B; --line:#EADBC8;
+    --brand:#FFB86C; --brand2:#FF9E3D; --radius:18px; --shadow:0 8px 24px rgba(89,70,62,.08);
+    /* 전역헤더 적용하기 위한 root 추가 */
+            --header-h: 72px;
+            /* 전역헤더 높이(기본) */
+            --brand: #FFC78A;
+            /* 헤더 그라데이션 시작색 */
+            --brand-200: #FFE0B2;
+            /* 헤더 경계선/연한색 */
+            --primary: #FF9E3D;
+            /* 로그인/내정보 등 기본 버튼색 */
+            --primary-600: #E07F1C;
+            /* 버튼 호버 */
+            --text: var(--ink);
+            /* header.css의 글자색 alias */
+            --maxw: 1120px;
+            /* header 내부 컨테이너 폭 */
+            --shadow-soft: 0 6px 20px rgba(0, 0, 0, .06);
+            --shadow: 0 12px 30px rgba(0, 0, 0, .12);
+  }
+   :root{
+      --bg:#FFF8F2; --text:#59463E; --muted:#806A5A;
+      --primary:#F6A96D; --primary-600:#e98c45;
+      --brand:#FFE8C2; --brand-200:#FADFCB;
+      --card:#FFFFFF; --card-br:#FFE1CB;
+      --hero-l:#FFEEE3; --hero-r:#FFF5E6;
+      --cta:#FFF0D5; --footer:#FFECD6;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+      --shadow-soft: 0 4px 10px rgba(0,0,0,0.06);
+      --radius: 20px; --maxw: 1100px;
+      --header-h: 72px;
+      --bottomnav-h: 0px;
+      --focus: 0 0 0 3px rgba(246,169,109,.35);
+    }
+
+  *{box-sizing:border-box}
+  body{margin:0; font-family:'SUIT',system-ui; background:var(--bg); color:var(--ink); font-size:19px; line-height:1.6}
+  .wrap{max-width:900px; margin:auto; padding:16px}
+  h1{margin:80px 0 14px; font-size:26px; font-weight:900}
+
+  /* 링크 클릭 밑줄 삭제 */
+  a{ color:inherit; text-decoration:none }
+    a:focus, button:focus{ outline: none; box-shadow: var(--focus); border-radius: 10px; }
+
+  /* 카드/헤더(=단계 헤더) */
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden}
+  .hd{
+    padding:14px 18px; border-bottom:1px solid var(--line); font-weight:900; display:flex; align-items:center; gap:10px;
+    background:linear-gradient(180deg, #FFF4E6, #FFE9CE); cursor:pointer;
+  }
+  .hd .stepnum{
+    display:inline-grid; place-items:center; width:28px; height:28px; border-radius:999px; font-size:14px; font-weight:900;
+    color:#fff; background:linear-gradient(180deg,var(--brand),var(--brand2));
+  }
+  .hd .label{flex:1}
+  .hd .hint{font-size:14px; color:#8a7569}
+  .hd:focus-within, .hd:active{outline:2px solid rgba(255,184,108,.5)}
+
+  /* 단계 본문 */
+  .bd{padding:18px}
+  .step{display:none}
+  .step.active{display:block}
+
+  /* 버튼 그리드 */
+  .grid{display:grid; gap:12px}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  .grid.cols-4{grid-template-columns:repeat(4,1fr)}
+  @media (max-width:760px){ .grid.cols-3,.grid.cols-4{grid-template-columns:repeat(2,1fr)} }
+
+  /* 큰 선택 버튼 */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; text-align:center; gap:8px;
+    border:2px solid var(--line); background:#FFF7EC; border-radius:14px; padding:16px; cursor:pointer;
+    font-weight:900; min-height:64px; user-select:none; transition:transform .03s ease, box-shadow .2s ease, background .2s ease
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.sel{background:linear-gradient(180deg,var(--brand),var(--brand2)); color:#fff; border-color:#f0b073}
+
+  /* 요약/칩 */
+  .sum{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:#fff; font-weight:800; font-size:14px}
+  .tiny{font-size:14px; color:var(--muted)}
+  .kicker{font-size:14px; color:var(--muted); margin:6px 0 14px}
+
+  /* 마지막 단계 - 제목 */
+  .field{display:flex; gap:8px; align-items:center}
+  input[type="text"]{flex:1; padding:12px 14px; font-size:18px; border:2px solid var(--line); border-radius:12px}
+  input:focus{outline:none; box-shadow:0 0 0 4px rgba(255,184,108,.24)}
+
+  /* 하단 고정 진행바 */
+  .dock{position:sticky; bottom:0; background:linear-gradient(180deg,rgba(255,248,242,.1),rgba(255,248,242,.95)); border-top:1px solid var(--line)}
+  .dock .bar{max-width:900px; margin:auto; padding:10px 16px; display:flex; gap:10px; align-items:center; justify-content:space-between}
+  .cta{border:0; border-radius:14px; padding:14px 20px; font-weight:900; font-size:20px; cursor:pointer}
+  .cta.primary{background:linear-gradient(180deg,var(--brand),var(--brand2)); color:#fff}
+  .cta.secondary{background:#fff; border:2px solid var(--line)}
+  .hide{display:none !important}
+</style>
+<!-- 헤더·네비·드로어 전용 스타일 -->
+  <link rel="stylesheet" href="css/header.css">
+  <!-- 푸터 전용 스타일 -->
+  <link rel="stylesheet" href="css/footer.css">
+</head>
+<body>
+ <!-- 헤더 -->
+  <header>
+    <div class="container">
+      <div class="header-container">
+        <!-- 좌: 네비 -->
+        <div class="header-left">
+          <button class="hamburger" id="hamburger" aria-label="메뉴 열기">☰</button>
+          <nav class="topnav" id="topnav" aria-label="상단 내비게이션">
+            <a href="about.html">서비스 소개</a>
+            <a href="guide.html">이용방법</a>
+            <a href="notice.html">공지</a>
+          </nav>
+        </div>
+        <!-- 중앙: 로고 -->
+        <div class="logo"><a href="index.html">소소한 도움</a></div>
+        <!-- 우: 사용자 -->
+        <div class="header-right" id="rightArea">
+          <span class="user-name">홍길동 님</span>
+          <button class="icon-btn" id="notifyBtn" aria-label="알림">🔔</button>
+          <button class="info-btn" onclick="location.href='mypage.html'">내정보</button>
+          <button class="auth-btn btn-ghost" onclick="alert('로그아웃 처리')">로그아웃</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+<div class="wrap">
+  <h1>도움 요청</h1>
+
+  <!-- 위저드 카드 -->
+  <div class="card" id="wizard">
+
+    <!-- ====== 단계 헤더 1 ====== -->
+    <div class="hd" data-step="1" tabindex="0">
+      <span class="stepnum">1</span>
+      <span class="label">무엇을 도와드릴까요?</span>
+      <span class="hint">클릭하여 선택하세요.</span>
+    </div>
+    <div class="bd step active" data-step="1">
+      <p class="kicker">한 가지를 선택하세요.</p>
+      <div class="grid cols-3" id="typeBtns">
+        <button type="button" class="btn" data-val="동행">동행</button>
+        <button type="button" class="btn" data-val="말벗">말벗</button>
+        <button type="button" class="btn" data-val="장보기">장보기</button>
+        <button type="button" class="btn" data-val="정리정돈">정리정돈</button>
+        <button type="button" class="btn" data-val="산책/보행">산책/보행</button>
+        <button type="button" class="btn" data-val="기타">기타</button>
+      </div>
+    </div>
+
+    <!-- ====== 단계 헤더 2 ====== -->
+    <div class="hd" data-step="2" tabindex="0">
+      <span class="stepnum">2</span>
+      <span class="label">어디에서 필요하신가요?</span>
+      <span class="hint">클릭하여 선택하세요.</span>
+    </div>
+    <div class="bd step" data-step="2">
+      <p class="kicker">지역(시/도)을 선택하세요.</p>
+      <div class="grid cols-4" id="regionBtns">
+        <button class="btn" data-val="서울">서울</button><button class="btn" data-val="경기">경기</button>
+        <button class="btn" data-val="인천">인천</button><button class="btn" data-val="강원">강원</button>
+        <button class="btn" data-val="충북">충북</button><button class="btn" data-val="충남">충남</button>
+        <button class="btn" data-val="대전">대전</button><button class="btn" data-val="전북">전북</button>
+        <button class="btn" data-val="전남">전남</button><button class="btn" data-val="광주">광주</button>
+        <button class="btn" data-val="경북">경북</button><button class="btn" data-val="경남">경남</button>
+        <button class="btn" data-val="대구">대구</button><button class="btn" data-val="부산">부산</button>
+        <button class="btn" data-val="울산">울산</button><button class="btn" data-val="제주">제주</button>
+      </div>
+    </div>
+
+    <!-- ====== 단계 헤더 3 ====== -->
+    <div class="hd" data-step="3" tabindex="0">
+      <span class="stepnum">3</span>
+      <span class="label">언제 도와드릴까요?</span>
+      <span class="hint">클릭하여 선택하세요.</span>
+    </div>
+    <div class="bd step" data-step="3">
+      <p class="kicker">날짜와 시간을 버튼으로 고르세요.</p>
+      <!-- 날짜 버튼(오늘/내일/모레) 자동 생성 -->
+      <div class="grid cols-3" id="dayBtns"></div>
+      <div style="height:8px"></div>
+      <div class="grid cols-4" id="timeBtns">
+        <button class="btn" data-val="오전 9시">오전 9시</button>
+        <button class="btn" data-val="오전 10시">오전 10시</button>
+        <button class="btn" data-val="오전 11시">오전 11시</button>
+        <button class="btn" data-val="오후 1시">오후 1시</button>
+        <button class="btn" data-val="오후 2시">오후 2시</button>
+        <button class="btn" data-val="오후 3시">오후 3시</button>
+        <button class="btn" data-val="오후 4시">오후 4시</button>
+        <button class="btn" data-val="오후 5시">오후 5시</button>
+      </div>
+    </div>
+
+    <!-- ====== 단계 헤더 4 ====== -->
+    <div class="hd" data-step="4" tabindex="0">
+      <span class="stepnum">4</span>
+      <span class="label">긴급도</span>
+      <span class="hint">클릭하여 선택하세요.</span>
+    </div>
+    <div class="bd step" data-step="4">
+      <div class="grid cols-3" id="urgBtns">
+        <button class="btn" data-val="일반">일반</button>
+        <button class="btn" data-val="긴급">긴급</button>
+      </div>
+    </div>
+
+    <!-- ====== 단계 헤더 5 ====== -->
+    <div class="hd" data-step="5" tabindex="0">
+      <span class="stepnum">5</span>
+      <span class="label">확인 / 제목(선택)</span>
+      <span class="hint">클릭하여 선택하세요.</span>
+    </div>
+    <div class="bd step" data-step="5">
+      <p class="kicker">자동으로 제목이 만들어집니다. 한 단어 정도 추가할 수 있어요(선택).</p>
+      <div class="field">
+        <input type="text" id="title" placeholder="자동 생성된 제목" />
+        <button class="btn" id="regen" type="button">제목 다시 만들기</button>
+      </div>
+      <p class="tiny">연락처/개인정보는 프로필을 사용합니다. 글 등록 후 채팅으로 연결됩니다.</p>
+    </div>
+  </div>
+
+  <!-- 요약 카드 -->
+  <div class="card" style="margin-top:14px">
+    <div class="hd" tabindex="-1" style="cursor:default">
+      <span class="stepnum">✓</span>
+      <span class="label">요약</span>
+    </div>
+    <div class="bd">
+      <div class="sum" id="summary">
+        <span class="chip">유형: -</span>
+        <span class="chip">지역: -</span>
+        <span class="chip">날짜: -</span>
+        <span class="chip">시간: -</span>
+        <span class="chip">긴급도: 일반</span>
+        <span class="chip">권장 포인트: 100 P</span>
+      </div>
+      <div class="tiny" style="margin-top:8px">기준 100P/시간 · 긴급 시 +30%</div>
+    </div>
+  </div>
+</div>
+
+<!-- 하단 고정 바 -->
+<div class="dock">
+  <div class="bar">
+    <div class="tiny">단계 진행: <b id="prog">1 / 5</b></div>
+    <div>
+      <button class="cta secondary" id="prev">이전</button>
+      <button class="cta primary" id="next">다음</button>
+      <button class="cta primary hide" id="submit">등록하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== 기본 유틸 =====
+  const $ = (s,p=document)=>p.querySelector(s);
+  const $$ = (s,p=document)=>[...p.querySelectorAll(s)];
+
+  // ===== 상태/요소 =====
+  const state = { type:'', region:'', day:'', time:'', urgency:'일반' };
+  const steps = $$('.step');
+  const prog  = $('#prog');
+  const nextBtn = $('#next');
+  const prevBtn = $('#prev');
+  const submitBtn = $('#submit');
+
+  let cur = 1;
+  const MAX_STEP = 5;
+
+  // ===== 단계 이동 =====
+  function go(step){
+    cur = Math.min(MAX_STEP, Math.max(1, step));
+    steps.forEach(s => s.classList.remove('active'));
+    $(`.step[data-step="${cur}"]`)?.classList.add('active');
+
+    prog && (prog.textContent = `${cur} / ${MAX_STEP}`);
+    if (prevBtn) prevBtn.disabled = (cur === 1);
+    if (nextBtn) nextBtn.classList.toggle('hide', cur === MAX_STEP);
+    if (submitBtn) submitBtn.classList.toggle('hide', cur !== MAX_STEP);
+
+    window.scrollTo({top:0, behavior:'smooth'});
+    updateTitle();
+  }
+  function move(delta){ go(cur + delta); }
+
+  prevBtn?.addEventListener('click', ()=>move(-1));
+  nextBtn?.addEventListener('click', ()=>move(1));
+
+  // ===== 헤더 클릭으로 단계 점프 =====
+  $$('.hd[data-step]').forEach(hd=>{
+    hd.addEventListener('click', ()=>{
+      const n = Number(hd.dataset.step||'1');
+      go(n);
+    });
+    hd.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter' || e.key===' '){
+        e.preventDefault();
+        const n = Number(hd.dataset.step||'1');
+        go(n);
+      }
+    });
+  });
+
+  // ===== 버튼 그룹(토글 + 자동다음) =====
+  function wireGroup(containerId, key, autoNext=true){
+    const box = document.getElementById(containerId);
+    if(!box) return;
+
+    box.addEventListener('click', e=>{
+      const b = e.target.closest('.btn'); if(!b) return;
+      const val = b.dataset.val;
+
+      if(state[key] === val){
+        // 같은 버튼 재클릭 → 해제
+        b.classList.remove('sel');
+        state[key] = '';
+      }else{
+        // 새 선택
+        $$('.btn', box).forEach(x=>x.classList.remove('sel'));
+        b.classList.add('sel');
+        state[key] = val;
+        // 시간 단계가 아니고 autoNext=true일 때 다음 단계로
+        if(autoNext && containerId !== 'timeBtns') move(1);
+      }
+      syncSummary();
+    });
+  }
+
+  wireGroup('typeBtns',   'type');
+  wireGroup('regionBtns', 'region');
+  wireGroup('timeBtns',   'time',  false); // 시간: 같은 단계에서 머무름
+  wireGroup('urgBtns',    'urgency');
+
+  // ===== 날짜 버튼(오늘/내일/모레) 생성 + 연결 =====
+  const dayBtns = $('#dayBtns');
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+  (function buildDays(){
+    if(!dayBtns) return;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const labels = ['오늘','내일','모레'];
+
+    for(let i=0;i<3;i++){
+      const d = new Date(today); d.setDate(today.getDate()+i);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn';
+      btn.dataset.val = fmt(d);
+      btn.innerHTML = `${labels[i]}<br><span class="tiny">${fmt(d)}</span>`;
+      dayBtns.appendChild(btn);
+    }
+    wireGroup('dayBtns','day'); // 날짜는 선택되면 다음 단계로 자동 이동
+  })();
+
+  // ===== 포인트/요약/제목 =====
+  function recommendedPoints(){
+    const base = 100, hours = 1, k = state.urgency==='긴급' ? 1.3 : 1;
+    return Math.round(base * hours * k);
+  }
+
+  const summary = $('#summary');
+  const titleEl = $('#title');
+  const regen = $('#regen');
+
+  function dayLabel(){
+    if(!state.day) return '';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const d = new Date(state.day);
+    const diff = Math.round((d - today)/86400000);
+    return ['오늘','내일','모레'][diff] ?? state.day;
+  }
+
+  function updateTitle(){
+    if(!titleEl) return;
+    const base = [state.region, state.type].filter(Boolean).join(' ');
+    const dl = dayLabel();
+    const tl = state.time ? ` ${state.time}` : '';
+    const text = `${base} ${dl}${tl} 도움 부탁드립니다`.trim();
+    if(!titleEl.dataset.touched) titleEl.value = text;
+  }
+
+  function syncSummary(){
+    if(!summary) return;
+    summary.innerHTML = `
+      <span class="chip">유형: ${state.type||'-'}</span>
+      <span class="chip">지역: ${state.region||'-'}</span>
+      <span class="chip">날짜: ${state.day||'-'}</span>
+      <span class="chip">시간: ${state.time||'-'}</span>
+      <span class="chip">긴급도: ${state.urgency||'일반'}</span>
+      <span class="chip">권장 포인트: ${recommendedPoints()} P</span>
+    `;
+    updateTitle();
+  }
+
+  titleEl?.addEventListener('input', ()=> titleEl.dataset.touched = '1');
+  regen?.addEventListener('click', ()=>{ titleEl.dataset.touched=''; updateTitle(); });
+
+  // ===== 제출(데모) =====
+  submitBtn?.addEventListener('click', ()=>{
+    const missing = [];
+    if(!state.type)  missing.push('유형');
+    if(!state.region)missing.push('지역');
+    if(!state.day)   missing.push('날짜');
+    if(!state.time)  missing.push('시간');
+
+    if(missing.length){
+      alert(`다음 항목을 선택해 주세요: ${missing.join(', ')}`);
+      const map = {유형:1, 지역:2, 날짜:3, 시간:3};
+      go(map[missing[0]] || 1); // 첫 누락 항목의 단계로 이동
+      return;
+    }
+
+    const payload = { ...state, title: (titleEl?.value||'').trim(), points: recommendedPoints() };
+    console.log('[제출]', payload);
+    alert('등록이 완료되었습니다. (데모)\n콘솔에서 payload를 확인할 수 있어요.');
+    location.reload();
+  });
+
+  // 초기 표시
+  go(1);
+  syncSummary();
+</script>
+
+  <!-- 푸터 마운트 -->
+  <div id="footer-root"></div>
+
+  <!-- ✅ 헤더/푸터 스크립트만 로드 (중복 로직 제거) -->
+  <script src="js/header.js"></script>
+  <script src="js/footer.js"></script>
+  <script>
+    renderFooter({
+      mount: '#footer-root',
+      siteName: '소소한 도움',
+      tagline: '따뜻한 연결, 함께 만드는 우리 동네'
+    });
+  </script>
+
+</body>
+</html>
