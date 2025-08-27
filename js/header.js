@@ -11,8 +11,8 @@
 
   /* -------- 로그인 상태 결정 (localStorage 우선) -------- */
   // 예: 로그인 성공 시 어딘가에서 
-  localStorage.setItem('loggedInUser','홍길동'); 
-  localStorage.setItem('userPoints','1250');
+  // localStorage.setItem('loggedInUser','홍길동'); 
+  // localStorage.setItem('userPoints','1250');
   const savedUser = localStorage.getItem("loggedInUser");
   let isLoggedIn  = !!savedUser && savedUser !== "null";
   let userName    = isLoggedIn ? savedUser : "";
@@ -77,6 +77,7 @@
       <a href="points.html">포인트</a>
       <a href="wirte.html">도움 요청하기</a>
       <a href="give.html">도움 주기</a>
+      <a href="chat.html">채팅</a>
       <a href="#" id="drawerLogout">로그아웃</a>
     `;
   }
