@@ -11,8 +11,8 @@
 
   /* -------- 로그인 상태 결정 (localStorage 우선) -------- */
   // 예: 로그인 성공 시 어딘가에서 
-  localStorage.setItem('loggedInUser','홍길동'); 
-  localStorage.setItem('userPoints','1250');
+  // localStorage.setItem('loggedInUser','홍길동'); 
+  // localStorage.setItem('userPoints','1250');
   const savedUser = localStorage.getItem("loggedInUser");
   let isLoggedIn  = !!savedUser && savedUser !== "null";
   let userName    = isLoggedIn ? savedUser : "";
