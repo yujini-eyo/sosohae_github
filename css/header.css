@@ -141,7 +141,7 @@ header .container{ max-width: var(--maxw); margin: 0 auto; width: 100%; }
   .logo a{ font-size:20px; }
   .info-btn{ display:none; }
 }
-@media (max-width:900px){ .header-right .auth-btn.btn-ghost, .header-right .auth-btn[href*="login"], .header-right .auth-btn[href*="signup"] { display:none !important; } }
+@media (max-width:900px){ .header-right .auth-btn.btn-ghost, .header-right .auth-btn[href*="login"], .header-right .auth-btn[href*="register"] { display:none !important; } }
 
 /* 로그인 버튼 = 내정보 버튼과 동일 색상/호버로 강제 */
 #rightArea .auth-btn#loginBtn,

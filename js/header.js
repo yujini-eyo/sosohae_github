@@ -10,7 +10,9 @@
   "use strict";
 
   /* -------- 로그인 상태 결정 (localStorage 우선) -------- */
-  // 예: 로그인 성공 시 어딘가에서 localStorage.setItem('loggedInUser','홍길동'); localStorage.setItem('userPoints','1250');
+  // 예: 로그인 성공 시 어딘가에서 
+  localStorage.setItem('loggedInUser','홍길동'); 
+  localStorage.setItem('userPoints','1250');
   const savedUser = localStorage.getItem("loggedInUser");
   let isLoggedIn  = !!savedUser && savedUser !== "null";
   let userName    = isLoggedIn ? savedUser : "";
@@ -63,6 +65,7 @@
         <a href="guide.html">이용방법</a>
         <a href="notice.html">공지</a>
         <a href="login.html" id="drawerLogin">로그인</a>
+        <a href="register.html" id="drawerLogin">회원가입</a>
       `;
     }
     // 로그인: 서비스 소개, 이용방법, 공지, 내정보, 포인트, 도움 요청하기, 도움 주기, 로그아웃
@@ -72,7 +75,7 @@
       <a href="notice.html">공지</a>
       <a href="mypage.html">내정보</a>
       <a href="points.html">포인트</a>
-      <a href="help.html">도움 요청하기</a>
+      <a href="wirte.html">도움 요청하기</a>
       <a href="give.html">도움 주기</a>
       <a href="#" id="drawerLogout">로그아웃</a>
     `;
@@ -113,7 +116,7 @@
       drawerLogin.addEventListener("click", ()=> {
         // 필요 시 추가 로직 가능
         // 예: 로그인 페이지 이동
-        // location.href = "login.html";  // 이미 href로 이동함
+        location.href = "login.html";  // 이미 href로 이동함
       });
     }
     if (drawerLogout){
@@ -163,14 +166,14 @@
       rightArea.innerHTML = !isMobile ? `
         ${bellBtnSVG}
         <button class="auth-btn" id="loginBtn">로그인</button>
-        <button class="auth-btn" id="signupBtn">회원가입</button>
+        <button class="auth-btn" id="registerBtn">회원가입</button>
       ` : `
         ${bellBtnSVG}
       `;
       const loginBtn  = document.getElementById("loginBtn");   // (버그 수정) 문자열이 아니라 요소 선택
-      const signupBtn = document.getElementById("signupBtn");
+      const registerBtn = document.getElementById("registerBtn");
       if (loginBtn)  loginBtn.addEventListener("click", () => location.href = "login.html");
-      if (signupBtn) signupBtn.addEventListener("click", () => location.href = "signup.html");
+      if (registerBtn) registerBtn.addEventListener("click", () => location.href = "register.html");
     }
 
     // 알림 뱃지(데모)
