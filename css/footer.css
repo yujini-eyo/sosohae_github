@@ -50,3 +50,35 @@
   .footer-link{ font-size: 13px; }
   .footer-copy{ font-size: 13px; }
 }
+/* ===== Mobile 하단 탭바 ===== */
+.mobile-tabbar{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  display: none; /* JS에서 600px 이하일 때만 flex로 표시 */
+  background: #fff;
+  border-top: 1px solid var(--brand-200, #FADFCB);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tabbar-item{
+  flex: 1 1 0;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex-direction: column;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text, #59463E);
+  padding: 8px 0;
+}
+
+.tabbar-item.is-active{ color: var(--primary, #F6A96D); }
+
+/* 탭바에 가리지 않도록 바디 하단 여백 */
+body.has-tabbar{
+  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+}

@@ -77,6 +77,7 @@
       <a href="points.html">포인트</a>
       <a href="wirte.html">도움 요청하기</a>
       <a href="give.html">도움 주기</a>
+      <a href="chat.html">채팅</a>
       <a href="#" id="drawerLogout">로그아웃</a>
     `;
   }
