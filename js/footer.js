@@ -13,7 +13,7 @@
         return;
       }
 
-      const siteName = opts.siteName || "소소한 도움";
+      const siteName = opts.siteName || "EuM:";
       const tagline = opts.tagline || "";
       const links = Array.isArray(opts.links) ? opts.links : [];
       const year = opts.year || new Date().getFullYear();
