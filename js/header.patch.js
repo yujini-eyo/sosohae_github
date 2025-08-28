@@ -88,7 +88,7 @@
   function syncTabbarActive() {
     const bar = document.querySelector('.mobile-tabbar');
     if (!bar) return;
-    const path = location.pathname.split('/').pop() || 'index.html';
+    const path = location.pathname.split('/').pop() || 'main.html';
     bar.querySelectorAll('a.tabbar-item').forEach(a => {
       const href = a.getAttribute('href') || '';
       const isHash = href.startsWith('#') && (location.hash === href);

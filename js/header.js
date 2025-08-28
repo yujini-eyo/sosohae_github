@@ -42,13 +42,13 @@
 
   /* -------- 현재 페이지 자동 강조 (함수화) -------- */
   function setActiveNav(scope=document){
-    const path = location.pathname.split('/').pop() || 'index.html';
+    const path = location.pathname.split('/').pop() || 'main.html';
     const links = scope.querySelectorAll('.topnav a, .drawer nav a');
     links.forEach(a=>{
       a.classList.remove('active');
       a.removeAttribute('aria-current');
       const href = a.getAttribute('href') || '';
-      const isHome = (path === 'index.html') && (href === '/' || href === 'index.html');
+      const isHome = (path === 'main.html') && (href === '/' || href === 'main.html');
       if (isHome || (href && path === href)) {
         a.classList.add('active');
         a.setAttribute('aria-current','page');
