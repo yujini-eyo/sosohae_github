@@ -1,0 +1,9 @@
+package com.eum.help.vo;
+
+public enum Region {
+    SEOUL, GYEONGGI, INCHEON, GANGWON,
+    CHUNGBUK, CHUNGNAM, DAEJEON,
+    JEONBUK, JEONNAM, GWANGJU,
+    GYEONGBUK, GYEONGNAM, DAEGU, BUSAN, ULSAN,
+    JEJU
+}
