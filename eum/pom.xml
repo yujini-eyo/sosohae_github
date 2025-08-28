@@ -17,6 +17,13 @@
 		<mybatis.spring.version>2.1.1</mybatis.spring.version>
 	</properties>
 	<dependencies>
+		<!-- 타입핸들러 의존성 -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-typehandlers-jsr310</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+
 		<!-- Spring MVC -->
 		<dependency>
 			<groupId>org.springframework</groupId>

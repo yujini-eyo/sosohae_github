@@ -5,6 +5,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import com.eum.help.vo.HelpType;
+import com.eum.help.vo.Region;
+
 public class HelpRequestVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
