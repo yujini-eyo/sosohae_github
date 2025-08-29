@@ -86,6 +86,27 @@
 			<version>1.5.6</version>
 		</dependency>
 
+		<!-- 트랜잭션 (@Transactional, DaoSupport 등) -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<!-- JDBC 지원 (DataSourceTransactionManager 등) -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<!-- AOP 프록시 (트랜잭션 어노테이션 동작에 필요) -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
 		<!-- (선택) JSON 필요 시 -->
 		<!-- <dependency> <groupId>com.fasterxml.jackson.core</groupId> <artifactId>jackson-databind</artifactId> 
 			<version>2.17.2</version> </dependency> -->
