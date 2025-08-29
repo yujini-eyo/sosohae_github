@@ -1,6 +1,11 @@
 eclipse.preferences.version=1
-encoding//src/main/java=UTF-8
-encoding//src/main/resources=UTF-8
-encoding//src/test/java=UTF-8
+encoding//src/main/java/com/myspring/eum/help/dao/HelpRequestDAO.java=UTF-8
+encoding//src/main/java/com/myspring/eum/help/dao/HelpRequestDAOImpl.java=UTF-8
+encoding//src/main/java/com/myspring/eum/help/service/HelpRequestService.java=UTF-8
+encoding//src/main/java/com/myspring/eum/help/service/HelpRequestServiceImpl.java=UTF-8
+encoding//src/main/java/com/myspring/eum/help/vo/HelpRequestVO.java=UTF-8
+encoding//src/main/java/com/myspring/eum/help/vo/HelpType.java=UTF-8
+encoding//src/main/java/com/myspring/eum/help/vo/Urgency.java=UTF-8
+encoding//src/main/java/com/myspring/eum/main/controller/MainController.java=UTF-8
+encoding//src/main/java/com/myspring/eum/main/vo/MainVO.java=UTF-8
 encoding//src/test/resources=UTF-8
-encoding/<project>=UTF-8

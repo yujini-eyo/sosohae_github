@@ -4,7 +4,8 @@
 <mapper namespace="com.eum.help.dao.HelpRequestDAO">
 
   <!-- VO 매핑 -->
-  <resultMap id="HelpRequestMap" type="com.eum.help.vo.HelpRequestVO">
+  <resultMap id="HelpRequestMap" type="com.myspring.eum.help.vo.HelpRequestVO">
+  <!-- 
     <id     column="id"            property="id"/>
     <result column="requester_id"  property="requesterId"/>
     <result column="type"          property="type"          javaType="com.eum.help.vo.HelpType"/>
@@ -18,6 +19,7 @@
     <result column="status"        property="status"        javaType="com.eum.help.vo.RequestStatus"/>
     <result column="created_at"    property="createdAt"     javaType="java.time.LocalDateTime"/>
     <result column="updated_at"    property="updatedAt"     javaType="java.time.LocalDateTime"/>
+    --> 
   </resultMap>
 
   <!-- 공통 컬럼 목록 -->
@@ -44,6 +46,7 @@
   </select>
 
   <!-- 등록 (PK 자동 채움) -->
+  <!-- 
   <insert id="insert"
           parameterType="com.eum.help.vo.HelpRequestVO"
           useGeneratedKeys="true" keyProperty="id" keyColumn="id">
@@ -55,7 +58,7 @@
        #{scheduledAt}, #{status},
        #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP})
   </insert>
-
+ -->
   <!-- 상태 변경 -->
   <update id="updateStatus">
     UPDATE help_request
