@@ -7,10 +7,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+  <meta charset="UTF-8">
+  <title>메인 페이지</title>
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
 </head>
 <body>
-헤더 ~~~~
+   <h1>메인 페이지입니다!!</h1>
+   ggggggggggggggggg
 </body>
 </html>

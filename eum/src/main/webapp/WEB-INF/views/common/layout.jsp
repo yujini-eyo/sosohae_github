@@ -19,7 +19,7 @@
   <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet" />
 
   <!-- 헤더 전용 CSS (원본 파일: 경로만 연결) -->
-  <link rel="stylesheet" href="<c:url value='/assets/css/header.css'/>" />
+  <link rel="stylesheet" href="<c:url value='/resources/css/header.css'/>" />
 
   <!-- (선택) 디자인 토큰 Fallback : 프로젝트 전역에서 이미 선언돼 있으면 삭제 가능 -->
   <style>
@@ -58,7 +58,7 @@
 
   <!-- JS: .js 파일 생성이 어려운 환경 대응 → JSP로 스크립트 서빙 -->
   <!-- 순서 유지: header.script.jsp → header.patch.script.jsp -->
-  <script defer src="<c:url value='/assets/js/header.script.jsp'/>"></script>
-  <script defer src="<c:url value='/assets/js/header.patch.script.jsp'/>"></script>
+  <script defer src="<c:url value='/resources/js/header.script.jsp'/>"></script>
+  <script defer src="<c:url value='/resources/js/header.patch.script.jsp'/>"></script>
 </body>
 </html>
