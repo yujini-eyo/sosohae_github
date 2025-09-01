@@ -22,7 +22,7 @@
 	
 	
 	<!-- Application Loggers -->
-	<logger name="com.myspring.eum">
+	<logger name="com.myspring.pro27">
 		<level value="info" />
 	</logger>
 	
