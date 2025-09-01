@@ -54,7 +54,7 @@
   </main>
 
   <%-- 공통 푸터가 있다면 Tiles로 주입(없으면 무시) --%>
-  <%-- <tiles:insertAttribute name="footer" ignore="true" /> --%>
+  <tiles:insertAttribute name="footer" ignore="true" />
 
   <!-- JS: .js 파일 생성이 어려운 환경 대응 → JSP로 스크립트 서빙 -->
   <!-- 순서 유지: header.script.jsp → header.patch.script.jsp -->
