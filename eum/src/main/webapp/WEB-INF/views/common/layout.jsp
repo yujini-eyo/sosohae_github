@@ -15,11 +15,12 @@
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- 전역 폰트(선택) -->
+  <!-- 전역 폰트 -->
   <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet" />
 
-  <!-- 헤더 전용 CSS (원본 파일: 경로만 연결) -->
+  <!-- 공통 CSS (헤더/푸터) -->
   <link rel="stylesheet" href="<c:url value='/resources/css/header.css'/>" />
+  <link rel="stylesheet" href="<c:url value='/resources/css/footer.css'/>" />
 
   <!-- (선택) 디자인 토큰 Fallback : 프로젝트 전역에서 이미 선언돼 있으면 삭제 가능 -->
   <style>
@@ -38,27 +39,37 @@
     main{ max-width: var(--maxw); margin: 0 auto; padding: 24px; box-sizing: border-box; }
   </style>
 
-  <!-- (선택) 페이지별 추가 head 리소스가 있으면 Tiles로 주입 -->
+  <!-- (선택) 페이지별 추가 head 리소스 -->
   <tiles:insertAttribute name="head" ignore="true" />
 </head>
 <body>
   <%-- 공통 헤더 --%>
-  <%@ include file="header.jsp" %>
+  <%-- 위치가 다를 수 있으니 안전하게 절대경로 include 권장 --%>
+  <jsp:include page="/WEB-INF/views/common/header.jsp" />
 
-  <%-- 페이지 본문 영역 (Tiles body 또는 수동 include) --%>
+  <%-- 페이지 본문 (Tiles body 또는 수동 include) --%>
   <main id="content" role="main">
     <tiles:insertAttribute name="body" ignore="true" />
-    <%-- 예: 수동으로 사용할 경우
+    <%-- 예:
          <jsp:include page="${view}" />
     --%>
   </main>
 
-  <%-- 공통 푸터가 있다면 Tiles로 주입(없으면 무시) --%>
+  <%-- 공통 푸터 (Tiles 정의에서 footer 경로를 지정해두었다면 자동 주입) --%>
   <tiles:insertAttribute name="footer" ignore="true" />
 
-  <!-- JS: .js 파일 생성이 어려운 환경 대응 → JSP로 스크립트 서빙 -->
-  <!-- 순서 유지: header.script.jsp → header.patch.script.jsp -->
-  <script defer src="<c:url value='/resources/js/header.script.jsp'/>"></script>
-  <script defer src="<c:url value='/resources/js/header.patch.script.jsp'/>"></script>
+  <!-- ===== JS: JSP 스크립트는 src로 호출하면 실행되지 않을 수 있으니 '인라인 include'로 실행 ===== -->
+  <!-- 헤더 스크립트 -->
+  <script>
+    <jsp:include page="/resources/js/header.script.jsp"/>
+  </script>
+  <!-- (선택) 헤더 패치 스크립트 -->
+  <script>
+    <jsp:include page="/resources/js/header.patch.script.jsp"/>
+  </script>
+  <!-- 푸터 스크립트 (모바일 탭바, 하단 패딩 보정 등) -->
+  <script>
+    <jsp:include page="/resources/js/footer.script.jsp"/>
+  </script>
 </body>
 </html>

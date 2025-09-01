@@ -1,25 +1,25 @@
-/* ===== Header / Nav / User / Drawer Àü¿ë CSS ===== */
-/* ÀÌ ÆÄÀÏÀº :root º¯¼ö(»ö»ó µî)°¡ ÀÌ¹Ì ¼±¾ğµÇ¾î ÀÖ´Ù´Â ÀüÁ¦ÇÏ¿¡ µ¿ÀÛÇÕ´Ï´Ù. */
+/* ===== Header / Nav / User / Drawer ===== */
+/* ì „ì—­ :root í† í°(brand, brand-200, primary ë“±)ì€ ì´ë¯¸ ì„ ì–¸ë˜ì–´ ìˆë‹¤ê³  ê°€ì •í•©ë‹ˆë‹¤. */
 
-/* °íÁ¤ Çì´õ */
-body > header{
+/* ìƒë‹¨ í—¤ë” */
+.site-header{
   position: fixed; top:0; left:0; right:0; z-index:1000;
   background: linear-gradient(180deg, var(--brand) 0%, #fff7e9 120%);
   border-bottom:1px solid var(--brand-200);
-  height: var(--header-h);
+  /* ê³ ì • ë†’ì´ â†’ ìë™ ë†’ì´ë¡œ ë³€ê²½ (ë‘ ì¤„ì¼ ë•Œ ì˜ë¦¬ì§€ ì•Šê²Œ) */
+  min-height: var(--header-h);
+  height: auto;
   display:flex; align-items:center;
   box-shadow: var(--shadow-soft);
   padding: 0 30px;
-
-  /* ³ëÄ¡/¾ÈÀü¿µ¿ª */
   padding-left: max(30px, env(safe-area-inset-left));
   padding-right: max(30px, env(safe-area-inset-right));
 }
 
-header .container{ max-width: var(--maxw); margin: 0 auto; width: 100%; }
+.site-header .container{ max-width: var(--maxw); margin: 0 auto; width: 100%; }
 .header-container{ display:flex; align-items:center; justify-content:space-between; gap: 20px; }
 
-/* ÁÂ/Áß/¿ì ·¹ÀÌ¾Æ¿ô */
+/* ì¢Œ/ì¤‘/ìš° ë ˆì´ì•„ì›ƒ */
 .header-left, .header-right{ display:flex; align-items:center; gap:20px; min-width: 260px; }
 .logo{ flex: 1; text-align: center; }
 .logo a{
@@ -28,10 +28,13 @@ header .container{ max-width: var(--maxw); margin: 0 auto; width: 100%; }
   font-weight: 900;
   letter-spacing: 1px;
   white-space: nowrap;
+  color: var(--text);
+  text-decoration: none;
 }
 
-/* ===== »ó´Ü ³×ºñ°ÔÀÌ¼Ç ===== */
-.topnav{
+/* ===== ìƒë‹¨ ë„¤ë¹„ê²Œì´ì…˜ (ì¢Œì¸¡ì˜ì—­) ===== */
+/* HTMLì´ #leftAreaë¥¼ ì“°ë¯€ë¡œ .topnavì™€ ë™ë“± ì·¨ê¸‰ */
+.topnav, #leftArea{
   display:flex; align-items:center; gap:14px;
   overflow-x:auto; max-width:100%;
   -webkit-overflow-scrolling: touch;
@@ -39,9 +42,9 @@ header .container{ max-width: var(--maxw); margin: 0 auto; width: 100%; }
   overscroll-behavior-inline: contain;
   scrollbar-width: none; -ms-overflow-style:none;
 }
-.topnav::-webkit-scrollbar{ display:none; }
+.topnav::-webkit-scrollbar, #leftArea::-webkit-scrollbar{ display:none; }
 
-.topnav a{
+.topnav a, #leftArea a{
   padding:8px 10px;
   border-radius:10px;
   font-weight:700; font-size:14px;
@@ -49,11 +52,12 @@ header .container{ max-width: var(--maxw); margin: 0 auto; width: 100%; }
   white-space: nowrap;
   transition: background-color .2s ease;
   max-width:40vw; overflow:hidden; text-overflow:ellipsis;
+  text-decoration: none;
 }
-.topnav a:hover{ background:#ffe7c9; }
-.topnav a.active{ background:#ffdcae; }
+.topnav a:hover, #leftArea a:hover{ background:#ffe7c9; }
+.topnav a.active, #leftArea a.active{ background:#ffdcae; }
 
-/* ===== ÇÜ¹ö°Å ¹öÆ° ===== */
+/* ===== í–„ë²„ê±° ë²„íŠ¼ ===== */
 .hamburger{
   display:none; background:#fff; border:1px solid var(--brand-200);
   width:36px; height:36px; border-radius:10px; cursor:pointer;
@@ -63,7 +67,7 @@ header .container{ max-width: var(--maxw); margin: 0 auto; width: 100%; }
 .hamburger:hover{ background:#fff3e3; }
 .hamburger:active{ transform: translateY(1px); }
 
-/* ===== »ç¿ëÀÚ/¾Ë¸²/¹öÆ° ===== */
+/* ===== ì‚¬ìš©ì / ì•„ì´ì½˜ / ë²„íŠ¼ ===== */
 .user-name{
   font-weight:900; font-size:14px; margin-right:4px;
   background:none; border:none; padding:0; white-space:nowrap;
@@ -94,21 +98,28 @@ header .container{ max-width: var(--maxw); margin: 0 auto; width: 100%; }
   height:34px; padding:0 12px; border-radius:999px; font-size:13px; font-weight:700;
   transition: transform .06s ease, background-color .2s ease; white-space:nowrap;
   box-shadow: 0 2px 0 rgba(0,0,0,0.04);
+  text-decoration: none;
 }
 .auth-btn:hover, .info-btn:hover{ background: var(--primary-600); }
 .btn-ghost{ background:#fff; color: var(--text); border:1px solid var(--brand-200); }
 .btn-ghost:hover{ background:#fff3e3; }
 
-/* ===== ¸ğ¹ÙÀÏ µå·Î¾î ===== */
-.drawer-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.25); display:none; z-index:1100; }
-.drawer{ position:fixed; top:0; left:0; height:100dvh; width:78%; max-width:300px;
-  background:#fff; border-right:1px solid var(--brand-200); box-shadow: var(--shadow);
+/* ===== ë“œë¡œì–´(ëª¨ë°”ì¼ ë©”ë‰´) ===== */
+/* ì´ˆê¸° ìˆ¨ê¹€ì€ [hidden]ìœ¼ë¡œ ì œì–´ â†’ JSê°€ hidden ì†ì„±ë§Œ í† ê¸€í•´ë„ ë™ì‘ */
+.drawer-backdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,.25); z-index:1100;
+}
+.drawer-backdrop[hidden]{ display:none !important; }
+
+.drawer{
+  position:fixed; top:0; left:0; height:100dvh; width:78%; max-width:300px;
+  background:#fff; border-right:1px solid var(--brand-200);
+  box-shadow: var(--shadow-soft);
   transform:translateX(-100%); transition:transform .25s ease; z-index:1110;
   display:flex; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch;
   padding-bottom: env(safe-area-inset-bottom);
 }
 .drawer.open{ transform:translateX(0); }
-.drawer-backdrop.show{ display:block; }
 
 .drawer header{
   position: sticky; top:0; left:0; right:0;
@@ -121,17 +132,22 @@ header .container{ max-width: var(--maxw); margin: 0 auto; width: 100%; }
 .drawer nav a{
   display:block; padding:12px 14px; border-radius:12px; font-weight:700;
   color:var(--text); background:#fff; border:1px solid var(--brand-200);
+  text-decoration: none;
 }
 .drawer nav a:hover{ background:#fff6ea; }
 
-/* ===== ¹İÀÀÇü ===== */
+/* ìŠ¤í¬ë¡¤ ê³ ì • (ë“œë¡œì–´ ì—´ë¦´ ë•Œ JSê°€ htmlì— .no-scroll ì¶”ê°€) */
+html.no-scroll, body.no-scroll{ overflow: hidden; }
+
+/* ===== ë°˜ì‘í˜• ===== */
 @media (max-width:1100px){
   .header-container{ gap: 10px; }
   .header-left, .header-right{ gap: 8px; }
   .logo a{ font-size: clamp(20px, 2vw, 28px); }
 }
 @media (max-width:900px){
-  .topnav{ display:none; }
+  /* ëª¨ë°”ì¼ì—ì„œëŠ” ìƒë‹¨ í…ìŠ¤íŠ¸ ë©”ë‰´ ìˆ¨ê¸°ê³  ë“œë¡œì–´ë§Œ ì‚¬ìš© */
+  .topnav, #leftArea{ display:none; }
   .hamburger{ display:flex; }
   .header-left, .header-right{ min-width:auto; }
 }
@@ -140,13 +156,8 @@ header .container{ max-width: var(--maxw); margin: 0 auto; width: 100%; }
   .logo a{ font-size:20px; }
   .info-btn{ display:none; }
 }
-@media (max-width:900px){
-  .header-right .auth-btn.btn-ghost,
-  .header-right .auth-btn[href*="login"],
-  .header-right .auth-btn[href*="register"] { display:none !important; }
-}
 
-/* ·Î±×ÀÎ ¹öÆ° »ö»ó ÅëÀÏ */
+/* ë¡œê·¸ì¸ ë²„íŠ¼ ê°•ì¡° */
 #rightArea .auth-btn#loginBtn,
 #rightArea .auth-btn[href*="login"]{
   background: var(--primary) !important;
