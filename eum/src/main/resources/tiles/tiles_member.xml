@@ -3,13 +3,6 @@
 "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
 "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
 <tiles-definitions>
-   <definition name="baseLayout"  template="/WEB-INF/views/common/layout.jsp">
-      <put-attribute name="title" value="" />
-      <put-attribute name="header" value="/WEB-INF/views/header.jsp" />
-      <!-- <put-attribute name="side" value="/WEB-INF/views/common/side.jsp" /> -->
-      <put-attribute name="body" value="" />
-      <!-- <put-attribute name="footer" value="/WEB-INF/views/common/footer.jsp" /> -->
-   </definition>
 
    <definition name="main" extends="baseLayout">
       <put-attribute name="title" value="메인페이지" />
@@ -20,21 +13,6 @@
    <definition name="/member/listMembers" extends="baseLayout">
       <put-attribute name="title" value="회원목록창" />
       <put-attribute name="body" value="/WEB-INF/views/member/listMembers.jsp" />
-   </definition>
-   
-	<definition name="/youjin" extends="baseLayout">
-      <put-attribute name="title" value="유진이 페이지" />
-      <put-attribute name="body" value="/WEB-INF/views/youjin.jsp" />
-   </definition>
-   
-   	<definition name="/yungyo" extends="baseLayout">
-      <put-attribute name="title" value="김윤교 페이지" />
-      <put-attribute name="body" value="/WEB-INF/views/yungyo.jsp" />
-	</definition>
-	
-	<definition name="/youjinida" extends="baseLayout">
-      <put-attribute name="title" value="유진이다 페이지" />
-      <put-attribute name="body" value="/WEB-INF/views/youjinida.jsp" />
    </definition>
     
    <definition name="/member/loginForm" extends="baseLayout">

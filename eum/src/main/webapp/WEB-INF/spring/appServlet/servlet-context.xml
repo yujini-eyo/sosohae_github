@@ -1,61 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans:beans
-	xmlns="http://www.springframework.org/schema/mvc"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:beans="http://www.springframework.org/schema/beans"
-		xmlns:mvc="http://www.springframework.org/schema/mvc"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    xmlns="http://www.springframework.org/schema/mvc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/mvc     http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<!-- DispatcherServlet Context: defines this servlet's request-processing 
-		infrastructure -->
+    <!-- Enables the Spring MVC @Controller programming model -->
+    <annotation-driven />
 
-	<!-- Enables the Spring MVC @Controller programming model -->
-	<annotation-driven />
+    <!-- Let the default servlet serve anything not handled by Spring -->
+    <default-servlet-handler />
 
-	<!-- Handles HTTP GET requests for /resources/** by efficiently serving 
-		up static resources in the ${webappRoot}/resources directory -->
-	<resources mapping="/resources/**" location="/resources/" />
+    <!-- Static resources under /resources/** (e.g. /resources/css, /resources/js, /resources/img) -->
+    <resources mapping="/resources/**" location="/resources/" />
 
-	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
-		in the /WEB-INF/views directory -->
-<!-- 	
-	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
-		<beans:property name="prefix" value="/WEB-INF/views/" /> 
-		<beans:property name="suffix" value=".jsp" /> 
-	</beans:bean>
- -->
+    <!-- ========== View Resolvers ========== -->
 
+    <!-- Tiles 2 config: read definitions from classpath:tiles/*.xml -->
     <beans:bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
-		<beans:property name="definitions">
-			<beans:list>
-				<beans:value>classpath:tiles/*.xml</beans:value>
-			</beans:list>
-		</beans:property>
-		<beans:property name="preparerFactoryClass"
-			          value="org.springframework.web.servlet.view.tiles2.SpringBeanPreparerFactory" />
-	</beans:bean>
-	<beans:bean id="viewResolver"
-		class="org.springframework.web.servlet.view.UrlBasedViewResolver">
-		<beans:property name="viewClass" value="org.springframework.web.servlet.view.tiles2.TilesView" />
-	</beans:bean>
-	
-    <context:component-scan	base-package="com.myspring.eum" />
- <!--    
-   <mvc:interceptors>
-    	<mvc:interceptor>
-	      <mvc:mapping path="/*/*.do"/>
-	   <beans:bean class="com.myspring.eum.common.interceptor.ViewNameInterceptor" />
-	</mvc:interceptor>
-</mvc:interceptors>
- -->
-	<!-- 멀티파트 리졸버 -->
-	<beans:bean id="multipartResolver" 	class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-		<beans:property name="maxUploadSize" value="52428800" />
-		<beans:property name="maxInMemorySize" value="52428800" />
-		<beans:property name="defaultEncoding" value="utf-8" />
-	</beans:bean>
-	
+        <beans:property name="definitions">
+            <beans:list>
+                <beans:value>classpath:tiles/*.xml</beans:value>
+            </beans:list>
+        </beans:property>
+        <beans:property name="preparerFactoryClass"
+                        value="org.springframework.web.servlet.view.tiles2.SpringBeanPreparerFactory" />
+    </beans:bean>
+
+    <!-- TilesView resolver (order=1) -->
+    <beans:bean id="tilesViewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+        <beans:property name="viewClass" value="org.springframework.web.servlet.view.tiles2.TilesView" />
+        <beans:property name="order" value="1" />
+        <!-- (선택) tiles로만 처리할 네이밍 패턴을 제한하고 싶다면:
+        <beans:property name="viewNames">
+            <beans:list>
+                <beans:value>*</beans:value>
+            </beans:list>
+        </beans:property>
+        -->
+    </beans:bean>
+
+    <!-- JSP fallback resolver (order=2): Tiles에 없을 때 /WEB-INF/views/*.jsp로 폴백 -->
+    <beans:bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <beans:property name="prefix" value="/WEB-INF/views/" />
+        <beans:property name="suffix" value=".jsp" />
+        <beans:property name="order" value="2" />
+    </beans:bean>
+
+    <!-- ========== Component Scan ========== -->
+    <context:component-scan base-package="com.myspring.eum" />
+
+    <!-- ========== (선택) ViewNameInterceptor 사용 시 주석 해제 ==========
+    주의: 인터셉터에서 앞 슬래시('/') 없는 뷰이름을 넣도록 구현해야 합니다. (예: 'main')
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/*Form.do"/>
+            <mvc:mapping path="/member/*Form.do"/>
+            <beans:bean class="com.myspring.eum.common.interceptor.ViewNameInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors>
+    -->
+
+    <!-- ========== Multipart ==========
+         CommonsMultipartResolver: 50MB 제한 -->
+    <beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <beans:property name="maxUploadSize" value="52428800" />
+        <beans:property name="maxInMemorySize" value="52428800" />
+        <beans:property name="defaultEncoding" value="UTF-8" />
+    </beans:bean>
+
 </beans:beans>

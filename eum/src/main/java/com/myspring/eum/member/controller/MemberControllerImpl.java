@@ -29,14 +29,6 @@ public class MemberControllerImpl   implements MemberController {
 	@Autowired
 	private MemberVO memberVO ;
 	
-	@RequestMapping(value = { "/","/main.do"}, method = RequestMethod.GET)
-	private ModelAndView main(HttpServletRequest request, HttpServletResponse response) {
-		String viewName = (String)request.getAttribute("viewName");
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName(viewName);
-		return mav;
-	}
-	
 	@Override
 	@RequestMapping(value="/member/listMembers.do" ,method = RequestMethod.GET)
 	public ModelAndView listMembers(HttpServletRequest request, HttpServletResponse response) throws Exception {
