@@ -1,66 +1,99 @@
 package com.myspring.eum.member.vo;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import org.springframework.stereotype.Component;
 
 @Component("memberVO")
 public class MemberVO {
-	private String id;
-	private String pwd;
-	private String name;
-	private String email;
-	private Date joinDate;
+    private String id;           // 아이디
+    private String password;     // 비밀번호
+    private String name;         // 이름
+    private String email;        // 이메일
+    private String address;      // 주소
+    private Integer age;         // 나이 (TINYINT UNSIGNED → Integer)
+    private Date birth;          // 생년월일
+    private String phone;        // 전화번호
+    private String code;         // 코드
+    private String notes;        // 메모
+    private Timestamp createdAt; // 생성일 (CURRENT_TIMESTAMP)
 
-	public MemberVO() {
-		
-	}
-
-	public MemberVO(String id, String pwd, String name, String email) {
-		this.id = id;
-		this.pwd = pwd;
-		this.name = name;
-		this.email = email;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getPwd() {
-		return pwd;
-	}
-
-	public void setPwd(String pwd) {
-		this.pwd = pwd;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public Date getJoinDate() {
-		return joinDate;
-	}
-
-	public void setJoinDate(Date joinDate) {
-		this.joinDate = joinDate;
-	}
-
+    // ===== Getter / Setter =====
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    
+    public Integer getAge() {
+        return age;
+    }
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+    
+    public Date getBirth() {
+        return birth;
+    }
+    public void setBirth(Date birth) {
+        this.birth = birth;
+    }
+    
+    public String getPhone() {
+        return phone;
+    }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+    
+    public String getCode() {
+        return code;
+    }
+    public void setCode(String code) {
+        this.code = code;
+    }
+    
+    public String getNotes() {
+        return notes;
+    }
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+    
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
 }
