@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" isELIgnored="false" %>
-<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
+	pageEncoding="UTF-8" isELIgnored="false"%>
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
@@ -44,32 +44,22 @@
 </head>
 <body>
   <%-- 공통 헤더 --%>
-  <%-- 위치가 다를 수 있으니 안전하게 절대경로 include 권장 --%>
   <jsp:include page="/WEB-INF/views/common/header.jsp" />
 
   <%-- 페이지 본문 (Tiles body 또는 수동 include) --%>
   <main id="content" role="main">
     <tiles:insertAttribute name="body" ignore="true" />
-    <%-- 예:
-         <jsp:include page="${view}" />
-    --%>
+    <%-- 예: <jsp:include page="${view}" /> --%>
   </main>
 
   <%-- 공통 푸터 (Tiles 정의에서 footer 경로를 지정해두었다면 자동 주입) --%>
   <tiles:insertAttribute name="footer" ignore="true" />
 
-  <!-- ===== JS: JSP 스크립트는 src로 호출하면 실행되지 않을 수 있으니 '인라인 include'로 실행 ===== -->
-  <!-- 헤더 스크립트 -->
-  <script>
-    <jsp:include page="/resources/js/header.script.jsp"/>
-  </script>
-  <!-- (선택) 헤더 패치 스크립트 -->
-  <script>
-    <jsp:include page="/resources/js/header.patch.script.jsp"/>
-  </script>
-  <!-- 푸터 스크립트 (모바일 탭바, 하단 패딩 보정 등) -->
-  <script>
-    <jsp:include page="/resources/js/footer.script.jsp"/>
-  </script>
+  <!-- JS: 외부 정적 .js 파일을 그대로 사용 -->
+  <!-- 순서 유지: header → header.patch → footer → footer.pad -->
+  <script src="${ctx}/resources/js/header.script.js"></script>
+  <script src="${ctx}/resources/js/header.patch.script.js"></script>
+  <script src="${ctx}/resources/js/footer.script.js"></script>
+  <script src="${ctx}/resources/js/footer.pad.js"></script>
 </body>
 </html>

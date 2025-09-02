@@ -48,7 +48,7 @@
     <a href="<c:url value='/about.do'/>">서비스 소개</a>
     <a href="<c:url value='/guide.do'/>">이용방법</a>
     <a href="<c:url value='/notice.do'/>">공지</a>
-    <a href="<c:url value='/give.do'/>">도움 주기</a>
+    <a href="<c:url value='/listArticle.do'/>">도움 주기</a>
     <a href="<c:url value='/write.do'/>">도움 요청하기</a>
     <a href="<c:url value='/chat.do'/>">채팅</a>
   </nav>

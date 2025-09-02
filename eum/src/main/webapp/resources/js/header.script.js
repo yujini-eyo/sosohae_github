@@ -1,148 +1,144 @@
-(function(){
+/* header.script.js — 레이아웃은 그대로, JS만 교체 */
+(function () {
   "use strict";
 
-  /* ===== 서버 값 주입 ===== */
-  var CTX         = "<c:out value='${CTX}'/>";
-  var SERVER_USER = "<c:out value='${S_USER}'/>";
+  // === CTX 추출: 현재 스크립트 src에서 '/resources/' 앞까지를 컨텍스트로 간주 ===
+  function getCtxFromScript(filename) {
+    var node = Array.from(document.scripts || []).find(function (s) {
+      return s.src && s.src.indexOf(filename) >= 0;
+    });
+    if (!node) return window.EUM_CTX || "";
+    var u = new URL(node.src, location.href);
+    var i = u.pathname.indexOf("/resources/");
+    var ctx = i >= 0 ? u.pathname.slice(0, i) : "";
+    return (window.EUM_CTX = ctx || "");
+  }
+  var CTX = getCtxFromScript("header.script.js");
 
-  /* ===== 헬퍼 ===== */
-  var $    = function(sel, root){ return (root||document).querySelector(sel); };
-  var $all = function(sel, root){ return (root||document).querySelectorAll(sel); };
+  // === 헬퍼 ===
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return (r || document).querySelectorAll(s); };
 
-  function getLoginName(){
-    if (SERVER_USER) return SERVER_USER;
+  // 로그인 이름: 세션 접근 불가 → localStorage만 사용
+  function getLoginName() {
     try { return localStorage.getItem("loggedInUser") || ""; }
-    catch(e){ return ""; }
-  }
-  function stripCtx(path){
-    // 컨텍스트 경로(CTX)를 제거해 비교를 안정화
-    if (!path) return "/";
-    return path.indexOf(CTX) === 0 ? path.slice(CTX.length) || "/" : path;
+    catch (e) { return ""; }
   }
 
-  /* ===== 헤더 우측 영역 렌더 ===== */
-  function renderRightArea(){
-    var el = $("#rightArea");
-    if (!el) return;
-
-    var name = getLoginName();
-    if (name){
-      el.innerHTML =
-        '<span class="user-name" aria-label="로그인 사용자">'+ name +'님</span>' +
-        '<button type="button" class="auth-btn btn-ghost" data-action="logout">로그아웃</button>';
-    } else {
-      el.innerHTML =
-        '<a class="auth-btn" href="'+ CTX +'/member/login.do" id="loginBtn">로그인</a>' +
-        '<a class="auth-btn btn-ghost" href="'+ CTX +'/member/signup.do">회원가입</a>';
+  // 고정 헤더 높이만큼 본문 보정
+  var lastH = 0, rafId = 0;
+  function headerHeight() {
+    var h = $(".site-header");
+    return h ? Math.ceil(h.getBoundingClientRect().height) : 0;
+  }
+  function applyBodyTopPadding(force) {
+    var h = headerHeight();
+    if (force || h !== lastH) {
+      document.body.style.paddingTop = h + "px";
+      lastH = h;
     }
   }
 
-  /* ===== 드로어 토글 ===== */
+  // 우측 사용자 버튼 렌더
+  function renderRight() {
+    var box = $("#rightArea");
+    if (!box) return;
+    var name = getLoginName();
+    if (name) {
+      box.innerHTML =
+        '<span class="user-name" aria-label="로그인 사용자">' + name + '님</span>' +
+        '<button type="button" class="auth-btn btn-ghost" data-action="logout">로그아웃</button>';
+    } else {
+      box.innerHTML =
+        '<a class="auth-btn" href="' + CTX + '/member/login.do" id="loginBtn">로그인</a>' +
+        '<a class="auth-btn btn-ghost" href="' + CTX + '/member/signup.do">회원가입</a>';
+    }
+  }
+
+  // 드로어 토글
   var isOpen = false;
-
-  function openDrawer(){
-    var drawer   = $("#drawer");
-    var backdrop = $("#drawerBackdrop");
-    var ham      = $("#hamburger");
-    if (!drawer || !backdrop || !ham) return;
-
-    drawer.classList.add("open");
-    drawer.setAttribute("aria-hidden","false");
-    backdrop.hidden = false;
+  function openDrawer() {
+    var d = $("#drawer"), b = $("#drawerBackdrop"), h = $("#hamburger");
+    if (!d || !b || !h) return;
+    d.classList.add("open");
+    d.setAttribute("aria-hidden", "false");
+    b.hidden = false;
     document.documentElement.classList.add("no-scroll");
-    ham.setAttribute("aria-expanded","true");
+    h.setAttribute("aria-expanded", "true");
     isOpen = true;
   }
-
-  function closeDrawer(){
-    var drawer   = $("#drawer");
-    var backdrop = $("#drawerBackdrop");
-    var ham      = $("#hamburger");
-    if (!drawer || !backdrop || !ham) return;
-
-    drawer.classList.remove("open");
-    drawer.setAttribute("aria-hidden","true");
-    backdrop.hidden = true;
+  function closeDrawer() {
+    var d = $("#drawer"), b = $("#drawerBackdrop"), h = $("#hamburger");
+    if (!d || !b || !h) return;
+    d.classList.remove("open");
+    d.setAttribute("aria-hidden", "true");
+    b.hidden = true;
     document.documentElement.classList.remove("no-scroll");
-    ham.setAttribute("aria-expanded","false");
+    h.setAttribute("aria-expanded", "false");
     isOpen = false;
   }
+  function toggleDrawer() { isOpen ? closeDrawer() : openDrawer(); }
 
-  function toggleDrawer(){
-    isOpen ? closeDrawer() : openDrawer();
+  // 현재 메뉴 강조 (#leftArea, .drawer nav)
+  function stripCtx(path) {
+    if (!path) return "/";
+    var c = window.EUM_CTX || "";
+    return path.indexOf(c) === 0 ? (path.slice(c.length) || "/") : path;
   }
-
-  /* ===== 현재 메뉴 강조 ===== */
-  function highlightCurrent(){
+  function highlightCurrent() {
     var cur = stripCtx(location.pathname);
-
-    $all("#leftArea a[href], .drawer nav a[href]").forEach(function(a){
-      try{
-        // a.pathname은 절대경로. 컨텍스트 제거 후 비교
+    $$("#leftArea a[href], .drawer nav a[href]").forEach(function (a) {
+      try {
         var p = stripCtx(a.pathname);
-        if (p === cur || (p !== "/" && cur.indexOf(p) === 0)){
-          a.classList.add("active");
-          var li = a.closest("li"); if (li) li.classList.add("active");
-        }
-      }catch(e){}
+        if (p === cur || (p !== "/" && cur.indexOf(p) === 0)) a.classList.add("active");
+        else a.classList.remove("active");
+      } catch (e) {}
     });
   }
 
-  /* ===== 이벤트 바인딩 ===== */
-  function bindEvents(){
-    var ham       = $("#hamburger");
-    var closeBtn  = $("#drawerClose");
-    var backdrop  = $("#drawerBackdrop");
-
-    if (ham)      ham.addEventListener("click", toggleDrawer);
+  // 이벤트 바인딩
+  function bindEvents() {
+    var ham = $("#hamburger"), closeBtn = $("#drawerClose"), backdrop = $("#drawerBackdrop");
+    if (ham) ham.addEventListener("click", toggleDrawer);
     if (closeBtn) closeBtn.addEventListener("click", closeDrawer);
     if (backdrop) backdrop.addEventListener("click", closeDrawer);
-
-    // ESC 닫기
-    document.addEventListener("keydown", function(ev){
-      if (ev.key === "Escape" && isOpen) closeDrawer();
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && isOpen) closeDrawer();
     });
-
-    // 드로어 내 링크 클릭 시 닫기
-    $all(".drawer nav a").forEach(function(a){
+    $$(".drawer nav a").forEach(function (a) {
       a.addEventListener("click", closeDrawer);
     });
 
-    // 로그아웃 처리
-    document.addEventListener("click", function(e){
+    // 로그아웃
+    document.addEventListener("click", function (e) {
       var t = e.target;
-      if (t && (t.matches("[data-action='logout']") || t.classList.contains("btn-logout"))){
+      if (t && (t.matches("[data-action='logout']") || t.classList.contains("btn-logout"))) {
         try {
           localStorage.removeItem("loggedInUser");
           localStorage.removeItem("userPoints");
-        } catch(e){}
-        window.location.href = CTX + "/member/logout.do";
+        } catch (e) {}
+        location.href = CTX + "/member/logout.do";
       }
     });
 
-    // (옵션) 우측 영역 축약 토글
-    function applyResponsive(){
-      var right = $("#rightArea");
-      if (!right) return;
-      var w = window.innerWidth || document.documentElement.clientWidth;
-      if (w <= 900) right.classList.add("is-compact");
-      else right.classList.remove("is-compact");
+    // 리사이즈 시 헤더 보정
+    window.addEventListener("resize", function () {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(function () { applyBodyTopPadding(false); });
+    });
+
+    // 폰트 로딩 후 높이 변동 대응
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { applyBodyTopPadding(true); });
     }
-    window.addEventListener("resize", applyResponsive);
-    applyResponsive();
   }
 
-  /* ===== 초기화 ===== */
-  function init(){
-    renderRightArea();
+  function init() {
+    renderRight();
     bindEvents();
     highlightCurrent();
+    applyBodyTopPadding(true);
   }
-
-  if (document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
 })();

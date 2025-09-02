@@ -7,7 +7,7 @@
   <!-- ===== 공통 레이아웃 =====
        template: 실제 레이아웃 JSP (헤더/사이드/본문/푸터 위치 잡아둔 틀) -->
   <definition name="baseLayout" template="/WEB-INF/views/common/layout.jsp">
-    <put-attribute name="title"  value="소소한 도움" />
+    <put-attribute name="title"  value="EuM:" />
     <put-attribute name="header" value="/WEB-INF/views/common/header.jsp" />
     <put-attribute name="side"   value="/WEB-INF/views/common/side.jsp" />
     <put-attribute name="body"   value="" />
@@ -22,34 +22,34 @@
 
   <!-- ===== 메인 페이지 ===== -->
   <definition name="main" extends="baseLayout">
-    <put-attribute name="title" value="메인 • 소소한 도움" />
+    <put-attribute name="title" value="메인 • EuM:" />
     <put-attribute name="body"  value="/WEB-INF/views/main.jsp" />
   </definition>
 
   <!-- ===== 회원 관련 예시 (필요한 것만 남겨 쓰세요) ===== -->
   <definition name="loginForm" extends="baseLayoutNoSide">
-    <put-attribute name="title" value="로그인 • 소소한 도움" />
+    <put-attribute name="title" value="로그인 • EuM:" />
     <put-attribute name="body"  value="/WEB-INF/views/member/loginForm.jsp" />
   </definition>
 
   <definition name="memberForm" extends="baseLayoutNoSide">
-    <put-attribute name="title" value="회원가입 • 소소한 도움" />
+    <put-attribute name="title" value="회원가입 • EuM:" />
     <put-attribute name="body"  value="/WEB-INF/views/member/memberForm.jsp" />
   </definition>
 
   <definition name="memberList" extends="baseLayout">
-    <put-attribute name="title" value="회원 목록 • 소소한 도움" />
+    <put-attribute name="title" value="회원 목록 • EuM:" />
     <put-attribute name="body"  value="/WEB-INF/views/member/listMembers.jsp" />
   </definition>
 
   <!-- ===== 오류 화면(선택) ===== -->
   <definition name="error.404" extends="baseLayoutNoSide">
-    <put-attribute name="title" value="페이지를 찾을 수 없습니다 • 소소한 도움" />
+    <put-attribute name="title" value="페이지를 찾을 수 없습니다 • EuM:" />
     <put-attribute name="body"  value="/WEB-INF/views/error/404.jsp" />
   </definition>
 
   <definition name="error.500" extends="baseLayoutNoSide">
-    <put-attribute name="title" value="서버 오류 • 소소한 도움" />
+    <put-attribute name="title" value="서버 오류 • EuM:" />
     <put-attribute name="body"  value="/WEB-INF/views/error/500.jsp" />
   </definition>
 

@@ -1,18 +1,20 @@
-(function(){
+/* header.patch.script.js — 가벼운 반응형/패치 전용 */
+(function () {
   "use strict";
 
-  // 예) 900px 이하에서 헤더 일부 숨김
-  function applyResponsive(){
-    var w = window.innerWidth || document.documentElement.clientWidth;
-    var right = document.querySelector(".header-right");
+  function $(s, r) { return (r || document).querySelector(s); }
+
+  function applyResponsive() {
+    var right = $("#rightArea");
     if (!right) return;
-    if (w <= 900) {
-      right.classList.add("is-compact");
-    } else {
-      right.classList.remove("is-compact");
-    }
+    var w = window.innerWidth || document.documentElement.clientWidth;
+    if (w <= 900) right.classList.add("is-compact");
+    else right.classList.remove("is-compact");
   }
 
+  function init() { applyResponsive(); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+
   window.addEventListener("resize", applyResponsive);
-  document.addEventListener("DOMContentLoaded", applyResponsive);
 })();
