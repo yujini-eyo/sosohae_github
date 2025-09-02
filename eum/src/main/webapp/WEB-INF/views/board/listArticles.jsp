@@ -7,7 +7,7 @@
 
 <!-- 페이지 전용 CSS/JS (당장은 바디에 둔다. 나중에 레이아웃 head 슬롯 분리해도 OK) -->
 <link rel="stylesheet" href="<c:url value='/resources/css/board.css'/>" />
-<script defer src="<c:url value='/resources/js/board.js'/>"></script>
+<script defer src="<c:url value='/resources/js/board.jsp'/>"></script>
 
 <a href="#main" class="skip-link">본문으로 건너뛰기</a>
 
