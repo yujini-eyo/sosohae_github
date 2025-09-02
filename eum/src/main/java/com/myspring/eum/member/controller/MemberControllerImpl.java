@@ -26,8 +26,6 @@ import com.myspring.eum.member.vo.MemberVO;
 public class MemberControllerImpl   implements MemberController {
 	@Autowired
 	private MemberService memberService;
-	@Autowired
-	private MemberVO memberVO ;
 	
 	@Override
 	@RequestMapping(value="/member/listMembers.do" ,method = RequestMethod.GET)
@@ -79,13 +77,15 @@ public class MemberControllerImpl   implements MemberController {
 				              RedirectAttributes rAttr,
 		                       HttpServletRequest request, HttpServletResponse response) throws Exception {
 	ModelAndView mav = new ModelAndView();
-	memberVO = memberService.login(member);
-	if(memberVO != null) {
+	
+	MemberVO loginUser = memberService.login(member);
+	if(loginUser != null) {
 	    HttpSession session = request.getSession();
-	    session.setAttribute("member", memberVO);
+	    session.setAttribute("member", loginUser);
 	    session.setAttribute("isLogOn", true);
+	    
 	    //mav.setViewName("redirect:/member/listMembers.do");
-	    String action = (String)session.getAttribute("action");
+	    String action = (String) session.getAttribute("action");
 	    session.removeAttribute("action");
 	    if(action!= null) {
 	       mav.setViewName("redirect:"+action);

@@ -7,25 +7,34 @@
 	request.setCharacterEncoding("UTF-8");
 %>
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
+<meta charset="UTF-8" />
+<title>로그인 - 소소한 도움</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- SUIT 폰트 -->
+<link
+	href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css"
+	rel="stylesheet">
+
+<!-- 공통 변수 -->
 <style>
-:root { -
-	-bg: #FFF8F2; -
-	-text: #59463E; -
-	-muted: #806A5A; -
-	-primary: #F6A96D; -
-	-primary-600: #e98c45; -
-	-brand: #FFE8C2; -
-	-brand-200: #FADFCB; -
-	-card: #FFFFFF; -
-	-card-br: #FFE1CB; -
-	-shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.06); -
-	-radius: 20px; -
-	-maxw: 1100px; -
-	-header-h: 72px; -
-	-footer-h: 90px; /* 초기값(실측으로 곧 대체) */ -
-	-focus: 0 0 0 3px rgba(246, 169, 109, .35);
+:root { 
+	--bg: #FFF8F2;
+	--text: #59463E;
+	--muted: #806A5A;
+	--primary: #F6A96D;
+	--primary-600: #e98c45;
+	--brand: #FFE8C2;
+	--brand-200: #FADFCB;
+	--card: #FFFFFF;
+	--card-br: #FFE1CB;
+	--shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.06);
+	--radius: 20px;
+	--maxw: 1100px;
+	--header-h: 72px;
+	--footer-h: 90px; /* 초기값(실측으로 곧 대체) */
+	--focus: 0 0 0 3px rgba(246, 169, 109, .35);
 }
 
 * {
@@ -41,8 +50,8 @@ html, body {
 body {
 	font-family: 'SUIT', system-ui, -apple-system, Segoe UI, Roboto,
 		sans-serif;
-	background: var(- -bg);
-	color: var(- -text);
+	background: var(--bg);
+	color: var(--text);
 	display: flex;
 	flex-direction: column;
 	overflow: hidden; /* 스크롤 제거 */
@@ -55,14 +64,14 @@ a {
 
 a:focus, button:focus {
 	outline: none;
-	box-shadow: var(- -focus);
+	box-shadow: var(--focus);
 	border-radius: 10px;
 }
 
 /* 한 화면 레이아웃 */
 main.content {
 	flex: 1;
-	height: calc(100dvh - var(- -header-h)- var(- -footer-h));
+	height: calc(100dvh -var(--header-h) -var(--footer-h));
 	display: grid;
 	place-items: center;
 	padding: 0 16px;
@@ -87,7 +96,7 @@ h1 {
 	padding: 30px 24px;
 	border-radius: 20px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-	border: 2px solid var(- -card-br);
+	border: 2px solid var(--card-br);
 	width: 100%;
 	max-width: 380px;
 	margin: 0 auto;
@@ -131,38 +140,37 @@ h1 {
 	text-decoration: underline;
 }
 </style>
-
-<meta charset="UTF-8">
-<title>로그인창</title>
-<c:choose>
-	<c:when test="${result=='loginFailed' }">
-		<script>
-			window.onload = function() {
-				alert("아이디나 비밀번호가 틀립니다.다시 로그인 하세요!");
-			}
-		</script>
-	</c:when>
-</c:choose>
 </head>
-
 <body>
-	<form name="frmLogin" method="post"
-		action="${contextPath}/member/login.do">
-		<table border="1" width="80%" align="center">
-			<tr align="center">
-				<td>아이디</td>
-				<td>비밀번호</td>
-			</tr>
-			<tr align="center">
-				<td><input type="text" name="id" value="" size="20"></td>
-				<td><input type="password" name="pwd" value="" size="20">
-				</td>
-			</tr>
-			<tr align="center">
-				<td colspan="2"><input type="submit" value="로그인"> <input
-					type="reset" value="다시입력"></td>
-			</tr>
-		</table>
-	</form>
+
+	<!-- 본문 -->
+	<main class="content">
+		<div class="content-inner" id="fitBox">
+			<h1>로그인</h1>
+			
+			<form class="login-box" method="post" action="${contextPath}/member/login.do" autocomplete="on">
+				<c:if test="${not empty _csrf}">
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+				</c:if>
+				
+				<input type="text" id="loginId" name="id" placeholder="아이디" autocomplete="username" required />
+				<input type="password" id="loginPw" name="password" placeholder="비밀번호" autocomplete="current-password" required />
+					
+				<button type="submit" id="doLogin">로그인</button>
+				
+				<div class="sub-buttons">
+					<a href="${contextPath}/member/memberForm.do">회원가입</a> |
+					<a href="#">아이디 · 비밀번호 찾기</a>
+				</div>
+			</form>
+		</div>
+	</main>
+
+	<c:if test="${result=='loginFailed'}">
+		<script>
+			alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+			document.getElementById('loginId')?.focus();
+		</script>
+	</c:if>
 </body>
 </html>

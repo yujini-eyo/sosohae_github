@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 
 import org.springframework.stereotype.Component;
 
-@Component("memberVO")
 public class MemberVO {
     private String id;           // 아이디
     private String password;     // 비밀번호
