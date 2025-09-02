@@ -1,11 +1,3 @@
-<%@ page language="java" contentType="application/javascript; charset=UTF-8"
-    pageEncoding="UTF-8" isELIgnored="false" %>
-<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core" %>
-
-<c:set var="CTX" value="${pageContext.request.contextPath}" />
-<c:set var="S_USER"
-       value="${empty sessionScope.loggedInUser ? (empty sessionScope.username ? '' : sessionScope.username) : sessionScope.loggedInUser}" />
-
 (function(){
   "use strict";
 

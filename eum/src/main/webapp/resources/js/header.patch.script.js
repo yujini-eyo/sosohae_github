@@ -1,5 +1,3 @@
-<%@ page language="java" pageEncoding="UTF-8" %>
-<%-- 선택: 환경 맞춤 패치/오버라이드 전용. 필요 없으면 내용 비워도 됩니다. --%>
 (function(){
   "use strict";
 
