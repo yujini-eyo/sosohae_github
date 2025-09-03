@@ -40,7 +40,7 @@
       <button type="submit" id="doLogin">로그인</button>
 
       <div class="sub-buttons" aria-label="보조 링크">
-        <a href="${contextPath}/eum/signupForm.do">회원가입</a> |
+        <a href="${contextPath}/signupForm.do">회원가입</a> |
         <a href="#">아이디 · 비밀번호 찾기</a>
       </div>
     </form>
