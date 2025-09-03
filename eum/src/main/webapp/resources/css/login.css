@@ -1,12 +1,20 @@
 :root{
-  --bg:#FFF8F2; --text:#59463E; --muted:#806A5A;
-  --primary:#F6A96D; --primary-600:#e98c45;
-  --brand:#FFE8C2; --brand-200:#FADFCB;
-  --card:#FFFFFF; --card-br:#FFE1CB;
+  --bg:#FFF8F2;
+  --text:#59463E;
+  --muted:#806A5A;
+  --primary:#F6A96D;
+  --primary-600:#e98c45;
+  --brand:#FFE8C2;
+  --brand-200:#FADFCB;
+  --card:#FFFFFF;
+  --card-br:#FFE1CB;
   --shadow-soft: 0 4px 10px rgba(0,0,0,.06);
-  --radius:20px; --maxw:1100px;
-  --header-h:72px; --footer-h:0px;
+  --radius:20px;
+  --maxw:1100px;
+  --header-h:72px;
+  --footer-h:0px;
   --focus:0 0 0 3px rgba(246,169,109,.35);
+  --content-pad: 24px;
 }
 
 
@@ -14,15 +22,36 @@
 .login-view, .login-view * { box-sizing: border-box; }
 
 .login-view{
-  /* 모바일 주소창 이슈 대비: svh 우선, vh 폴백 */
-  min-height: calc(100svh - var(--header-h,72px) - var(--footer-h,0px));
-  min-height: calc(100vh  - var(--header-h,72px) - var(--footer-h,0px));
-  display:grid; place-items:center;
-  padding: clamp(16px, 4vh, 40px) 16px;
+  /* 화면 채우기 (fixed 헤더/탭바 보정) */
+  --vpad: clamp(16px, 4vh, 40px);
+  
+  /* ✅ 푸터와 로그인 박스 사이 간격 미세 조절 전용 (원하는 값으로 바꿔!) */
+  --gap: 0px;  /* 예: 20px, 40px ... */
+  
+  min-height: calc(
+    100dvh
+    - var(--header-h,72px)
+    - var(--footer-h,0px)
+    - (var(--content-pad,24px) * 2)
+    - (var(--vpad) * 2)
+    - var(--gap)
+  );
+
+  /* 헤더/푸터와 겹치지 않도록 상하 여백 */
+  padding-top: calc(var(--header-h,72px) + var(--vpad));
+  padding-bottom: calc(var(--footer-h,0px) + var(--vpad) + var(--gap));
+  padding-left: 16px;
+  padding-right: 16px;
+
+  display:grid;
+  place-items:center;
   background: var(--bg, #FFF8F2);
   color: var(--text, #59463E);
-  isolation: isolate;
+  isolation:isolate;
+  box-sizing:border-box;
 }
+
+.login-view h1{ margin-top: 0; }
 
 .login-view .content-inner{ width:100%; max-width:420px; }
 
@@ -69,9 +98,30 @@
   border-radius:10px;
 }
 
+/* 데스크톱(>900px): 푸터 실제 높이 추정값을 변수로 지정 */
+@media (min-width:901px){
+  :root{
+    /* 필요하면 140~220px 사이에서 이 값만 미세조정 하면 됨 */
+    --footer-h: 160px;
+  }
+}
+
+@media (max-width:900px){
+  .site-footer{
+    border-top: none !important;
+  }
+}
+
+/* 모바일(<=900px): 하단 탭바 고정 높이 + 안전영역 */
+@media (max-width:900px){
+  :root{
+    --footer-h: calc(56px + env(safe-area-inset-bottom));
+  }
+}
+
 /* 모바일 여유 */
 @media (max-width:600px){
-  .login-view{ padding: 20px 16px calc(16px + env(safe-area-inset-bottom)); }
+  .login-view{ padding-left:16px; padding-right:16px; }
 }
 
 /* 로그인 페이지 전체 배경을 var(--bg)로 통일 */
