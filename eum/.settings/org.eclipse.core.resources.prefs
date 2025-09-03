@@ -6,6 +6,7 @@ encoding//src/main/java/com/myspring/eum/help/service/HelpRequestServiceImpl.jav
 encoding//src/main/java/com/myspring/eum/help/vo/HelpRequestVO.java=UTF-8
 encoding//src/main/java/com/myspring/eum/help/vo/HelpType.java=UTF-8
 encoding//src/main/java/com/myspring/eum/help/vo/Urgency.java=UTF-8
+encoding//src/main/webapp/WEB-INF/views/member/loginForm.jsp=UTF-8
 encoding//src/main/webapp/resources/js/header.patch.script.js=UTF-8
 encoding//src/main/webapp/resources/js/header.script.js=UTF-8
 encoding//src/test/resources=UTF-8

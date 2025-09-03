@@ -7,19 +7,19 @@
   <!-- ===== 공통 레이아웃 =====
        template: 실제 레이아웃 JSP (헤더/사이드/본문/푸터 위치 잡아둔 틀) -->
   <definition name="baseLayout" template="/WEB-INF/views/common/layout.jsp">
-    <put-attribute name="title"  value="EuM:" />
+    <put-attribute name="title"  value="" />
     <put-attribute name="header" value="/WEB-INF/views/common/header.jsp" />
     <put-attribute name="side"   value="/WEB-INF/views/common/side.jsp" />
     <put-attribute name="body"   value="" />
     <put-attribute name="footer" value="/WEB-INF/views/common/footer.jsp" />
   </definition>
 
-  <!-- ===== 사이드 없는 레이아웃(로그인/단일 폼 등) =====
+ <!-- ===== 사이드 없는 레이아웃(로그인/단일 폼 등) =====
        /WEB-INF/views/common/empty.jsp 는 내용 없는 빈 파일 하나 만들어 두세요. -->
-  <definition name="baseLayoutNoSide" extends="baseLayout">
+  <!--  <definition name="baseLayoutNoSide" extends="baseLayout">
     <put-attribute name="side" value="/WEB-INF/views/common/empty.jsp" />
   </definition>
-
+ -->
   <!-- ===== 메인 페이지 ===== -->
   <definition name="main" extends="baseLayout">
     <put-attribute name="title" value="메인 • EuM:" />
@@ -27,12 +27,12 @@
   </definition>
 
   <!-- ===== 회원 관련 예시 (필요한 것만 남겨 쓰세요) ===== -->
-  <definition name="loginForm" extends="baseLayoutNoSide">
-    <put-attribute name="title" value="로그인 • EuM:" />
-    <put-attribute name="body"  value="/WEB-INF/views/member/loginForm.jsp" />
-  </definition>
+  <definition name="loginForm" extends="baseLayout">
+    <put-attribute name="title" value="로그인 | Eum:" />
+    <put-attribute name="body" value="/WEB-INF/views/member/loginForm.jsp" />
+    </definition>
 
-  <definition name="memberForm" extends="baseLayoutNoSide">
+  <definition name="memberForm" extends="baseLayout">
     <put-attribute name="title" value="회원가입 • EuM:" />
     <put-attribute name="body"  value="/WEB-INF/views/member/memberForm.jsp" />
   </definition>
@@ -43,12 +43,12 @@
   </definition>
 
   <!-- ===== 오류 화면(선택) ===== -->
-  <definition name="error.404" extends="baseLayoutNoSide">
+  <definition name="error.404" extends="baseLayout">
     <put-attribute name="title" value="페이지를 찾을 수 없습니다 • EuM:" />
     <put-attribute name="body"  value="/WEB-INF/views/error/404.jsp" />
   </definition>
 
-  <definition name="error.500" extends="baseLayoutNoSide">
+  <definition name="error.500" extends="baseLayout">
     <put-attribute name="title" value="서버 오류 • EuM:" />
     <put-attribute name="body"  value="/WEB-INF/views/error/500.jsp" />
   </definition>
