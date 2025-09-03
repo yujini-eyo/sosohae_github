@@ -50,7 +50,7 @@
         '<button type="button" class="auth-btn btn-ghost" data-action="logout">로그아웃</button>';
     } else {
       box.innerHTML =
-        '<a class="auth-btn" href="' + CTX + '/member/login.do" id="loginBtn">로그인</a>' +
+        '<a class="auth-btn" href="' + CTX + '/member/loginForm.do" id="loginBtn">로그인</a>' +
         '<a class="auth-btn btn-ghost" href="' + CTX + '/member/signup.do">회원가입</a>';
     }
   }

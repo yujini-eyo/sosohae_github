@@ -2,15 +2,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
-<link rel="stylesheet" href="<c:url value='/resources/css/header.css'/>">
-<link rel="stylesheet" href="<c:url value='/resources/css/footer.css'/>">
-
-<!-- 페이지 전용 CSS/JS (당장은 바디에 둔다. 나중에 레이아웃 head 슬롯 분리해도 OK) -->
-<link rel="stylesheet" href="<c:url value='/resources/css/board.css'/>" />
-
-<script src="${contextPath}/resources/js/board.js"></script>
-
-<a href="#main" class="skip-link">본문으로 건너뛰기</a>
 
 <div class="container">
   <section id="main" class="board" aria-labelledby="boardTitle">
