@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+  "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+  "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+<tiles-definitions>
+
+  <!-- 공통 레이아웃 -->
+  <definition name="baseLayout" template="/WEB-INF/views/common/layout.jsp">
+    <put-attribute name="title"  value="" />
+    <put-attribute name="header" value="/WEB-INF/views/common/header.jsp" />
+    <put-attribute name="body"   value="" />
+    <put-attribute name="footer" value="/WEB-INF/views/common/footer.jsp" />
+  </definition>
+
+  <!-- 페이지들 -->
+  <definition name="main" extends="baseLayout">
+    <put-attribute name="title" value="메인 • EuM:" />
+    <put-attribute name="body"  value="/WEB-INF/views/main.jsp" />
+  </definition>
+
+  <definition name="about" extends="baseLayout">
+    <put-attribute name="title" value="서비스 소개 • EuM" />
+    <put-attribute name="body"  value="/WEB-INF/views/about.jsp" />
+  </definition>
+
+  <definition name="guide" extends="baseLayout">
+    <put-attribute name="title" value="이용방법 가이드 • EuM:" />
+    <put-attribute name="body"  value="/WEB-INF/views/guide.jsp" />
+  </definition>
+  
+  <definition name="notice" extends="baseLayout">
+    <put-attribute name="title" value="공지사항 • EuM:" />
+    <put-attribute name="body"  value="/WEB-INF/views/notice.jsp" />
+  </definition>
+
+
+  <!-- (옵션) 폼 페이지가 이 컨트롤러에서 렌더된다면 정의 추가
+  <definition name="loginForm" extends="baseLayout">
+    <put-attribute name="title" value="로그인 • EuM:" />
+    <put-attribute name="body"  value="/WEB-INF/views/member/loginForm.jsp" />
+  </definition>
+
+  <definition name="memberForm" extends="baseLayout">
+    <put-attribute name="title" value="회원가입 • EuM:" />
+    <put-attribute name="body"  value="/WEB-INF/views/member/memberForm.jsp" />
+  </definition>
+  -->
+
+</tiles-definitions>

@@ -23,7 +23,7 @@ public class MainControllerImpl implements MainController {
 
     /** 상단 공용 페이지들 (필요에 맞게 추가/삭제) */
     @Override
-    @RequestMapping(value = { "/index.do", "/home.do", "/intro.do", "/about.do", "/contact.do" },
+    @RequestMapping(value = { "/index.do", "/guide.do", "/intro.do", "/about.do", "/contact.do", "/notice.do" },
                     method = RequestMethod.GET)
     public ModelAndView pages(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String viewName = (String) request.getAttribute("viewName");

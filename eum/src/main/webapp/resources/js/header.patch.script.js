@@ -1,8 +1,7 @@
 /* header.patch.script.js — 가벼운 반응형/패치 전용 */
 (function () {
   "use strict";
-
-  function $(s, r) { return (r || document).querySelector(s); }
+  var $ = function (s, r) { return (r || document).querySelector(s); };
 
   function applyResponsive() {
     var right = $("#rightArea");
@@ -12,7 +11,7 @@
     else right.classList.remove("is-compact");
   }
 
-  function init() { applyResponsive(); }
+  function init(){ applyResponsive(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
 
