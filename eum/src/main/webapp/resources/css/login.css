@@ -1,14 +1,14 @@
 :root{
-  /* 전역 토큰이 이미 있다면 이 블록은 삭제 가능 */
   --bg:#FFF8F2; --text:#59463E; --muted:#806A5A;
   --primary:#F6A96D; --primary-600:#e98c45;
   --brand:#FFE8C2; --brand-200:#FADFCB;
   --card:#FFFFFF; --card-br:#FFE1CB;
   --shadow-soft: 0 4px 10px rgba(0,0,0,.06);
   --radius:20px; --maxw:1100px;
-  --header-h:72px; --footer-h:0px; /* footer 없으면 0 */
+  --header-h:72px; --footer-h:0px;
   --focus:0 0 0 3px rgba(246,169,109,.35);
 }
+
 
 /* ===== 전용 스코프로 격리 ===== */
 .login-view, .login-view * { box-sizing: border-box; }
@@ -72,4 +72,16 @@
 /* 모바일 여유 */
 @media (max-width:600px){
   .login-view{ padding: 20px 16px calc(16px + env(safe-area-inset-bottom)); }
+}
+
+/* 로그인 페이지 전체 배경을 var(--bg)로 통일 */
+html, body { 
+  height: 100%;
+  margin: 0;
+  background: var(--bg, #FFF8F2) !important;
+}
+
+/* 레이아웃 컨테이너가 흰 배경을 덮어쓰지 못하게 투명 처리 */
+#main, .page-body, .content-wrap, .container, .wrap {
+  background: transparent !important;
 }
