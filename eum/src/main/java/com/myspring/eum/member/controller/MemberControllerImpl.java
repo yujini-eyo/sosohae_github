@@ -19,84 +19,65 @@ import com.myspring.eum.member.service.MemberService;
 import com.myspring.eum.member.vo.MemberVO;
 
 @Controller("memberController")
-//@EnableAspectJAutoProxy
+@RequestMapping("/eum") // ✅ /eum/... 로 공개 URL 통일
 public class MemberControllerImpl implements MemberController {
 
     @Autowired
     private MemberService memberService;
 
+    // ===== 목록 =====
     @Override
-    @RequestMapping(value = "/member/listMembers.do", method = RequestMethod.GET)
+    @RequestMapping(value = "/listMembers.do", method = RequestMethod.GET)
     public ModelAndView listMembers(HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setCharacterEncoding("utf-8");
-        // 수정: 올바른 콘텐츠 타입
         response.setContentType("text/html;charset=UTF-8");
 
-        String viewName = (String) request.getAttribute("viewName"); // ex) "/member/listMembers"
         List membersList = memberService.listMembers();
-        ModelAndView mav = new ModelAndView(viewName);
+        ModelAndView mav = new ModelAndView("listMembers"); // ✅ Tiles 이름 짧게
         mav.addObject("membersList", membersList);
         return mav;
     }
 
+    // ===== 회원가입 화면 =====
+    @RequestMapping(value = "/signupForm.do", method = RequestMethod.GET)
+    public String signupForm() {
+        return "signupForm"; // ✅ Tiles 정의 이름과 동일
+    }
+
+    // ===== 로그인 화면 =====
+    @RequestMapping(value = "/loginForm.do", method = RequestMethod.GET)
+    public ModelAndView loginForm(@RequestParam(value = "result", required = false) String result) {
+        ModelAndView mav = new ModelAndView("loginForm"); // ✅ Tiles 정의 이름과 동일
+        mav.addObject("result", result);
+        return mav;
+    }
+
+    // ===== 회원가입 처리 =====
     @Override
-    @RequestMapping(value = "/member/addMember.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/addMember.do", method = RequestMethod.POST)
     public ModelAndView addMember(@ModelAttribute("member") MemberVO member,
                                   HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setCharacterEncoding("utf-8");
-        // 수정: 올바른 콘텐츠 타입
         response.setContentType("text/html;charset=UTF-8");
 
         int result = memberService.addMember(member);
-        // 성공/실패 분기 필요하면 result 활용
-        return new ModelAndView("redirect:/member/listMembers.do");
+        // 필요 시 result로 분기 가능
+        return new ModelAndView("redirect:/eum/listMembers.do");
     }
 
+    // ===== 회원 삭제 =====
     @Override
-    @RequestMapping(value = "/member/removeMember.do", method = RequestMethod.GET)
+    @RequestMapping(value = "/removeMember.do", method = RequestMethod.GET)
     public ModelAndView removeMember(@RequestParam("id") String id,
                                      HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setCharacterEncoding("utf-8");
         memberService.removeMember(id);
-        return new ModelAndView("redirect:/member/listMembers.do");
+        return new ModelAndView("redirect:/eum/listMembers.do");
     }
 
-    // ===== [추가] 명시적 폼 화면 GET 매핑 (Tiles + ViewNameInterceptor 사용 시에도 안전) =====
-
-    @RequestMapping(value = "/member/memberForm.do", method = RequestMethod.GET)
-    public ModelAndView memberForm(HttpServletRequest request) throws Exception {
-        String viewName = (String) request.getAttribute("viewName"); // -> "/member/memberForm"
-        // ViewNameInterceptor가 없다면 아래처럼 명시적으로 써도 됨:
-        // String viewName = "/member/memberForm";
-        return new ModelAndView(viewName);
-    }
-
-    @RequestMapping(value = "/member/loginForm.do", method = RequestMethod.GET)
-    public ModelAndView loginForm(@RequestParam(value = "result", required = false) String result,
-                                  HttpServletRequest request) throws Exception {
-        String viewName = (String) request.getAttribute("viewName"); // -> "/member/loginForm"
-        ModelAndView mav = new ModelAndView(viewName);
-        mav.addObject("result", result); // 로그인 실패 메시지 전달
-        return mav;
-    }
-
-    // ===== [기존] 와일드카드 폼 매핑 유지 (명시적 매핑보다 우선순위 낮음) =====
-    @RequestMapping(value = "/member/*Form.do", method = RequestMethod.GET)
-    private ModelAndView form(@RequestParam(value = "result", required = false) String result,
-                              @RequestParam(value = "action", required = false) String action,
-                              HttpServletRequest request,
-                              HttpServletResponse response) throws Exception {
-        String viewName = (String) request.getAttribute("viewName");
-        HttpSession session = request.getSession();
-        session.setAttribute("action", action);
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("result", result);
-        mav.setViewName(viewName);
-        return mav;
-    }
-
+    // ===== 로그인 처리 =====
     @Override
-    @RequestMapping(value = "/member/login.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/login.do", method = RequestMethod.POST)
     public ModelAndView login(@ModelAttribute("member") MemberVO member,
                               RedirectAttributes rAttr,
                               HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -113,55 +94,21 @@ public class MemberControllerImpl implements MemberController {
             if (action != null) {
                 mav.setViewName("redirect:" + action);
             } else {
-                mav.setViewName("redirect:/member/listMembers.do");
+                mav.setViewName("redirect:/eum/listMembers.do");
             }
         } else {
             rAttr.addAttribute("result", "loginFailed");
-            mav.setViewName("redirect:/member/loginForm.do");
+            mav.setViewName("redirect:/eum/loginForm.do");
         }
         return mav;
     }
 
+    // ===== 로그아웃 =====
     @Override
-    @RequestMapping(value = "/member/logout.do", method = RequestMethod.GET)
+    @RequestMapping(value = "/logout.do", method = RequestMethod.GET)
     public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
         HttpSession session = request.getSession();
-        // 개선: 깔끔하게 세션 종료
-        session.invalidate();
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("redirect:/member/listMembers.do");
-        return mav;
-    }
-
-    // ===== (유지) URI → viewName 유틸 =====
-    private String getViewName(HttpServletRequest request) throws Exception {
-        String contextPath = request.getContextPath();
-        String uri = (String) request.getAttribute("javax.servlet.include.request_uri");
-        if (uri == null || uri.trim().equals("")) {
-            uri = request.getRequestURI();
-        }
-
-        int begin = 0;
-        if (!((contextPath == null) || ("".equals(contextPath)))) {
-            begin = contextPath.length();
-        }
-
-        int end;
-        if (uri.indexOf(";") != -1) {
-            end = uri.indexOf(";");
-        } else if (uri.indexOf("?") != -1) {
-            end = uri.indexOf("?");
-        } else {
-            end = uri.length();
-        }
-
-        String viewName = uri.substring(begin, end);
-        if (viewName.indexOf(".") != -1) {
-            viewName = viewName.substring(0, viewName.lastIndexOf("."));
-        }
-        if (viewName.lastIndexOf("/") != -1) {
-            viewName = viewName.substring(viewName.lastIndexOf("/", 1), viewName.length());
-        }
-        return viewName;
+        session.invalidate(); // ✅ 깔끔 종료
+        return new ModelAndView("redirect:/eum/listMembers.do");
     }
 }

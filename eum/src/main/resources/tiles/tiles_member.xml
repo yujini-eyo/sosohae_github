@@ -4,33 +4,35 @@
 "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
 <tiles-definitions>
 
-   <definition name="main" extends="baseLayout">
-      <put-attribute name="title" value="메인페이지" />
-      <put-attribute name="body" value="/WEB-INF/views/main.jsp" />
-   </definition>
+	<definition name="main" extends="baseLayout">
+		<put-attribute name="title" value="메인페이지" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/main.jsp" />
+	</definition>
 
 
-  <definition name="loginForm" extends="baseLayout">
-    <put-attribute name="title" value="로그인 | Eum:" />
-    <put-attribute name="body" value="/WEB-INF/views/member/loginForm.jsp" />
-    </definition>
+	<definition name="loginForm" extends="baseLayout">
+		<put-attribute name="title" value="로그인" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/member/login.jsp" />
+	</definition>
 
-  <definition name="memberForm" extends="baseLayout">
-    <put-attribute name="title" value="회원가입 • EuM:" />
-    <put-attribute name="body"  value="/WEB-INF/views/member/memberForm.jsp" />
-  </definition>
+	<definition name="signupForm" extends="baseLayout">
+		<put-attribute name="title" value="회원가입" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/member/signupForm.jsp" />
+	</definition>
 
-  <definition name="memberList" extends="baseLayout">
-    <put-attribute name="title" value="회원 목록 • EuM:" />
-    <put-attribute name="body"  value="/WEB-INF/views/member/listMembers.jsp" />
-  </definition>
-   
-   
+	<definition name="listMembers" extends="baseLayout">
+		<put-attribute name="title" value="회원목록" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/member/listMembers.jsp" />
+	</definition>
 
 
-<!--
-   <definition name="/member/viewDetail" extends="baseLayout">
-      <put-attribute name="title" value="회원상세창" />
-      <put-attribute name="body" value="/WEB-INF/views/member/viewDetail.jsp" />
-   </definition> -->
+
+
+	<!-- <definition name="/member/viewDetail" extends="baseLayout"> <put-attribute 
+		name="title" value="회원상세창" /> <put-attribute name="body" value="/WEB-INF/views/member/viewDetail.jsp" 
+		/> </definition> -->
 </tiles-definitions>

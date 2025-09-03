@@ -1,93 +1,230 @@
 :root{
-  --bg:#FFF8F2; --text:#59463E; --muted:#806A5A;
-  --primary:#F6A96D; --primary-600:#e98c45;
-  --brand:#FFE8C2; --brand-200:#FADFCB;
-  --card:#FFFFFF; --card-br:#FFE1CB;
-  --shadow-soft: 0 4px 10px rgba(0,0,0,.06);
-  --radius:20px; --maxw:1100px;
-  --header-h:72px; --footer-h:0px;
+  --bg:#FFF8F2;
+  --text:#59463E;
+  --muted:#806A5A;
+  --primary:#F6A96D;
+  --primary-600:#e98c45;
+  --brand:#FFE8C2;
+  --brand-200:#FADFCB;
+  --card:#FFFFFF;
+  --card-br:#FFE1CB;
+  --shadow-soft:0 4px 10px rgba(0,0,0,.06);
+  --radius:20px;
+  --maxw:1100px;
+  --header-h:72px;
+  --footer-h:0px;
   --focus:0 0 0 3px rgba(246,169,109,.35);
   --content-pad:24px;
 }
 
-/* ===== 전용 스코프로 격리 ===== */
-.login-view, .login-view * { box-sizing:border-box; }
+/* === 배경/폰트 (전역 덮어쓰기 방지) === */
+html, body{ height:100%; margin:0; background:var(--bg) !important; }
+#main, .page-body, .content-wrap, .container, .wrap{ background:transparent !important; }
+.login-view{ font-family:'SUIT',sans-serif; }
 
+/* === 레이아웃 === */
+.login-view, .login-view *{ box-sizing:border-box; }
 .login-view{
-  --vpad: clamp(16px, 4vh, 40px);
-  --gap: 0px; /* 필요 시 푸터-폼 간격 조절 */
-
-  min-height: calc(100dvh - var(--header-h,72px) - var(--footer-h,0px)
-                  - (var(--content-pad,24px) * 2) - (var(--vpad) * 2) - var(--gap));
-  padding-top: calc(var(--header-h,72px) + var(--vpad));
-  padding-bottom: calc(var(--footer-h,0px) + var(--vpad) + var(--gap));
-  padding-left:16px; padding-right:16px;
-
+  --vpad:clamp(16px,4vh,40px); --gap:0px;
+  min-height:calc(100dvh - var(--header-h) - var(--footer-h) - (var(--content-pad)*2) - (var(--vpad)*2) - var(--gap));
+  padding:calc(var(--header-h) + var(--vpad)) 16px calc(var(--footer-h) + var(--vpad) + var(--gap));
   display:grid; place-items:center;
-  background:var(--bg,#FFF8F2); color:var(--text,#59463E);
-  isolation:isolate;
+  background:var(--bg) !important; color:var(--text) !important; isolation:isolate;
 }
+.login-view .content-inner{ width:100%; max-width:460px; }
+.login-view h1{ font-size:28px; font-weight:900; text-align:center; margin:0 0 14px; }
 
-.login-view .content-inner{ width:100%; max-width:420px; }
-
-.login-view h1{
-  font-size:28px; font-weight:900; text-align:center; margin:0 0 14px;
-  scroll-margin-top: var(--header-h,72px);
-}
-
-.login-view .alert{
-  margin: 8px 0 18px; padding:12px 14px; border-radius:12px;
-  border:2px solid #FFD7C2; background:#FFF7F1; color:#7A3E2A; font-weight:600;
-}
-.login-view .alert.error{ border-color:#FFB8A1; background:#FFF0EA; }
-
+/* === 카드(폼 박스) === */
 .login-view .login-box{
+  width:100%; max-width:420px; margin:0 auto;
   background:#fff; padding:30px 24px; border-radius:20px;
-  box-shadow:0 4px 8px rgba(0,0,0,.05);
-  border:2px solid var(--card-br,#FFE1CB);
-  width:100%; max-width:380px; margin:0 auto;
+  border:2px solid var(--card-br); box-shadow:0 4px 8px rgba(0,0,0,.05);
 }
 .login-view .login-box label{ display:block; font-weight:700; margin:8px 0 6px; }
+.login-view .login-box label small{ display:inline-block; white-space:nowrap; margin-left:4px; }
+
 .login-view .login-box input{
   width:100%; padding:14px; margin-bottom:14px; font-size:16px;
   border-radius:12px; border:2px solid #FFD8B0; background:#fff;
 }
-.login-view .login-box button{
-  width:100%; padding:14px; font-size:18px; font-weight:700;
-  background:#FFB88A; color:#fff; border:none; border-radius:30px; cursor:pointer;
+
+/* 제출 버튼(직계만) — 인증 버튼엔 영향 X */
+.login-view .login-box > button{
+  width:100%;
+  padding:14px;
+  font-size:18px;
+  font-weight:700;
+  background:#FFB88A;
+  color:#fff;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
   margin-top:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 }
-.login-view .login-box button:hover{ background:#f3a776; }
+.login-view .login-box > button:hover{ background:#f3a776; }
 
-.login-view .phone-wrap{ display:flex; gap:10px; margin-bottom:14px; }
-.login-view .phone-wrap input{ flex:1; height:48px; }
-.login-view .phone-wrap button{ width:110px; height:48px; border-radius:12px; }
+/* === 전화번호 + 인증 버튼 (같은 줄/같은 높이, 크기 원본) === */
+.login-view .phone-wrap{
+  display:flex; align-items:center; gap:10px; flex-wrap:nowrap;
+  margin-bottom:14px;
+}
+.login-view .phone-wrap input{
+  flex:1 1 auto; min-width:0;
+  height:48px; padding:0 14px; font-size:16px; box-sizing:border-box;
+}
+/* 인증 버튼: HTML 원본 100x48 고정 */
+.login-view .phone-wrap button{
+  width:100px; height:48px;
+  margin:0; padding:0; border:none; border-radius:12px;
+  background:#FFB88A; color:#fff; font-weight:700; font-size:16px;
+  white-space:nowrap; text-align:center;
+  display:inline-flex; align-items:center; justify-content:center;
+}
 
+/* === 체크박스 === */
+:root{ --checkbox-size:16px; }
+.login-view .login-box input[type="checkbox"]{
+  -webkit-appearance:auto; appearance:auto; accent-color:#FFB88A;
+  width:var(--checkbox-size); height:var(--checkbox-size);
+  margin:0; padding:0; cursor:pointer; vertical-align:middle;
+}
 .login-view .checkbox-area{ margin-top:-6px; margin-bottom:14px; font-size:15px; }
+.login-view .checkbox-area label{ display:inline-flex; align-items:center; gap:8px; }
 
+/* === 안내/링크/포커스 === */
+.login-view .login-box .info-text{
+  display:block; font-size:14px; color:#806A5A;
+  line-height:1.6; margin-top:24px; text-align:center;
+}
+.login-view .alert{ margin:8px 0 18px; padding:12px 14px; border-radius:12px; border:2px solid #FFD7C2; background:#FFF7F1; color:#7A3E2A; font-weight:600; }
+.login-view .alert.error{ border-color:#FFB8A1; background:#FFF0EA; }
 .login-view .sub-buttons{ margin-top:16px; text-align:center; }
 .login-view .sub-buttons a{ font-size:16px; color:#7A5A48; text-decoration:none; margin:0 8px; }
 .login-view .sub-buttons a:hover{ text-decoration:underline; }
+.login-view a:focus, .login-view button:focus, .login-view input:focus{ outline:none; box-shadow:var(--focus); border-radius:10px; }
 
-.login-view a{ color:inherit; text-decoration:none; }
-.login-view a:focus,
-.login-view button:focus,
-.login-view input:focus{
-  outline:none; box-shadow: var(--focus,0 0 0 3px rgba(246,169,109,.35)); border-radius:10px;
+/* === 푸터 높이 보정 === */
+@media (min-width:901px){ :root{ --footer-h:160px; } }
+@media (max-width:900px){ :root{ --footer-h:calc(56px + env(safe-area-inset-bottom)); } }
+
+/* === 인증 버튼 하드 잠금(HTML과 동일 100×48, 어떤 전역 규칙도 못 깨게) === */
+#btnSendCode {
+  /* 크기 하드락 */
+  width: 100px !important;
+  min-width: 100px !important;
+  max-width: 100px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+
+  /* 박스 모델/여백 고정 */
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 12px !important;
+
+  /* 정렬/줄바꿈 */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  line-height: normal !important; /* flex로 수직중앙, 라인높이 영향 제거 */
+
+  /* 타이포/색상 (HTML 원본과 동일 톤) */
+  background: #FFB88A !important;
+  color: #fff !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
 }
 
-/* 데스크톱: 푸터 높이 추정 */
-@media (min-width:901px){
-  :root{ --footer-h:160px; }
+/* 같은 줄/높이 유지용(크기는 건드리지 않음) */
+.login-view .phone-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important; /* 줄바꿈 방지 */
+}
+.login-view .phone-wrap input {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: 48px !important;
+  box-sizing: border-box !important;
 }
 
-/* 모바일: 하단 탭바 + 안전영역 고려 */
+/* 0) 전화번호 줄: flex 한 줄 & 수직중앙 */
+.login-view .phone-wrap{
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  flex-wrap:nowrap !important; /* 줄바꿈 방지 */
+}
+
+/* 1) input의 아래 여백을 '그 줄에서만' 제거 (정렬 틀어짐 원인 제거) */
+.login-view .phone-wrap input{
+  margin:0 !important;             /* ← 핵심! 기존 margin-bottom:14px 무력화 */
+  height:48px !important;
+  padding:0 14px !important;
+  box-sizing:border-box !important;
+  flex:1 1 auto !important;
+  min-width:0 !important;
+}
+
+/* 2) 인증 버튼 — HTML과 동일 크기(100×48) '하드락' + 정렬만 */
+#btnSendCode{
+  width:100px !important;
+  min-width:100px !important;
+  max-width:100px !important;
+  height:48px !important;
+  min-height:48px !important;
+  max-height:48px !important;
+
+  margin:0 !important;
+  padding:0 !important;
+  border:none !important;
+  border-radius:12px !important;
+  box-sizing:border-box !important;
+
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  white-space:nowrap !important;
+  text-align:center !important;
+  line-height:normal !important;    /* flex로 수직 중앙, 라인높이 영향 제거 */
+
+  background:#FFB88A !important;
+  color:#fff !important;
+  font-size:16px !important;
+  font-weight:700 !important;
+  cursor:pointer !important;
+}
+
+/* ===== 회원가입 화면 위/아래 간격 컴팩트 모드 ===== */
+/* 헤더~박스, 박스~푸터 사이 패딩을 담당하는 변수를 작게 덮어씁니다. */
+#signupView{
+  --vpad: 0px;      /* 기본 16~40px → 10px로 축소 (상·하 공통 추가 여백) */
+  --footer-h: 50px; /* 데스크톱 푸터 높이 추정치 160px → 120px로 축소 */
+}
+
+/* 모바일에선 좀 더 타이트하게 */
 @media (max-width:900px){
-  :root{ --footer-h: calc(56px + env(safe-area-inset-bottom)); }
+  #signupView{ --vpad: 8px; }       /* 하단 탭바는 그대로 계산됨 */
 }
 
-/* 페이지 배경 통일 */
-html, body{ height:100%; margin:0; background:var(--bg,#FFF8F2) !important; }
+/* 제목 아래 간격도 살짝 줄이고 싶다면(선택) */
+#signupView h1{ margin-bottom: 10px; }
 
-/* 레이아웃 컨테이너 배경 투명 처리(레이아웃 흰배경 덮지 않게) */
-#main, .page-body, .content-wrap, .container, .wrap{ background:transparent !important; }
+/* 1) 가운데 정렬 끄고, 위로 붙이기 */
+#signupView{
+  place-items: start center !important;              /* 수직 상단 정렬 */
+  padding-top: calc(var(--header-h) - 50px) !important; /* 헤더보다 8px 더 붙임(겹침) */
+}
+
+/* 2) 미세튜닝: 1~6px 정도 더 올리고 싶으면 음수 마진 추가 */
+#signupView .content-inner{ margin-top: -4px; }       /* 필요 없으면 삭제 */
