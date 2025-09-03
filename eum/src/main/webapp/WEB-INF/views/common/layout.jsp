@@ -37,6 +37,16 @@
       font-family:'SUIT', system-ui, -apple-system, Segoe UI, Roboto, Arial, Apple SD Gothic Neo, 'Noto Sans KR', sans-serif;
     }
     main#content{ max-width: var(--maxw); margin: 0 auto; padding: 24px 16px; box-sizing: border-box; }
+    
+    html, body{ height:100%; }
+	body{
+  		min-height:100dvh;
+ 		display:flex;
+  		flex-direction:column;
+	}
+	main{ flex:1 0 auto; }         /* 본문이 남는 공간을 채우고 */
+	footer.site-footer{ position: static; }  /* 푸터는 고정 해제 */
+    
   </style>
 
   <!-- (선택) 페이지별 head 리소스 주입: 각 definition에서 name="pageHead"로 전달 -->
