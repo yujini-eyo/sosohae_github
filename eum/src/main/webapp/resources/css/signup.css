@@ -1,0 +1,93 @@
+:root{
+  --bg:#FFF8F2; --text:#59463E; --muted:#806A5A;
+  --primary:#F6A96D; --primary-600:#e98c45;
+  --brand:#FFE8C2; --brand-200:#FADFCB;
+  --card:#FFFFFF; --card-br:#FFE1CB;
+  --shadow-soft: 0 4px 10px rgba(0,0,0,.06);
+  --radius:20px; --maxw:1100px;
+  --header-h:72px; --footer-h:0px;
+  --focus:0 0 0 3px rgba(246,169,109,.35);
+  --content-pad:24px;
+}
+
+/* ===== 전용 스코프로 격리 ===== */
+.login-view, .login-view * { box-sizing:border-box; }
+
+.login-view{
+  --vpad: clamp(16px, 4vh, 40px);
+  --gap: 0px; /* 필요 시 푸터-폼 간격 조절 */
+
+  min-height: calc(100dvh - var(--header-h,72px) - var(--footer-h,0px)
+                  - (var(--content-pad,24px) * 2) - (var(--vpad) * 2) - var(--gap));
+  padding-top: calc(var(--header-h,72px) + var(--vpad));
+  padding-bottom: calc(var(--footer-h,0px) + var(--vpad) + var(--gap));
+  padding-left:16px; padding-right:16px;
+
+  display:grid; place-items:center;
+  background:var(--bg,#FFF8F2); color:var(--text,#59463E);
+  isolation:isolate;
+}
+
+.login-view .content-inner{ width:100%; max-width:420px; }
+
+.login-view h1{
+  font-size:28px; font-weight:900; text-align:center; margin:0 0 14px;
+  scroll-margin-top: var(--header-h,72px);
+}
+
+.login-view .alert{
+  margin: 8px 0 18px; padding:12px 14px; border-radius:12px;
+  border:2px solid #FFD7C2; background:#FFF7F1; color:#7A3E2A; font-weight:600;
+}
+.login-view .alert.error{ border-color:#FFB8A1; background:#FFF0EA; }
+
+.login-view .login-box{
+  background:#fff; padding:30px 24px; border-radius:20px;
+  box-shadow:0 4px 8px rgba(0,0,0,.05);
+  border:2px solid var(--card-br,#FFE1CB);
+  width:100%; max-width:380px; margin:0 auto;
+}
+.login-view .login-box label{ display:block; font-weight:700; margin:8px 0 6px; }
+.login-view .login-box input{
+  width:100%; padding:14px; margin-bottom:14px; font-size:16px;
+  border-radius:12px; border:2px solid #FFD8B0; background:#fff;
+}
+.login-view .login-box button{
+  width:100%; padding:14px; font-size:18px; font-weight:700;
+  background:#FFB88A; color:#fff; border:none; border-radius:30px; cursor:pointer;
+  margin-top:10px;
+}
+.login-view .login-box button:hover{ background:#f3a776; }
+
+.login-view .phone-wrap{ display:flex; gap:10px; margin-bottom:14px; }
+.login-view .phone-wrap input{ flex:1; height:48px; }
+.login-view .phone-wrap button{ width:110px; height:48px; border-radius:12px; }
+
+.login-view .checkbox-area{ margin-top:-6px; margin-bottom:14px; font-size:15px; }
+
+.login-view .sub-buttons{ margin-top:16px; text-align:center; }
+.login-view .sub-buttons a{ font-size:16px; color:#7A5A48; text-decoration:none; margin:0 8px; }
+.login-view .sub-buttons a:hover{ text-decoration:underline; }
+
+.login-view a{ color:inherit; text-decoration:none; }
+.login-view a:focus,
+.login-view button:focus,
+.login-view input:focus{
+  outline:none; box-shadow: var(--focus,0 0 0 3px rgba(246,169,109,.35)); border-radius:10px;
+}
+
+/* 데스크톱: 푸터 높이 추정 */
+@media (min-width:901px){
+  :root{ --footer-h:160px; }
+}
+
+/* 모바일: 하단 탭바 + 안전영역 고려 */
+@media (max-width:900px){
+  :root{ --footer-h: calc(56px + env(safe-area-inset-bottom)); }
+}
+
+/* 페이지 배경 통일 */
+html, body{ height:100%; margin:0; background:var(--bg,#FFF8F2) !important; }
+
+/* 레이아웃 컨테이너 배경 투명 처리(레이아웃 흰배경 덮지 않게) */
+#main, .page-body, .content-wrap, .container, .wrap{ background:transparent !important; }
