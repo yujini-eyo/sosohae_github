@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" isELIgnored="false"%>
+    pageEncoding="UTF-8" isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
@@ -7,17 +7,14 @@
 
 <div class="page-guide" role="region" aria-labelledby="guideTitle">
   <div class="container">
-    <!-- Hero -->
+    <!-- Hero (CTA 제거됨) -->
     <section class="hero" aria-labelledby="guideTitle">
       <h1 id="guideTitle">소소한 도움 – 이용방법 가이드</h1>
       <p class="subtitle">
         전구 교체, 약국 심부름, 병원 동행처럼 <strong>작지만 꼭 필요한 도움</strong>을
         <strong>근처 이웃</strong>과 연결하는 방법을 단계별로 안내합니다.
       </p>
-      <%-- 빠른 액션 CTA 제거됨 --%>
     </section>
-
-    <%-- ✅ TOC(목차) 완전히 제거되었습니다. --%>
 
     <!-- 1. 시작하기 -->
     <section id="start" aria-labelledby="startTitle">
@@ -34,6 +31,7 @@
             <button class="btn outline" type="button" data-href="${ctx}/member/memberForm.do">회원가입</button>
           </div>
         </article>
+
         <article class="card">
           <h3>도우미(봉사자)</h3>
           <ul class="list">
@@ -147,7 +145,7 @@
     </section>
 
     <!-- FAQ -->
-    <section id="faq" aria-labelledby="faqTitle" style="margin:24px 0 40px;">
+    <section id="faq" aria-labelledby="faqTitle">
       <h2 id="faqTitle">자주 묻는 질문</h2>
       <details>
         <summary>요청은 하루 몇 번까지 가능한가요?</summary>
@@ -163,7 +161,7 @@
       </details>
     </section>
 
-    <!-- CTA (원하면 유지/삭제 선택 가능) -->
+    <!-- 마지막 CTA(유지) -->
     <section aria-label="바로 시작하기" style="text-align:center; margin-bottom:40px;">
       <button class="btn primary" type="button" data-href="${ctx}/help/write.do">지금 도움 요청하기</button>
       <button class="btn ghost"   type="button" data-href="${ctx}/board/listArticles.do">요청 목록 보기</button>

@@ -64,7 +64,7 @@
     } else {
       box.innerHTML =
         '<a class="auth-btn" href="' + CTX + '/loginForm.do" id="loginBtn">로그인</a>' +
-        '<a class="auth-btn btn-ghost" href="' + CTX + '/memberForm.do">회원가입</a>';
+        '<a class="auth-btn btn-ghost" href="' + CTX + '/signupForm.do">회원가입</a>';
     }
   }
 
