@@ -4,20 +4,13 @@
  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans">
 
-	<!-- <bean id="propertyPlaceholderConfigurer"
+	<bean id="propertyPlaceholderConfigurer"
 	class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 	<property name="locations">
 	<value>/WEB-INF/config/jdbc/jdbc.properties</value>
 	</property>
-	</bean> -->
-	
-	<bean id="propertyPlaceholderConfigurer"
-	class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-  	<property name="locations" value="classpath:jdbc.properties"/>
 	</bean>
-	
-	<context:property-placeholder location="classpath:jdbc.properties"/>
-	
+
 	<bean id="dataSource" class="org.apache.ibatis.datasource.pooled.PooledDataSource">
 		<property name="driver" value="${jdbc.driverClassName}" />
 		<property name="url" value="${jdbc.url}" />
@@ -38,7 +31,7 @@
 		class="org.mybatis.spring.SqlSessionTemplate">
 		<constructor-arg index="0" ref="sqlSessionFactory"></constructor-arg>
 	</bean>
-	
+
 
 	<!-- <bean id="memberDAO"
 		class="com.spring.member.dao.MemberDAOImpl">
