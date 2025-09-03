@@ -27,7 +27,6 @@
       START WITH  parentNO=0
       CONNECT BY PRIOR articleNO=parentNO 
       ORDER SIBLINGS BY articleNO DESC	
-     -->  	
     <![CDATA[
 	     WITH RECURSIVE cte AS (
 		    
@@ -62,6 +61,11 @@
 		ORDER BY parentNO, articleNO DESC
      
     ]]>
+     -->  	
+     
+     SELECT *
+		FROM t_board t
+		ORDER BY parentNO, articleNO DESC
   </select>
   
 	<!--단일이미지 추가  -->
