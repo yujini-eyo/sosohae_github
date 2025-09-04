@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.adminBoard">
+
+  <!-- ArticleVO에 맞춘 매핑 -->
+  <resultMap id="ArticleMap" type="com.myspring.eum.board.vo.ArticleVO">
+    <id     column="articleNO"     property="articleNO"/>
+    <result column="parentNO"      property="parentNO"/>
+    <result column="title"         property="title"/>
+    <result column="content"       property="content"/>
+    <result column="id"            property="id"/>
+    <result column="imageFileName" property="imageFileName"/>
+    <result column="writeDate"     property="writeDate"/>
+  </resultMap>
+
+  <!-- 목록 -->
+  <select id="selectAllArticles" parameterType="map" resultMap="ArticleMap">
+    SELECT articleNO, parentNO, title, content, id, imageFileName, writeDate
+    FROM board_article
+    ORDER BY articleNO DESC
+    <if test="limit != null">  LIMIT #{limit} </if>
+    <if test="offset != null"> OFFSET #{offset}</if>
+  </select>
+
+  <!-- 단건 -->
+  <select id="selectArticle" parameterType="int" resultMap="ArticleMap">
+    SELECT articleNO, parentNO, title, content, id, imageFileName, writeDate
+    FROM board_article
+    WHERE articleNO = #{articleNO}
+    LIMIT 1
+  </select>
+
+  <!-- 등록 (MySQL/MariaDB: 자동증가 키 사용) -->
+  <insert id="insertNewArticle" parameterType="map" useGeneratedKeys="true" keyProperty="articleNO">
+    INSERT INTO board_article
+      (parentNO, title, content, id, imageFileName, writeDate)
+    VALUES
+      (#{parentNO}, #{title}, #{content}, #{id}, #{imageFileName}, NOW())
+  </insert>
+
+  <!-- 삭제 -->
+  <delete id="deleteArticle" parameterType="int">
+    DELETE FROM board_article WHERE articleNO = #{articleNO}
+  </delete>
+
+</mapper>

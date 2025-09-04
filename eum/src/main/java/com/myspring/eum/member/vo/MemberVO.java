@@ -95,4 +95,14 @@ public class MemberVO {
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
+    
+    // ✅ 관리자 판별에 필요한 필드
+    private String role;   // "ADMIN" or "USER"
+    private String status; // "ACTIVE" 등
+    
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

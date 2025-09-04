@@ -4,10 +4,17 @@
 
 <configuration>
 	<typeAliases>
-		<typeAlias type="com.myspring.eum.help.vo.HelpRequestVO"  alias="helpRequestVO" />
-		<typeAlias type="com.myspring.eum.board.vo.ArticleVO"  alias="articleVO" />
-		<typeAlias type="com.myspring.eum.board.vo.ImageVO"  alias="imageVO" />
-		<typeAlias type="com.myspring.eum.member.vo.MemberVO"  alias="memberVO" />
-		
+		<typeAlias type="com.myspring.eum.board.vo.ArticleVO"
+			alias="articleVO" />
+		<typeAlias type="com.myspring.eum.board.vo.ImageVO"
+			alias="imageVO" />
+		<typeAlias type="com.myspring.eum.member.vo.MemberVO"
+			alias="memberVO" />
+		<typeAlias type="com.myspring.eum.admin.vo.AdminArticleVO"
+			alias="adminArticleVO" />
+		<!-- <typeAlias type="com.myspring.eum.main.vo.MainVO" alias="mainVO"/> -->
+		<typeAlias type="com.myspring.eum.admin.vo.AdminVO"
+			alias="adminVO" />
+
 	</typeAliases>
 </configuration>

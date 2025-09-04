@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.admin">
+  <resultMap id="AdminMap" type="com.myspring.eum.admin.vo.AdminVO">
+    <id     column="id"          property="userId"/>
+    <result column="name"        property="name"/>
+    <result column="email"       property="email"/>
+    <result column="role"        property="role"/>
+    <result column="status"      property="status"/>
+    <result column="created_at"  property="createdAt"/>
+    <result column="updated_at"  property="updatedAt"/>
+  </resultMap>
+
+  <select id="findAdminById" parameterType="string" resultMap="AdminMap">
+    SELECT id, name, email, role, status, created_at, updated_at
+    FROM member
+    WHERE id = #{id} AND role = 'ADMIN'
+    LIMIT 1
+  </select>
+</mapper>

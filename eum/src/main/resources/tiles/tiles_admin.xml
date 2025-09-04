@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+  "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+  "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+
+<tiles-definitions>
+
+	<!-- 공통 레이아웃 -->
+	<definition name="layout1.base"
+		template="/WEB-INF/views/admin/bbg/adminlayout.jsp">
+		<put-attribute name="title" value="관리자" />
+		<put-attribute name="extra_head" value="" />
+		<put-attribute name="header"
+			value="/WEB-INF/views/admin/bbg/header.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer"
+			value="/WEB-INF/views/admin/bbg/footer.jsp" />
+	</definition>
+
+	<!-- 컨트롤러에서 반환하는 뷰 이름과 동일하게 매핑 -->
+	<definition name="admin/board/listArticles"
+		extends="layout1.base">
+		<put-attribute name="title" value="관리자 게시글 목록" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/admin/board/listArticles-body.jsp" />
+	</definition>
+
+	<definition name="admin/board/viewArticle"
+		extends="layout1.base">
+		<put-attribute name="title" value="게시글 상세" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/admin/board/viewArticle-body.jsp" />
+	</definition>
+
+	<definition name="admin/board/writeForm"
+		extends="layout1.base">
+		<put-attribute name="title" value="게시글 작성" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/admin/board/writeForm-body.jsp" />
+	</definition>
+
+	<definition name="admin/auth/login" extends="layout1.base">
+		<put-attribute name="title" value="관리자 로그인" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/admin/auth/login.jsp" />
+	</definition>
+
+
+</tiles-definitions>
