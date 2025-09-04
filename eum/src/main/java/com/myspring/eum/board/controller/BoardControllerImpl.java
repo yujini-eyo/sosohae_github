@@ -38,26 +38,29 @@ public class BoardControllerImpl  implements BoardController{
 	@Autowired
 	private ArticleVO articleVO;
 	
-	@RequestMapping(value= "/youjin.do", method = {RequestMethod.GET, RequestMethod.POST})
-	public ModelAndView youjin(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String viewName = (String)request.getAttribute("viewName");
-		
-		System.out.println("viewName :: "+ viewName);
-		
-		ModelAndView mav = new ModelAndView("/youjin");
-		return mav;
-		
-	}
-	@RequestMapping(value= "/yungyo.do", method = {RequestMethod.GET, RequestMethod.POST})
-	public ModelAndView yungyo(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String viewName = (String)request.getAttribute("viewName");
-		
-		System.out.println("viewName :: "+ viewName);
-		
-		ModelAndView mav = new ModelAndView("/yungyo");
-		return mav;
-		
-	}
+	/*
+	 * @RequestMapping(value= "/youjin.do", method = {RequestMethod.GET,
+	 * RequestMethod.POST}) public ModelAndView youjin(HttpServletRequest request,
+	 * HttpServletResponse response) throws Exception { String viewName =
+	 * (String)request.getAttribute("viewName");
+	 * 
+	 * System.out.println("viewName :: "+ viewName);
+	 * 
+	 * ModelAndView mav = new ModelAndView("/youjin"); return mav;
+	 * 
+	 * }
+	 * 
+	 * @RequestMapping(value= "/yungyo.do", method = {RequestMethod.GET,
+	 * RequestMethod.POST}) public ModelAndView yungyo(HttpServletRequest request,
+	 * HttpServletResponse response) throws Exception { String viewName =
+	 * (String)request.getAttribute("viewName");
+	 * 
+	 * System.out.println("viewName :: "+ viewName);
+	 * 
+	 * ModelAndView mav = new ModelAndView("/yungyo"); return mav;
+	 * 
+	 * }
+	 */
 	
 	@Override
 	@RequestMapping(value= "/board/listArticles.do", method = {RequestMethod.GET, RequestMethod.POST})
@@ -83,6 +86,17 @@ public class BoardControllerImpl  implements BoardController{
 		return mav;
 	}
 	
+	@RequestMapping(value="/board/articleForm.do", method=RequestMethod.GET)
+	public String articleForm() {
+	  return "board/articleForm";
+	}
+	
+	/*
+	 * @RequestMapping(value = "/board/articleForm.do", method = RequestMethod.GET)
+	 * public String articleForm_direct() { // JSP 파일이 진짜 이 경로에 있으면 화면이 뜹니다. return
+	 * "forward:/WEB-INF/views/board/articleForm.jsp"; }
+	 */
+
 	 //한 개 이미지 글쓰기
 	@Override
 	@RequestMapping(value="/board/addNewArticle.do" ,method = RequestMethod.POST)
@@ -166,9 +180,7 @@ public class BoardControllerImpl  implements BoardController{
 		return mav;
 	}
    */
-	
 
-	
   //한 개 이미지 수정 기능
   @RequestMapping(value="/board/modArticle.do" ,method = RequestMethod.POST)
   @ResponseBody
@@ -331,16 +343,13 @@ public class BoardControllerImpl  implements BoardController{
 */
 
 	
-
-	@RequestMapping(value = "/board/*Form.do", method = {RequestMethod.GET, RequestMethod.POST})
-	private ModelAndView form(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String viewName = (String)request.getAttribute("viewName");
-		System.out.println("viewName : "+ viewName);
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName(viewName);
-		return mav;
-	}
-
+	  @RequestMapping(value = "/board/*Form.do", method = {RequestMethod.GET,
+	  RequestMethod.POST}) private ModelAndView form(HttpServletRequest request,
+	  HttpServletResponse response) throws Exception { String viewName =
+	  (String)request.getAttribute("viewName"); System.out.println("viewName : "+
+	  viewName); ModelAndView mav = new ModelAndView(); mav.setViewName(viewName);
+	  return mav; }
+	 
 	//한개 이미지 업로드 하기
 	private String upload(MultipartHttpServletRequest multipartRequest) throws Exception{
 		String imageFileName= null;

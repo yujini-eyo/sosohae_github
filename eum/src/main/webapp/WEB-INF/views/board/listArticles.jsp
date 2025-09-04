@@ -2,13 +2,17 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
+<!-- 스타일 자바스크립트 -->
+<link rel="stylesheet" href="<c:url value='/resources/css/board.css' />">
+<script defer src="<c:url value='/resources/js/board.js' />"></script>
+<script defer src="<c:url value='/resources/js/board-header-offset.js'/>"></script>
 
 <div class="container">
   <section id="main" class="board" aria-labelledby="boardTitle">
     <header class="board-header">
       <div>
         <h1 id="boardTitle" class="board-title">도움 매칭 게시판</h1>
-        <p class="desc">고령자(요청자)와 봉사자가 서로 연결되는 공간입니다. 큰 글씨와 선명한 버튼으로 가독성과 가시성을 강화했습니다.</p>
+        <p class="desc">이거 위로 어케 올려</p>
       </div>
 
       <nav class="tabs" role="tablist" aria-label="게시판 카테고리">
