@@ -1,0 +1,138 @@
+/* 변수/스타일을 페이지 스코프로 묶어 다른 화면에 영향 최소화 */
+.chat-page{
+  --bg:#FFF8F2; --text:#59463E; --muted:#806A5A;
+  --primary:#F6A96D; --primary-600:#e98c45;
+  --brand:#FFE8C2; --brand-200:#FADFCB;
+  --card:#FFFFFF; --card-br:#FFE1CB;
+  --shadow-soft: 0 4px 10px rgba(0,0,0,0.06);
+  --radius:20px;
+  --header-h:72px; --footer-h:90px;
+  --resizer-w:10px;
+  --desktop-chat-w:420px;
+  --desktop-chat-w-min:320px;
+  --desktop-chat-w-max:640px;
+  --sheet-snap-min:20vh;
+  --sheet-snap-mid:70vh;
+  --sheet-snap-max:95vh;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --input-h:64px;
+  font-family:'SUIT',sans-serif;
+  color:var(--text);
+  background:var(--bg);
+}
+
+/* 컨테이너 내부만 리셋/레이아웃 */
+.chat-page *{ box-sizing:border-box; }
+.chat-page .main{
+  height: calc(100dvh - var(--header-h) - var(--footer-h));
+  position:relative;
+}
+
+/* 데스크톱 레이아웃 */
+.chat-page .desktop-split{
+  height:100%; max-width:1400px; margin:0 auto;
+  display:none; grid-template-columns: var(--desktop-chat-w) var(--resizer-w) 1fr;
+}
+.chat-page .desktop-split .panel{
+  border:2px solid var(--card-br); background:var(--card);
+  display:flex; flex-direction:column;
+}
+.chat-page .desktop-split .panel header{
+  padding:10px 12px; border-bottom:1px solid var(--brand-200);
+  background:#FFF4E9; font-weight:800;
+}
+.chat-page .desktop-split .panel .body{
+  flex:1 1 auto; display:flex; flex-direction:column;
+  overflow:hidden; padding:0;
+}
+.chat-page .resizer{
+  width:var(--resizer-w); cursor:col-resize; background:linear-gradient(#FFD9AF,#FFE8C2);
+}
+
+/* 채팅(데스크톱) */
+.chat-page #chatBoxDesk{
+  flex:1 1 auto; overflow:auto;
+  padding: 12px 12px calc(var(--input-h) + 12px);
+  display:flex; flex-direction:column; gap:10px;
+}
+.chat-page .msg{ max-width:78%; padding:12px 14px; border-radius:18px; font-size:16px; line-height:1.5; word-break:break-word; }
+.chat-page .me{ align-self:flex-end; background:#FFE2D1; }
+.chat-page .other{ align-self:flex-start; background:#FFD9AF; }
+
+.chat-page #chatPanelDesk .chat-input{
+  position: sticky; bottom: 0; left:0; right:0;
+  height: var(--input-h);
+  display:flex; gap:8px; align-items:center;
+  padding:10px 12px; background:var(--card);
+  border-top:1px dashed var(--brand-200);
+  box-shadow:0 -6px 12px rgba(0,0,0,0.06); z-index:1;
+}
+.chat-page #chatPanelDesk .chat-input input{
+  flex:1; height:42px; padding:0 12px; font-size:16px; border:1px solid #ccc; border-radius:12px; outline:none;
+}
+.chat-page #chatPanelDesk .chat-input button{
+  height:42px; padding:0 16px; font-size:16px; background:#FFB88A; color:#fff; border:none; border-radius:12px; cursor:pointer; white-space:nowrap;
+}
+
+/* 지도 */
+.chat-page #mapCanvasDesktop{ height:100%; width:100%; position:relative; }
+.chat-page #mapCanvasDesktop .map-bg,
+.chat-page .mobile-map .map-bg{
+  position:absolute; inset:0;
+  background:
+    linear-gradient(0deg, rgba(255,255,255,.25), rgba(255,255,255,.25)),
+    url('https://tile.openstreetmap.org/5/28/12.png');
+  background-size:cover; transition: transform .12s ease-out;
+}
+.chat-page .zoom-controls{
+  position:absolute; right:12px; top:12px; display:flex; flex-direction:column; gap:6px; z-index:2;
+}
+.chat-page .zoom-controls button{
+  width:38px; height:38px; border:none; border-radius:10px; background:#fff; box-shadow:var(--shadow-soft); cursor:pointer; font-weight:900;
+}
+
+/* 모바일 + 바텀시트 */
+.chat-page .mobile-map{ position:absolute; inset:0; display:block; z-index:0; }
+.chat-page .sheet{
+  position:absolute; left:0; right:0; bottom:0; height:var(--sheet-snap-mid);
+  max-height: calc(100dvh - 8px);
+  background:#fff; border-radius:16px 16px 0 0; box-shadow:0 -8px 24px rgba(0,0,0,.12);
+  transform: translateY(0); display:flex; flex-direction:column;
+  transition: height .18s ease, transform .18s ease; will-change: transform, height; z-index:3;
+}
+.chat-page .sheet .handle{ height:24px; display:flex; align-items:center; justify-content:center; cursor:grab; user-select:none; }
+.chat-page .sheet .handle::before{ content:""; width:48px; height:5px; border-radius:999px; background:#d9d9d9; }
+.chat-page .sheet header{ padding:0 14px 8px; font-weight:800; border-bottom:1px solid #f2e6db; }
+.chat-page .sheet .content{
+  flex:1 1 auto; min-height:0; overflow:auto; padding:12px; display:flex; flex-direction:column; gap:10px;
+}
+.chat-page .sheet-footer{
+  position: sticky; bottom: 0; left: 0; right: 0;
+  height: var(--input-h); display:flex; gap:8px; align-items:center;
+  padding:10px 12px calc(10px + var(--safe-bottom)); background:#fff;
+  border-top:1px solid #f2e6db; box-shadow:0 -6px 12px rgba(0,0,0,0.06); z-index:3;
+}
+.chat-page .sheet-footer input{ flex:1; height:42px; padding:0 12px; font-size:16px; border:1px solid #ccc; border-radius:12px; outline:none; }
+.chat-page .sheet-footer button{ height:42px; padding:0 16px; font-size:16px; background:#FFB88A; color:#fff; border:none; border-radius:12px; cursor:pointer; white-space:nowrap; }
+
+/* 반응 전환 */
+@media (min-width:1024px){
+  .chat-page .desktop-split{ display:grid; }
+  .chat-page .mobile-map{ display:none; }
+}
+@media (max-width:600px){
+  .chat-page .msg{ font-size:15px; }
+}
+
+/* ✅ 1) 모바일·데스크톱 공통: 메시지 리스트를 flex 컬럼으로 */
+.chat-page .chat-box,
+.chat-page #chatBoxMob,
+.chat-page #chatBoxDesk{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ✅ 2) 좌·우 정렬을 확실히 고정 (충돌 방지용 쐐기) */
+.chat-page .msg.me{    align-self: flex-end;  margin-left:  auto; }
+.chat-page .msg.other{ align-self: flex-start; margin-right: auto; }
