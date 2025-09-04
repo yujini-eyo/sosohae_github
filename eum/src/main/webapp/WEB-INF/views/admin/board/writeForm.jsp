@@ -12,6 +12,7 @@
   .btn.primary{background:#f6a96d; color:#fff; border-color:#f6a96d;}
   .actions{display:flex; gap:8px; margin-top:16px;}
   .muted{color:#777; font-size:12px;}
+  .inline-field{display:flex; align-items:center; gap:8px;}
 </style>
 
 <h2>게시글 작성</h2>
@@ -40,6 +41,14 @@
     <input type="file" id="imageFile" name="imageFile" accept="image/*" />
     <p class="muted">최대 업로드 크기 및 허용 확장자는 서버 설정을 따릅니다.</p>
   </div>
+
+  <!-- ✅ 공지 등록 플래그 -->
+  <c:if test="${sessionScope.member == null || sessionScope.member.role == 'ADMIN'}">
+    <div class="field inline-field">
+      <input type="checkbox" id="isNotice" name="isNotice" value="1" />
+      <label for="isNotice" style="margin:0;">공지사항으로 등록</label>
+    </div>
+  </c:if>
 
   <div class="actions">
     <button type="submit" class="btn primary">등록</button>

@@ -1,12 +1,10 @@
 package com.myspring.eum.admin.service;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.myspring.eum.admin.dao.AdminBoardDAO;
 import com.myspring.eum.board.vo.ArticleVO;
+
 
 @Service("adminBoardService")
 public class AdminBoardServiceImpl implements AdminBoardService {
@@ -62,9 +61,8 @@ public class AdminBoardServiceImpl implements AdminBoardService {
         assertAdmin(multipartRequest.getSession(false));
         multipartRequest.setCharacterEncoding("UTF-8");
 
-     // 파라미터 수집: 단일값=String, 다중값=List<String>
+        // 파라미터 수집: 단일값=String, 다중값=List<String>
         Map<String, Object> articleMap = new HashMap<String, Object>();
-
         java.util.Enumeration<?> names = multipartRequest.getParameterNames();
         while (names.hasMoreElements()) {
             String key = (String) names.nextElement();
@@ -82,12 +80,14 @@ public class AdminBoardServiceImpl implements AdminBoardService {
             }
         }
 
-
         // 작성자
         HttpSession session = multipartRequest.getSession(false);
         Object uid = (session != null) ? session.getAttribute("userId") : null;
         articleMap.put("id", (uid instanceof String) ? ((String) uid) : "admin");
         articleMap.put("parentNO", 0);
+
+        // ✅ isNotice 정규화(1/0) — 체크박스 미체크/부재 시 0
+        articleMap.put("isNotice", normalizeIsNotice(articleMap.get("isNotice")));
 
         // 파일 저장 (단일 이미지: input name="imageFile")
         String imageFileName = handleSingleFileUpload(multipartRequest);
@@ -98,6 +98,7 @@ public class AdminBoardServiceImpl implements AdminBoardService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "text/html; charset=utf-8");
         try {
+            // ⚠️ 매퍼/DAO는 #{isNotice} → INSERT ... is_notice 컬럼으로 매핑되어 있어야 함
             adminBoardDAO.insertNewArticle(articleMap);
 
             // (선택) articleNO 반환 시 temp → <articleNO> 이동 로직 추가
@@ -174,6 +175,25 @@ public class AdminBoardServiceImpl implements AdminBoardService {
 
     private int parseIntOrDefault(String s, int def){
         try { return Integer.parseInt(s); } catch (Exception e){ return def; }
+    }
+
+    /** ✅ isNotice 값 정규화: "1"/"on"/"true"/true/숫자!=0 → 1, 그 외 0 */
+    @SuppressWarnings("rawtypes")
+    private int normalizeIsNotice(Object raw){
+        if (raw == null) return 0;
+        if (raw instanceof Number)   return (((Number) raw).intValue() != 0) ? 1 : 0;
+        if (raw instanceof Boolean)  return ((Boolean) raw) ? 1 : 0;
+        if (raw instanceof List) {
+            List list = (List) raw;
+            return list.isEmpty() ? 0 : normalizeIsNotice(list.get(0));
+        }
+        String s = String.valueOf(raw).trim();
+        if (s.isEmpty()) return 0;
+        if ("1".equals(s)) return 1;
+        if ("on".equalsIgnoreCase(s)) return 1;
+        if ("true".equalsIgnoreCase(s)) return 1;
+        try { return (Integer.parseInt(s) != 0) ? 1 : 0; } catch (Exception ignore) {}
+        return 0;
     }
 
     /** 단일 파일 업로드 (임시폴더: C:\board\article_image\temp) */

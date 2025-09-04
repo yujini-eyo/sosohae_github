@@ -44,5 +44,12 @@
   <delete id="deleteArticle" parameterType="int">
     DELETE FROM board_article WHERE articleNO = #{articleNO}
   </delete>
+  
+  <insert id="insertArticle" parameterType="map">
+    INSERT INTO eum12.board_article
+      (title, content, id, imageFileName, is_notice)
+    VALUES
+      (#{title}, #{content}, #{id}, #{imageFileName}, #{isNotice})
+  </insert>
 
 </mapper>
