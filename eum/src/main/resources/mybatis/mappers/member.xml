@@ -5,73 +5,52 @@
 
 <mapper namespace="mapper.member">
 
-	<resultMap id="memResult"
-		type="com.myspring.eum.member.vo.MemberVO">
-		<id property="id" column="id" />
-		<result property="password" column="password" />
-		<result property="name" column="name" />
-		<result property="email" column="email" />
-		<result property="address" column="address" />
-		<result property="age" column="age" />
-		<result property="birth" column="birth" />
-		<result property="phone" column="phone" />
-		<result property="code" column="code" />
-		<result property="notes" column="notes" />
-		<result property="createdAt" column="created_at" />
-	</resultMap>
+  <resultMap id="memResult" type="com.myspring.eum.member.vo.MemberVO">
+    <id property="id" column="id"/>
+    <result property="password"  column="password"/>
+    <result property="name"      column="name"/>
+    <result property="email"     column="email"/>
+    <result property="address"   column="address"/>
+    <result property="age"       column="age"/>
+    <result property="birth"     column="birth"/>
+    <result property="phone"     column="phone"/>
+    <result property="code"      column="code"/>
+    <result property="notes"     column="notes"/>
+    <result property="createdAt" column="created_at"/>
+  </resultMap>
 
-	<select id="findById" parameterType="string"
-		resultMap="memResult">
-		SELECT *
-		FROM member
-		WHERE id = #{id}
-		LIMIT 1
-	</select>
+  <!-- ✅ 회원가입(삽입) : MemberService.signup -> DAO.insertMember 가 호출 -->
+  <insert id="insertMember" parameterType="com.myspring.eum.member.vo.MemberVO">
+    INSERT INTO member
+      (id, password, name, email, address, age, birth, phone, code, notes, createdAt)
+    VALUES
+      (#{id}, #{password}, #{name}, #{email}, #{address}, #{age}, #{birth}, #{phone}, #{code}, #{notes}, #{createdAt})
+  </insert> 
+  
+  <select id="selectAllMemberList" resultMap="memResult">
+  SELECT * FROM member ORDER BY created_at DESC
+</select>
 
-	<select id="selectAllMemberList" resultMap="memResult">
-		SELECT * FROM member ORDER BY created_at DESC
-	</select>
+  <!-- ✅ 단건 조회(id) : VO 파라미터로 받아 #{id} 사용 -->
+  <select id="findById"
+          parameterType="com.myspring.eum.member.vo.MemberVO"
+          resultMap="memResult">
+    SELECT *
+    FROM member
+    WHERE id = #{id}
+    LIMIT 1
+  </select>
 
-	<insert id="insertMember"
-		parameterType="com.myspring.eum.member.vo.MemberVO">
-		INSERT INTO member (id, password, name, email, address, age, birth, phone,
-		code, notes)
-		VALUES (#{id}, #{password}, #{name}, #{email}, #{address}, #{age}, #{birth},
-		#{phone}, #{code}, #{notes})
-	</insert>
+  <!-- 로그인(id+password) -->
+  <select id="loginById"
+          parameterType="com.myspring.eum.member.vo.MemberVO"
+          resultMap="memResult">
+    SELECT *
+    FROM member
+    WHERE id = #{id}
+      AND password = #{password}
+    LIMIT 1
+  </select>
 
-
-	<!-- 비밀번호 null/빈문자면 SET하지 않음 -->
-	<update id="updateMember"
-		parameterType="com.myspring.eum.member.vo.MemberVO">
-		UPDATE member
-		<set>
-			<if test="password != null and password != ''">password = #{password},</if>
-			<if test="name    != null">name = #{name},</if>
-			<if test="email   != null">email = #{email},</if>
-			<if test="address != null">address = #{address},</if>
-			<if test="age     != null">age = #{age},</if>
-			<if test="birth   != null">birth = #{birth},</if>
-			<if test="phone   != null">phone = #{phone},</if>
-			<if test="code    != null">code = #{code},</if>
-			<if test="notes   != null">notes = #{notes},</if>
-		</set>
-		WHERE id = #{id}
-	</update>
-
-	<delete id="deleteMember" parameterType="string">
-		DELETE FROM member
-		WHERE id = #{_parameter}
-	</delete>
-
-	<select id="loginById"
-		parameterType="com.myspring.eum.member.vo.MemberVO"
-		resultMap="memResult">
-		SELECT *
-		FROM member
-		WHERE id = #{id}
-		AND password = #{password}
-		LIMIT 1
-	</select>
 
 </mapper>

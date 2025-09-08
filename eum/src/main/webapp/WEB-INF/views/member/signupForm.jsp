@@ -12,7 +12,7 @@
     <h1 id="signupTitle">회원가입</h1>
 
     <!-- HTML 디자인과 동일한 입력 UI, action은 서버연동 -->
-    <form class="login-box" method="post" action="${contextPath}/eum/addMember.do" autocomplete="on">
+    <form class="login-box" method="post" action="${contextPath}/eum/loginForm.do" autocomplete="on">
       <c:if test="${not empty _csrf}">
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
       </c:if>

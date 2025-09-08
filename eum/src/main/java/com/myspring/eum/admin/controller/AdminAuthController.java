@@ -7,8 +7,8 @@ import javax.servlet.http.HttpSession;
 import com.myspring.eum.auth.service.AuthService;
 import com.myspring.eum.admin.vo.AdminVO;
 import java.util.List;
-import com.myspring.eum.member.service.MemberService;
 import com.myspring.eum.member.vo.MemberVO;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -27,42 +27,36 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/admin")
 public class AdminAuthController {
 
-    @Autowired
-    private AuthService authService;
-    
-    @Autowired
-    private MemberService memberService;
+	@Autowired
+	private AuthService authService; // ✅ 이거만 유지
 
-    /** 관리자 메인 (GET /admin/main.do) */
+	@RequestMapping(value="/auth/listMembers.do", method=RequestMethod.GET)
+	public ModelAndView listMembers(HttpServletRequest request) throws Exception {
+	    HttpSession session = request.getSession(false);
+	    if (session == null || session.getAttribute("adminUser") == null) {
+	        return new ModelAndView("redirect:/admin/auth/login.do");
+	    }
+	    // ✅ AuthService로 직접 조회
+	    java.util.List<MemberVO> list = authService.listAllMembers();
+	    ModelAndView mav = new ModelAndView("admin/auth/listMembers");
+	    mav.addObject("membersList", list);
+	    return mav;
+	}
+
     @RequestMapping(value="/main.do", method=RequestMethod.GET)
     public ModelAndView adminMain(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("adminUser") == null) {
             return new ModelAndView("redirect:/admin/auth/login.do");
         }
-        return new ModelAndView("admin/main"); // /WEB-INF/views/admin/main.jsp
+        return new ModelAndView("admin/main");
     }
 
-    /** 로그인 폼 */
     @RequestMapping(value="/auth/login.do", method=RequestMethod.GET)
     public ModelAndView loginForm(HttpServletRequest request, HttpServletResponse response) {
         return new ModelAndView("admin/auth/login");
     }
 
-    /** (관리자 전용) 회원 조회 페이지 */
-    @RequestMapping(value="/auth/listMembers.do", method=RequestMethod.GET)
-    public ModelAndView listMembers(HttpServletRequest request) throws Exception {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("adminUser") == null) {
-            return new ModelAndView("redirect:/admin/auth/login.do");
-        }
-        List<MemberVO> list = memberService.listMembers();
-        ModelAndView mav = new ModelAndView("admin/auth/listMembers");
-        mav.addObject("membersList", list);
-        return mav;
-    }
-    
-    /** 로그인 처리 (관리자만) */
     @RequestMapping(value="/auth/login.do", method=RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> login(
@@ -80,7 +74,7 @@ public class AdminAuthController {
             }
             HttpSession session = request.getSession(true);
             session.setAttribute("adminUser", admin);
-            session.setMaxInactiveInterval(60 * 60); // 1시간
+            session.setMaxInactiveInterval(60 * 60);
 
             String msg = "<script>alert('관리자 로그인 성공'); location.href='"
                        + request.getContextPath()
@@ -95,7 +89,6 @@ public class AdminAuthController {
         }
     }
 
-    /** 로그아웃 */
     @RequestMapping(value="/logout.do", method=RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<String> logout(HttpServletRequest request) {
@@ -109,7 +102,6 @@ public class AdminAuthController {
         return new ResponseEntity<String>(msg, h, HttpStatus.OK);
     }
 
-    /** (관리자 전용) 회원 정보 단건 조회 API */
     @RequestMapping(value="/api/members/{id}", method=RequestMethod.GET, produces="application/json; charset=UTF-8")
     @ResponseBody
     public ResponseEntity<?> getMember(@PathVariable("id") String id, HttpServletRequest request) {
@@ -129,7 +121,6 @@ public class AdminAuthController {
         }
     }
 
-    /** 공통 예외 처리 */
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<String> handleAny(HttpServletRequest request, Exception ex) {

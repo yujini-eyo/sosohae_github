@@ -23,32 +23,38 @@ public class MemberControllerImpl implements MemberController {
     @Autowired
     private MemberService memberService;
 
+    /** 회원가입 폼 */
     @RequestMapping(value="/signupForm.do", method=RequestMethod.GET)
     public ModelAndView signupForm(HttpServletRequest request, HttpServletResponse response) throws Exception {
         return new ModelAndView("member/signupForm");
     }
 
+    /** 로그인 폼 */
     @RequestMapping(value="/loginForm.do", method=RequestMethod.GET)
     public ModelAndView loginForm(HttpServletRequest request, HttpServletResponse response) throws Exception {
         return new ModelAndView("member/loginForm");
     }
 
+    /** 회원가입 처리: POST /member/signup.do */
     @Override
-    @RequestMapping(value="/addMember.do", method=RequestMethod.POST)
-    public ModelAndView addMember(@ModelAttribute("info") MemberVO memberVO,
-                                  HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @RequestMapping(value="/signup.do", method=RequestMethod.POST)
+    public ModelAndView signup(@ModelAttribute("info") MemberVO memberVO,
+                               HttpServletRequest request, HttpServletResponse response) throws Exception {
+
         if (memberVO == null || isEmpty(memberVO.getId()) || isEmpty(memberVO.getPassword())) {
             return new ModelAndView("redirect:/member/signupForm.do");
         }
 
+        // 중복 체크
         MemberVO exists = memberService.findById(memberVO.getId().trim());
         if (exists != null) {
             return new ModelAndView("redirect:/member/signupForm.do");
         }
 
         try {
+            // 저장 (운영 시 비밀번호 해싱 권장)
             memberVO.setId(memberVO.getId().trim());
-            memberService.addMember(memberVO);
+            memberService.signup(memberVO); // ⬅️ addMember 대신 signup 사용
         } catch (DuplicateKeyException dke) {
             return new ModelAndView("redirect:/member/signupForm.do");
         }
@@ -56,6 +62,7 @@ public class MemberControllerImpl implements MemberController {
         return new ModelAndView("redirect:/member/loginForm.do");
     }
 
+    /** 로그인 처리: POST /member/login.do */
     @Override
     @RequestMapping(value="/login.do", method=RequestMethod.POST)
     public ModelAndView login(@ModelAttribute("member") MemberVO member,
@@ -66,7 +73,7 @@ public class MemberControllerImpl implements MemberController {
             return new ModelAndView("redirect:/member/loginForm.do");
         }
 
-        MemberVO db = memberService.login(member);
+        MemberVO db = memberService.login(member); // mapper: loginById
         if (db == null) {
             rAttr.addFlashAttribute("loginError", "아이디 또는 비밀번호가 올바르지 않습니다.");
             return new ModelAndView("redirect:/member/loginForm.do");
@@ -78,6 +85,7 @@ public class MemberControllerImpl implements MemberController {
         return new ModelAndView("redirect:/");
     }
 
+    /** 로그아웃 */
     @Override
     @RequestMapping(value="/logout.do", method=RequestMethod.GET)
     public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) throws Exception {

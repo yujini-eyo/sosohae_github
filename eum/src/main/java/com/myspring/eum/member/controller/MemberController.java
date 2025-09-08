@@ -11,15 +11,15 @@ import com.myspring.eum.member.vo.MemberVO;
 
 public interface MemberController {
 
-    /** 회원가입 폼: GET /member/signupForm.do */
+    /** 회원가입 폼 */
     ModelAndView signupForm(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
-    /** 로그인 폼: GET /member/loginForm.do */
+    /** 로그인 폼 */
     ModelAndView loginForm(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
-    /** 회원가입 처리: POST /member/addMember.do (성공 시 /member/loginForm.do 리다이렉트) */
-    ModelAndView addMember(@ModelAttribute("info") MemberVO memberVO,
-                           HttpServletRequest request, HttpServletResponse response) throws Exception;
+    /** 회원가입 처리: POST /member/signup.do → 성공 시 /member/loginForm.do */
+    ModelAndView signup(@ModelAttribute("info") MemberVO memberVO,
+                        HttpServletRequest request, HttpServletResponse response) throws Exception;
 
     /** 로그인 처리: POST /member/login.do (세션 key: "member") */
     ModelAndView login(@ModelAttribute("member") MemberVO member,
