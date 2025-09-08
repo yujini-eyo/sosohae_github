@@ -4,19 +4,28 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.myspring.eum.member.vo.MemberVO;
 
-
 public interface MemberController {
-	public ModelAndView listMembers(HttpServletRequest request, HttpServletResponse response) throws Exception;
-	public ModelAndView addMember(@ModelAttribute("info") MemberVO memberVO,HttpServletRequest request, HttpServletResponse response) throws Exception;
-	public ModelAndView removeMember(@RequestParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws Exception;
-	public ModelAndView login(@ModelAttribute("member") MemberVO member,
-                              RedirectAttributes rAttr,
-                              HttpServletRequest request, HttpServletResponse response) throws Exception;
-	public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) throws Exception;
+
+    /** 회원가입 폼: GET /member/signupForm.do */
+    ModelAndView signupForm(HttpServletRequest request, HttpServletResponse response) throws Exception;
+
+    /** 로그인 폼: GET /member/loginForm.do */
+    ModelAndView loginForm(HttpServletRequest request, HttpServletResponse response) throws Exception;
+
+    /** 회원가입 처리: POST /member/addMember.do (성공 시 /member/loginForm.do 리다이렉트) */
+    ModelAndView addMember(@ModelAttribute("info") MemberVO memberVO,
+                           HttpServletRequest request, HttpServletResponse response) throws Exception;
+
+    /** 로그인 처리: POST /member/login.do (세션 key: "member") */
+    ModelAndView login(@ModelAttribute("member") MemberVO member,
+                       RedirectAttributes rAttr,
+                       HttpServletRequest request, HttpServletResponse response) throws Exception;
+
+    /** 로그아웃: GET /member/logout.do */
+    ModelAndView logout(HttpServletRequest request, HttpServletResponse response) throws Exception;
 }

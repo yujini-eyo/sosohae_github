@@ -21,8 +21,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.myspring.eum.admin.dao.AdminBoardDAO;
-import com.myspring.eum.board.vo.ArticleVO;
-
+import com.myspring.eum.admin.vo.AdminArticleVO;
 
 @Service("adminBoardService")
 public class AdminBoardServiceImpl implements AdminBoardService {
@@ -49,7 +48,7 @@ public class AdminBoardServiceImpl implements AdminBoardService {
         param.put("limit", size);
         param.put("offset", (page - 1) * size);
 
-        List<ArticleVO> list = adminBoardDAO.selectAllArticles(param);
+        List<AdminArticleVO> list = adminBoardDAO.selectAllArticles(param);
         ModelAndView mav = new ModelAndView("admin/board/listArticles");
         mav.addObject("articlesList", list);
         return mav;
@@ -126,7 +125,7 @@ public class AdminBoardServiceImpl implements AdminBoardService {
     @Override
     public ModelAndView viewArticle(int articleNO, HttpServletRequest request, HttpServletResponse response) throws Exception {
         assertAdmin(request.getSession(false));
-        ArticleVO article = adminBoardDAO.selectArticle(articleNO);
+        AdminArticleVO article = adminBoardDAO.selectArticle(articleNO);
         ModelAndView mav = new ModelAndView("admin/board/viewArticle");
         mav.addObject("article", article);
         return mav;

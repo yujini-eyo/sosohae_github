@@ -2,10 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="mapper.admin">
+<mapper namespace="mapper.adminAuth">
+
   <resultMap id="AdminMap" type="com.myspring.eum.admin.vo.AdminVO">
     <id     column="id"          property="userId"/>
     <result column="name"        property="name"/>
+    <result column="password"    property="password"/>
     <result column="email"       property="email"/>
     <result column="role"        property="role"/>
     <result column="status"      property="status"/>
@@ -13,10 +15,12 @@
     <result column="updated_at"  property="updatedAt"/>
   </resultMap>
 
-  <select id="findAdminById" parameterType="string" resultMap="AdminMap">
-    SELECT id, name, email, role, status, created_at, updated_at
+  <!-- 관리자 계정 조회 (member 테이블 기준, 서비스에서 ROLE/STATUS 검증) -->
+  <select id="findById" parameterType="string" resultMap="AdminMap">
+    SELECT id, name, password, email, role, status, created_at, updated_at
     FROM member
-    WHERE id = #{id} AND role = 'ADMIN'
+    WHERE id = #{id}
     LIMIT 1
   </select>
+
 </mapper>

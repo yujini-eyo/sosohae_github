@@ -2,12 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+<!-- 회원 로그인/조회 -->
 <mapper namespace="mapper.auth">
   <select id="findById" parameterType="string" resultType="com.myspring.eum.member.vo.MemberVO">
     SELECT
       id, password, name, email,
-      role,        
-      status       
+      role,
+      status
     FROM member
     WHERE id = #{id}
     LIMIT 1

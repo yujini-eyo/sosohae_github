@@ -15,7 +15,7 @@
 
     <!-- 툴바 -->
     <section class="toolbar" aria-label="검색 및 정렬">
-      <form id="noticeSearchForm" class="filters" method="get" action="${ctx}/notice.do" role="search">
+      <form id="noticeSearchForm" class="filters" method="get" action="${ctx}/eum/notice.do" role="search">
         <label class="field" aria-label="검색어">
           🔎 <input id="q" name="q" type="search" placeholder="제목, 내용 검색" value="${param.q}" autocomplete="off" />
         </label>
@@ -28,12 +28,12 @@
           </select>
         </label>
         <button class="btn" id="searchBtn" type="submit">검색</button>
-        <button class="btn ghost" id="resetBtn" type="button">초기화</button>
+        <button class="btn ghost" id="resetBtn" type="button" onclick="location.href='${ctx}/eum/notice.do'">초기화</button>
       </form>
 
       <div class="cta">
-        <c:if test="${sessionScope.member != null && sessionScope.member.role == 'ADMIN'}">
-          <a class="btn primary" href="<c:url value='/notice/writeForm.do'/>">+ 새 공지</a>
+        <c:if test="${sessionScope.userRole eq 'ADMIN' or (sessionScope.member ne null and sessionScope.member.role eq 'ADMIN')}">
+          <a class="btn primary" href="<c:url value='/admin/board/writeForm.do'/>">+ 새 공지</a>
         </c:if>
       </div>
     </section>
@@ -61,30 +61,28 @@
           </thead>
 
           <tbody id="tbody-notice">
-            <!-- 서버 렌더링: noticeList 가 있으면 바로 표시 -->
             <c:choose>
               <c:when test="${not empty noticeList}">
                 <c:forEach items="${noticeList}" var="n" varStatus="i">
                   <tr>
-                    <!-- TODO: 필드명은 프로젝트에 맞게 매핑하세요. (noticeNo / id 등) -->
-                    <td class="td-no"><c:out value="${n.noticeNo != null ? n.noticeNo : (n.id != null ? n.id : i.index + 1)}"/></td>
+                    <td class="td-no"><c:out value="${n.articleNO != null ? n.articleNO : (n.noticeNo != null ? n.noticeNo : i.index + 1)}"/></td>
                     <td class="td-title">
-                      <a href="<c:url value='/notice/view.do'/>?id=${n.noticeNo != null ? n.noticeNo : n.id}">
+                      <%-- 퍼블릭 뷰가 없다면 아래 링크를 /admin/board/viewArticle.do?articleNO= 로 바꿔도 됩니다. --%>
+                      <a href="<c:url value='/notice/view.do'/>?articleNO=${n.articleNO != null ? n.articleNO : n.noticeNo}">
                         <c:out value="${n.title}"/>
-                        <c:if test="${n.isPinned == true}">
+                        <c:if test="${n.isNotice == 1 or n.is_notice == 1 or n.isPinned == true}">
                           <span class="badge">고정</span>
                         </c:if>
                       </a>
                     </td>
                     <td class="td-date">
-                      <fmt:formatDate value="${n.createDate != null ? n.createDate : n.writeDate}" pattern="yyyy.MM.dd" />
+                      <fmt:formatDate value="${n.writeDate != null ? n.writeDate : n.createDate}" pattern="yyyy.MM.dd" />
                     </td>
-                    <td class="td-views"><c:out value="${n.viewCnt != null ? n.viewCnt : n.views}"/></td>
+                    <td class="td-views"><c:out value="${n.viewCnt != null ? n.viewCnt : (n.views != null ? n.views : '-')}"/></td>
                   </tr>
                 </c:forEach>
               </c:when>
               <c:otherwise>
-                <!-- 클라이언트 렌더링(목록 비었거나 API 사용 시 JS가 채움) -->
                 <tr class="empty">
                   <td colspan="4">등록된 공지사항이 없습니다.</td>
                 </tr>
@@ -94,18 +92,18 @@
         </table>
       </div>
 
-      <!-- 페이지네이션 (서버 렌더링 버전) -->
+      <!-- 페이지네이션 (pageMaker가 있을 때만 표시) -->
       <nav class="pagination" id="pagination-notice" aria-label="공지사항 페이지">
         <c:if test="${not empty pageMaker}">
           <c:if test="${pageMaker.prev}">
-            <a class="page" href="${ctx}/notice.do?page=${pageMaker.startPage - 1}&q=${param.q}&sort=${param.sort}">이전</a>
+            <a class="page" href="${ctx}/eum/notice.do?page=${pageMaker.startPage - 1}&q=${param.q}&sort=${param.sort}">이전</a>
           </c:if>
           <c:forEach begin="${pageMaker.startPage}" end="${pageMaker.endPage}" var="p">
             <a class="page <c:out value='${p == pageMaker.cri.page ? "is-active" : ""}'/>"
-               href="${ctx}/notice.do?page=${p}&q=${param.q}&sort=${param.sort}">${p}</a>
+               href="${ctx}/eum/notice.do?page=${p}&q=${param.q}&sort=${param.sort}">${p}</a>
           </c:forEach>
           <c:if test="${pageMaker.next && pageMaker.endPage > 0}">
-            <a class="page" href="${ctx}/notice.do?page=${pageMaker.endPage + 1}&q=${param.q}&sort=${param.sort}">다음</a>
+            <a class="page" href="${ctx}/eum/notice.do?page=${pageMaker.endPage + 1}&q=${param.q}&sort=${param.sort}">다음</a>
           </c:if>
         </c:if>
       </nav>

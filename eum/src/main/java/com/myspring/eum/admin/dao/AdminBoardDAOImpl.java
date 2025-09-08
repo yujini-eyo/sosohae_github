@@ -3,7 +3,7 @@ package com.myspring.eum.admin.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.myspring.eum.board.vo.ArticleVO;
+import com.myspring.eum.admin.vo.AdminArticleVO;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +19,12 @@ public class AdminBoardDAOImpl implements AdminBoardDAO {
     private static final String NS = "mapper.adminBoard"; // XML의 <mapper namespace>
 
     @Override
-    public List<ArticleVO> selectAllArticles(Map<String, Object> param) {
+    public List<AdminArticleVO> selectAllArticles(Map<String, Object> param) {
         return sqlSession.selectList(NS + ".selectAllArticles", param);
     }
 
     @Override
-    public ArticleVO selectArticle(int articleNO) {
+    public AdminArticleVO selectArticle(int articleNO) {
         return sqlSession.selectOne(NS + ".selectArticle", articleNO);
     }
 

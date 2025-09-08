@@ -45,5 +45,20 @@
 			value="/WEB-INF/views/admin/auth/login.jsp" />
 	</definition>
 
+	<definition name="admin/auth/listMembers" extends="layout1.base">
+		<put-attribute name="title" value="관리자 회원정보" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/admin/auth/listMembers.jsp" />
+	</definition>
+	
+		<definition name="admin/main" extends="layout1.base">
+		<put-attribute name="title" value="관리자 메인페이지" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/admin/main.jsp" />
+	</definition>
+	
+
+
+	
 
 </tiles-definitions>
