@@ -87,72 +87,11 @@
           </section>
 
           <div class="actions">
-            <button type="button" class="btn ghost" onclick="location.href='board.html'">목록</button>
+            <button type="button" class="btn ghost" onclick="location.href='listArticles.do'">목록</button>
             <button type="reset" class="btn ghost">초기화</button>
-            <button type="submit" class="btn primary">등록</button>
+              <button type="submit">등록</button>
           </div>
         </form>
-
-        <!-- 봉사자 모집 글쓰기 -->
-        <form id="panel-vol" role="tabpanel" aria-labelledby="tab-vol" hidden>
-          <section class="fieldset">
-            <div class="legend">기본 정보</div>
-            <div class="form-grid">
-              <div class="form-row">
-                <label for="vol-title">제목 <span class="badge">필수</span></label>
-                <input id="vol-title" name="title" type="text" placeholder="예) 평일 오후 병원 동행 가능" required />
-              </div>
-              <div class="form-row">
-                <label for="vol-area">가능 지역 <span class="badge">필수</span></label>
-                <select id="vol-area" name="area" required>
-                  <option value="">선택하세요</option>
-                </select>
-              </div>
-              <div class="form-row">
-                <label for="vol-time">가능 시간대</label>
-                <select id="vol-time" name="time">
-                  <option value="">선택하세요</option>
-                  <option>평일 오전</option>
-                  <option>평일 오후</option>
-                  <option>주말 오전</option>
-                  <option>주말 오후</option>
-                </select>
-              </div>
-              <div class="form-row">
-                <label for="vol-skills">보유 기술</label>
-                <input id="vol-skills" name="skills" type="text" placeholder="예) 운전, 휠체어 보조, 정리수납" />
-                <div class="hint">쉼표(,)로 구분하여 입력하세요.</div>
-              </div>
-            </div>
-          </section>
-
-          <section class="fieldset">
-            <div class="legend">소개</div>
-            <div class="form-row">
-              <label for="vol-intro">간단 소개 <span class="badge">필수</span></label>
-              <textarea id="vol-intro" name="intro" placeholder="경험과 가능한 도움을 적어주세요." required></textarea>
-              <div class="hint" id="vol-counter">0 / 1000</div>
-            </div>
-          </section>
-
-          <section class="fieldset">
-            <div class="legend">첨부</div>
-            <div class="form-row">
-              <label for="vol-files">이미지 (최대 3장)</label>
-              <input id="vol-files" name="files" type="file" accept="image/*" multiple />
-              <div class="preview" id="vol-preview" aria-live="polite"></div>
-            </div>
-          </section>
-
-          <div class="actions">
-            <button type="button" class="btn ghost" onclick="location.href='board.html'">목록</button>
-            <button type="reset" class="btn ghost">초기화</button>
-            <button type="submit" class="btn primary">등록</button>
-          </div>
-        </form>
-      </div>
-    </section>
-  </div>
   
   <script>
     // ===== 공통 데이터(board.html과 동일 지역/유형) =====

@@ -64,7 +64,7 @@
      -->  	
      
      SELECT *
-		FROM t_board t
+		FROM board t
 		ORDER BY parentNO, articleNO DESC
   </select>
   
@@ -72,27 +72,27 @@
 	 
   <insert id="insertNewArticle"  parameterType="java.util.Map">
 		<![CDATA[
-			INSERT into t_board(articleNO,  title, content, imageFileName, id)
+			INSERT into board(articleNO,  title, content, imageFileName, id)
 			VALUES(#{articleNO},#{title},	#{content}, #{imageFileName},	#{id})
 		]]>      
 	</insert>
 	
   <select id="selectNewArticleNO" resultType="int"  >
-		<!-- SELECT  nvl(max(articleNO), 0) + 1 from t_board -->
+		<!-- SELECT  nvl(max(articleNO), 0) + 1 from board -->
 		<![CDATA[	
-			SELECT IFNULL(MAX(articleNO), 0) + 1 FROM t_board;
+			SELECT IFNULL(MAX(articleNO), 0) + 1 FROM board;
 		]]>
 	</select>
 	
   <select id="selectArticle" resultType="articleVO"   parameterType="int">
     <![CDATA[
-      SELECT * from t_board
+      SELECT * from board
       where articleNO = #{articleNO}		
     ]]>
   </select>
   
   <update id="updateArticle"  parameterType="java.util.Map">
-			update t_board
+			update board
 			set title=#{title},	 
 			content=#{content}
 			 <if test="imageFileName!='' and imageFileName!=null">
@@ -103,9 +103,9 @@
 	
 	<delete id="deleteArticle"  parameterType="int">
     <![CDATA[
-      delete from t_board
+      delete from board
       where articleNO in (
-         SELECT articleNO FROM  t_board
+         SELECT articleNO FROM  board
          START WITH articleNO = #{articleNO}
          CONNECT BY PRIOR  articleNO = parentNO )
     ]]>      

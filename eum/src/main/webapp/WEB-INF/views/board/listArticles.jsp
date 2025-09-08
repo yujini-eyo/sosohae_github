@@ -1,11 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="contextPath" value="${pageContext.request.contextPath}" />
-
-<!-- 스타일 자바스크립트 -->
-<link rel="stylesheet" href="<c:url value='/resources/css/board.css' />">
-<script defer src="<c:url value='/resources/js/board.js' />"></script>
-<script defer src="<c:url value='/resources/js/board-header-offset.js'/>"></script>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<head>
+  <!-- CSS -->
+  <link rel="stylesheet" href="<c:url value='/resources/css/board.css'/>">
+  <!-- JS: 반드시 c:url 사용, defer 권장 -->
+  <script defer src="<c:url value='/resources/js/board.js'/>"></script>
+</head>
 
 <div class="container">
   <section id="main" class="board" aria-labelledby="boardTitle">
@@ -61,45 +62,13 @@
           </label>
         </div>
         <div class="cta">
-          <button class="btn ghost"   id="resetBtn" type="button">초기화</button>
-          <button class="btn primary" id="writeBtn" type="button" aria-label="새 글 쓰기">글쓰기</button>
+          <!-- 글쓰기 버튼 -->
+		  <a class="btn primary" href="/eum/board/articleForm.do" style="text-decoration:none;">글쓰기</a>
+		  
         </div>
       </div>
     </header>
-
-    <!-- 도움 요청 -->
-    <div id="panel-req" role="tabpanel" aria-labelledby="tab-req">
-      <div class="table-wrap">
-        <table aria-describedby="desc-req">
-          <caption id="desc-req" class="sr-only" style="position:absolute;left:-9999px;">도움 요청 목록</caption>
-
-          <!-- ✅ colgroup을 테이블 최상단으로 이동 -->
-          <colgroup>
-            <col style="width:72px"><col style="width:auto"><col style="width:96px">
-            <col style="width:110px"><col style="width:110px"><col style="width:180px">
-            <col style="width:90px"><col style="width:100px"><col style="width:88px"><col style="width:140px">
-          </colgroup>
-
-          <thead>
-            <tr>
-              <th scope="col">번호</th>
-              <th scope="col">제목</th>
-              <th scope="col">요청자</th>
-              <th scope="col">유형</th>
-              <th scope="col">지역</th>
-              <th scope="col">희망일시</th>
-              <th scope="col">긴급</th>
-              <th scope="col">진행</th>
-              <th scope="col">조회</th>
-              <th scope="col">액션</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-req"></tbody>
-        </table>
-      </div>
-      <nav class="pagination" id="pagination-req" aria-label="도움 요청 페이지"></nav>
-    </div>
-
+    
     <!-- 봉사자 모집 -->
     <div id="panel-vol" role="tabpanel" aria-labelledby="tab-vol" hidden>
       <div class="table-wrap">

@@ -1,52 +1,31 @@
+// com.myspring.eum.board.vo.ArticleVO
 package com.myspring.eum.board.vo;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.sql.Date;
+import java.util.Date;
 
-import org.springframework.stereotype.Component;
-
-@Component("articleVO")
 public class ArticleVO {
-	private int  level;
-	private int articleNO;
-	private int parentNO;
+	private Long articleNO;
+	private Long parentNO;
 	private String title;
 	private String content;
+	private Date writeDate;
 	private String imageFileName;
-	private String id;
-	private Date  writeDate;
-	
-	
-	public ArticleVO() {
-		System.out.println("ArticleVO ������");
-	}
 
-	public int getArticleNO() {
+	public Long getArticleNO() {
 		return articleNO;
 	}
 
-	public void setArticleNO(int articleNO) {
+	public void setArticleNO(Long articleNO) {
 		this.articleNO = articleNO;
 	}
 
-	public int getParentNO() {
+	public Long getParentNO() {
 		return parentNO;
 	}
 
-	public void setParentNO(int parentNO) {
+	public void setParentNO(Long parentNO) {
 		this.parentNO = parentNO;
 	}
-
-	public int getLevel() {
-		return level;
-	}
-
-	public void setLevel(int level) {
-		this.level = level;
-	}
-
 
 	public String getTitle() {
 		return title;
@@ -64,37 +43,6 @@ public class ArticleVO {
 		this.content = content;
 	}
 
-	public String getImageFileName() {
-		try {
-			if (imageFileName != null && imageFileName.length() != 0) {
-				imageFileName = URLDecoder.decode(imageFileName, "UTF-8");
-			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return imageFileName;
-	}
-
-	public void setImageFileName(String imageFileName) {
-		try {
-			if(imageFileName!= null && imageFileName.length()!=0) {
-				this.imageFileName = URLEncoder.encode(imageFileName,"UTF-8");
-			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
 	public Date getWriteDate() {
 		return writeDate;
 	}
@@ -103,7 +51,11 @@ public class ArticleVO {
 		this.writeDate = writeDate;
 	}
 
+	public String getImageFileName() {
+		return imageFileName;
+	}
 
-	
-	
+	public void setImageFileName(String imageFileName) {
+		this.imageFileName = imageFileName;
+	}
 }
