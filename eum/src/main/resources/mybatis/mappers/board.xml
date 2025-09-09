@@ -1,147 +1,53 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="mapper.board">
-<resultMap id="articlesResult" type="articleVO">
-    <result property="level" column="level" />
-    <result property="articleNO" column="articleNO" />
-    <result property="parentNO" column="parentNO" />
-    <result property="title" column="title" />
-    <result property="content" column="content" />
-    <result property="writeDate" column="writeDate" />
-    <result property="imageFileName" column="imageFileName" />
-  </resultMap> 
-  
-  <resultMap id="imgResult" type="imageVO">
-	  <result property="imageFileNO" column="imageFileNO" />
-	  <result property="articleNO" column="articleNO" />
-	  <result property="imageFileName" column="imageFileName" />
- </resultMap>
+  <!-- (중요) typeAlias 등록: action-mybatis.xml에 아래 추가
+       <typeAlias alias="articleVO" type="com.myspring.eum.board.vo.ArticleVO"/> -->
 
-  <select id="selectAllArticlesList" resultMap="articlesResult"   >
-    <!-- 
-      SELECT level, articleNO, parentNO, title, content, writeDate, imageFileName, id
-      from t_board
-      START WITH  parentNO=0
-      CONNECT BY PRIOR articleNO=parentNO 
-      ORDER SIBLINGS BY articleNO DESC	
-    <![CDATA[
-	     WITH RECURSIVE cte AS (
-		    
-		    SELECT 
-		        1 AS level,
-		        articleNO,
-		        parentNO,
-		        title,
-		        content,
-		        writeDate,
-		        imageFileName,
-		        id
-		    FROM t_board
-		    WHERE parentNO = 0
-		    
-		    UNION ALL
-		    
-		    SELECT 
-		        cte.level + 1,
-		        t.articleNO,
-		        t.parentNO,
-		        t.title,
-		        t.content,
-		        t.writeDate,
-		        t.imageFileName,
-		        t.id
-		    FROM t_board t
-		    INNER JOIN cte ON t.parentNO = cte.articleNO
-		)
-		SELECT *
-		FROM cte
-		ORDER BY parentNO, articleNO DESC
-     
-    ]]>
-     -->  	
-     
-     SELECT *
-		FROM board t
-		ORDER BY parentNO, articleNO DESC
+  <resultMap id="ArticleMap" type="articleVO">
+    <id     property="articleNO"     column="article_no"/>
+    <result property="parentNO"      column="parent_no"/>
+    <result property="id"            column="id"/>
+    <result property="title"         column="title"/>
+    <result property="content"       column="content"/>
+    <result property="imageFileName" column="image_file_name"/>
+    <result property="writeDate"     column="write_date"/>
+  </resultMap>
+
+  <select id="selectAllArticlesList" resultMap="ArticleMap">
+    SELECT article_no, parent_no, id, title, content, image_file_name, write_date
+    FROM tb_board
+    ORDER BY article_no DESC
   </select>
-  
-	<!--단일이미지 추가  -->
-	 
-  <insert id="insertNewArticle"  parameterType="java.util.Map">
-		<![CDATA[
-			INSERT into board(articleNO,  title, content, imageFileName, id)
-			VALUES(#{articleNO},#{title},	#{content}, #{imageFileName},	#{id})
-		]]>      
-	</insert>
-	
-  <select id="selectNewArticleNO" resultType="int"  >
-		<!-- SELECT  nvl(max(articleNO), 0) + 1 from board -->
-		<![CDATA[	
-			SELECT IFNULL(MAX(articleNO), 0) + 1 FROM board;
-		]]>
-	</select>
-	
-  <select id="selectArticle" resultType="articleVO"   parameterType="int">
-    <![CDATA[
-      SELECT * from board
-      where articleNO = #{articleNO}		
-    ]]>
+
+  <select id="selectArticle" parameterType="long" resultMap="ArticleMap">
+    SELECT article_no, parent_no, id, title, content, image_file_name, write_date
+    FROM tb_board
+    WHERE article_no = #{value}
   </select>
-  
-  <update id="updateArticle"  parameterType="java.util.Map">
-			update board
-			set title=#{title},	 
-			content=#{content}
-			 <if test="imageFileName!='' and imageFileName!=null">
-			  , imageFileName=#{imageFileName}
-			</if>
-			where articleNO=#{articleNO}
-	</update>
-	
-	<delete id="deleteArticle"  parameterType="int">
-    <![CDATA[
-      delete from board
-      where articleNO in (
-         SELECT articleNO FROM  board
-         START WITH articleNO = #{articleNO}
-         CONNECT BY PRIOR  articleNO = parentNO )
-    ]]>      
+
+  <insert id="insertNewArticle" parameterType="map">
+  INSERT INTO tb_board (parent_no, id, title, content, image_file_name, write_date)
+  VALUES (#{parentNO}, #{id}, #{title}, #{content}, #{imageFileName}, NOW());
+  <selectKey keyProperty="articleNO" resultType="long" order="AFTER">
+    SELECT LAST_INSERT_ID()
+  </selectKey>
+</insert>
+
+
+  <update id="updateArticle" parameterType="map">
+    UPDATE tb_board
+       SET title = #{title},
+           content = #{content},
+           image_file_name =
+             CASE WHEN #{imageFileName} IS NOT NULL AND #{imageFileName} != '' THEN #{imageFileName}
+                  ELSE image_file_name END
+     WHERE article_no = #{articleNO}
+  </update>
+
+  <delete id="deleteArticle" parameterType="long">
+    DELETE FROM tb_board WHERE article_no = #{value}
   </delete>
-
- <!--다중 이미지 추가 SQL문 -->   
-  <!--
-    <insert id="insertNewArticle"  parameterType="java.util.Map">
-    <![CDATA[
-      insert into t_board(articleNO, id, title, content, imageFileName)
-      values(#{articleNO}, #{id}, #{title}, #{content}, null)
-    ]]>      
-  </insert>
-
- 
-   <insert id="insertNewImage"  parameterType="java.util.Map">
-    <foreach item="item"  collection="list"   open="INSERT ALL" 
-                  separator=" " close="SELECT * FROM DUAL" >
-      INTO t_imageFile(imageFileNO, imageFileName, articleNO, regDate)
-      VALUES (#{item.imageFileNO}, #{item.imageFileName}, #{item.articleNO}, sysdate)
-    </foreach>
-  </insert>
- -->
- 
-  <select id="selectNewImageFileNO" resultType="int"  >
-    <![CDATA[
-      SELECT  nvl(max(imageFileNO),0) from t_imageFile		
-    ]]>
-  </select>
-	
-
-  <select  id="selectImageFileList" resultMap="imgResult" parameterType="int">
-    <![CDATA[
-      SELECT * from t_imageFile
-      where articleNO=#{articleNO}	
-    ]]>
-  </select> 
-  
 </mapper>

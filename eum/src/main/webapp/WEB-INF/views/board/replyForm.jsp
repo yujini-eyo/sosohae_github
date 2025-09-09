@@ -1,73 +1,62 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"
-    isELIgnored="false" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>    
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="contextPath"  value="${pageContext.request.contextPath}"  />
-<%
-  request.setCharacterEncoding("UTF-8");
-%> 
+	pageEncoding="UTF-8" isELIgnored="false"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 
-<head>
-<meta charset="UTF-8">
- <script src="//code.jquery.com/jquery-3.3.1.js"></script> 
-<script type="text/javascript">
 
- function backToList(obj){
- obj.action="${contextPath}/board/listArticles.do";
- obj.submit();
- }
- 
- 
-  function readURL(input) {
-      if (input.files && input.files[0]) {
-          var reader = new FileReader();
-          reader.onload = function (e) {
-              $('#preview').attr('src', e.target.result);
-          }
-          reader.readAsDataURL(input.files[0]);
-      }
-  }  
-</script> 
-<title>답글쓰기 페이지</title>
-</head>
+<!-- 현재 컨트롤러는 parentNO=0 으로 저장하므로, 답글 기능은 추후 구현 예정 -->
+<tiles:putAttribute name="pageHead">
+	<style>
+.muted {
+	color: #777;
+	font-size: .95rem
+}
+</style>
+</tiles:putAttribute>
 
-<body>
- <h1>답글쓰기</h1>
-  <form name="frmReply" method="post"  action="${contextPath}/board/addReply.do"   enctype="multipart/form-data">
-    <table>
-    <tr>
-			<td align="right"> 작성자:&nbsp; </td>
-			<td><input type="text" size="20" maxlength="100"  name="writer"></input> </td>
-		</tr>
-		<tr>
-			<td align="right">제목:&nbsp;  </td>
-			<td><input type="text" size="67"  maxlength="500" name="title"> </input></td>
-		</tr>
-		<tr>
-			<td align="right" valign="top"><br>내용:&nbsp; </td>
-			<td><textarea name="content" rows="10" cols="65" maxlength="4000"> </textarea> </td>
-		</tr>
-		<tr>
-			<td align="right">비밀번호:&nbsp;  </td>
-			<td><input type="password" size="10" maxlength="12" name="passwd"> </input> </td>
-		</tr>
-		<tr>
-			<td align="right">이미지파일 첨부:  </td>
-			<td> <input type="file" name="imageFileName"  onchange="readURL(this);" /></td>
-            <td><img  id="preview" src="#"   width=200 height=200/></td>
-		</tr>
-		<tr>
-			<td align="right"> </td>
-			<td>
-				<input type=submit value="답글쓰기" />
-				<input type=button value="취소"onClick="backToList(this.form)" />
-				
-			</td>
-		</tr>
-    
-    </table>
-  
-  </form>
-</body>
-</html>
+
+<div class="container">
+	<section class="board" aria-labelledby="replyTitle">
+		<header class="board-header">
+			<div>
+				<h1 id="replyTitle" class="board-title">답글 작성</h1>
+				<p class="desc muted">현재 버전은 일반 글쓰기와 저장 로직이 동일합니다.</p>
+			</div>
+			<div class="cta">
+				<a class="btn ghost" href="<c:url value='/board/listArticles.do'/>">목록</a>
+			</div>
+		</header>
+
+
+		<form class="card" action="<c:url value='/board/addNewArticle.do'/>"
+			method="post" enctype="multipart/form-data">
+			<input type="hidden" name="parentNO" value="${param.parentNO}" />
+
+
+			<fieldset class="fieldset">
+				<label for="title2">제목</label> <input id="title2" name="title"
+					type="text" required maxlength="200" placeholder="제목을 입력하세요" />
+			</fieldset>
+
+
+			<fieldset class="fieldset">
+				<label for="content2">내용</label>
+				<textarea id="content2" name="content" rows="8" required
+					placeholder="본문을 입력하세요"></textarea>
+			</fieldset>
+
+
+			<fieldset class="fieldset">
+				<label for="image2">이미지 (선택)</label> <input id="image2"
+					name="imageFileName" type="file" accept="image/*" />
+			</fieldset>
+
+
+			<div class="form-actions">
+				<button class="btn ghost" type="reset">초기화</button>
+				<button class="btn primary" type="submit">등록</button>
+			</div>
+		</form>
+	</section>
+</div>
