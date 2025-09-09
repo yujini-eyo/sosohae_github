@@ -3,6 +3,8 @@ package com.myspring.eum.auth.dao;
 import com.myspring.eum.admin.vo.AdminVO;
 import com.myspring.eum.member.vo.MemberVO;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -28,4 +30,11 @@ public class AuthDAOImpl implements AuthDAO {
     public AdminVO findById(String id) throws Exception {
         return findAdminById(id);
     }
+    
+   // 전체 회원 조회
+	@Override
+	public List<MemberVO> findAllMembers() throws Exception {
+		// TODO Auto-generated method stub
+		 return sqlSession.selectList(MEMBER_NS + "selectAllMemberList");
+	}
 }

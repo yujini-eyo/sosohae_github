@@ -1,5 +1,7 @@
 package com.myspring.eum.auth.dao;
 
+import java.util.List;
+
 import com.myspring.eum.admin.vo.AdminVO;
 import com.myspring.eum.member.vo.MemberVO;
 
@@ -16,4 +18,7 @@ public interface AuthDAO {
      */
     @Deprecated
     AdminVO findById(String id) throws Exception;
+    
+    // ✅ 추가: 전체 회원 목록
+    List<MemberVO> findAllMembers() throws Exception;
 }
