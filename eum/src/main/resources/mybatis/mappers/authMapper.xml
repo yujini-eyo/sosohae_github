@@ -1,48 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<!-- NS는 AuthDAOImpl의 NS = "mapper.auth." 와 동일해야 합니다 -->
-<mapper namespace="mapper.auth">
+<mapper namespace="mapper.adminAuth">
 
   <!-- AdminVO 매핑 -->
   <resultMap id="AdminMap" type="com.myspring.eum.admin.vo.AdminVO">
-    <id     column="user_id"    property="userId"/>
-    <result column="name"       property="name"/>
-    <result column="password"   property="password"/>
-    <result column="email"      property="email"/>
-    <result column="role"       property="role"/>
-    <result column="status"     property="status"/>
-    <result column="created_at" property="createdAt"/>
-    <result column="updated_at" property="updatedAt"/>
+    <id     property="id"        column="id"/>
+    <result property="password"  column="password"/>
+    <result property="name"      column="name"/>
+    <result property="email"     column="email"/>
+    <result property="address"   column="address"/>
+    <result property="age"       column="age"/>
+    <result property="birth"     column="birth"/>
+    <result property="phone"     column="phone"/>
+    <result property="code"      column="code"/>
+    <result property="notes"     column="notes"/>
+    <result property="createdAt" column="created_at"/>
   </resultMap>
 
-  <!-- 기본: 아이디로 조회 (컨트롤러/서비스에서 ACTIVE/ADMIN 체크) -->
-  <select id="findById" parameterType="string" resultMap="AdminMap">
-    SELECT user_id, name, password, email, role, status, created_at, updated_at
-    FROM member
-    WHERE user_id = #{id}
+  <!-- [기본] admin 테이블에서 관리자 1명 조회 -->
+  <select id="findAdminById" parameterType="string" resultMap="AdminMap">
+    SELECT *
+    FROM admin
+    WHERE id = #{id}
     LIMIT 1
   </select>
 
-  <!-- (선택) SQL에서 바로 ADMIN & ACTIVE만 통과시키려면 이걸 쓰고 DAO 메서드 추가 -->
+  <!-- [대안: 주석 해제시 사용] member 테이블에서 role='ADMIN'만 관리자라고 보는 경우 -->
   <!--
   <select id="findAdminById" parameterType="string" resultMap="AdminMap">
-    SELECT user_id, name, password, email, role, status, created_at, updated_at
+    SELECT *
     FROM member
-    WHERE user_id = #{id}
+    WHERE id = #{id}
       AND role = 'ADMIN'
-      AND status = 'ACTIVE'
     LIMIT 1
   </select>
   -->
 
-  <!-- (선택) 해시 업그레이드/비번 변경용. DAO에 메서드 추가하면 사용 -->
-  <!--
-  <update id="updatePasswordHash">
-    UPDATE member
-    SET password = #{newHash}, updated_at = NOW()
-    WHERE user_id = #{id}
-  </update>
-  -->
 </mapper>

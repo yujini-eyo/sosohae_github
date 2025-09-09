@@ -17,7 +17,11 @@ public class MemberVO {
     private String code;         // 코드
     private String notes;        // 메모
     private Timestamp createdAt; // 생성일 (CURRENT_TIMESTAMP)
-
+    private String role;     // ADMIN / USER ...
+    private String status;   // ACTIVE / INACTIVE ...
+    private Timestamp updatedAt;
+    
+    
     // ===== Getter / Setter =====
     public String getId() {
         return id;
@@ -33,7 +37,25 @@ public class MemberVO {
         this.password = password;
     }
     
-    public String getName() {
+    public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public Timestamp getUpdatedAt() {
+		return updatedAt;
+	}
+	public void setUpdatedAt(Timestamp updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+	public String getName() {
         return name;
     }
     public void setName(String name) {

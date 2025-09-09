@@ -5,8 +5,9 @@
 
 <mapper namespace="mapper.member">
 
+  <!-- MemberVO 매핑 -->
   <resultMap id="memResult" type="com.myspring.eum.member.vo.MemberVO">
-    <id property="id" column="id"/>
+    <id     property="id"        column="id"/>
     <result property="password"  column="password"/>
     <result property="name"      column="name"/>
     <result property="email"     column="email"/>
@@ -16,32 +17,34 @@
     <result property="phone"     column="phone"/>
     <result property="code"      column="code"/>
     <result property="notes"     column="notes"/>
+    <!-- createdAt(java) ↔ created_at(DB) -->
     <result property="createdAt" column="created_at"/>
   </resultMap>
 
-  <!-- ✅ 회원가입(삽입) : MemberService.signup -> DAO.insertMember 가 호출 -->
-<insert id="insertMember" parameterType="com.myspring.eum.member.vo.MemberVO">
-  INSERT INTO member
-    (id, password, name, email, address, age, birth, phone, code, notes, created_at)
-  VALUES
-    (#{id}, #{password}, #{name}, #{email}, #{address}, #{age}, #{birth}, #{phone}, #{code}, #{notes}, NOW())
-</insert>
-  
-  <select id="selectAllMemberList" resultMap="memResult">
-  SELECT * FROM member ORDER BY created_at DESC
-</select>
+  <!-- 회원 가입 -->
+  <insert id="insertMember" parameterType="com.myspring.eum.member.vo.MemberVO">
+    INSERT INTO member
+      (id, password, name, email, address, age, birth, phone, code, notes, created_at)
+    VALUES
+      (#{id}, #{password}, #{name}, #{email}, #{address}, #{age}, #{birth}, #{phone}, #{code}, #{notes}, NOW())
+  </insert>
 
-  <!-- ✅ 단건 조회(id) : VO 파라미터로 받아 #{id} 사용 -->
-  <select id="findById"
-          parameterType="com.myspring.eum.member.vo.MemberVO"
-          resultMap="memResult">
+  <!-- 회원 목록(관리자 목록 화면에 사용) -->
+  <select id="selectAllMemberList" resultMap="memResult">
+    SELECT *
+    FROM member
+    ORDER BY created_at DESC
+  </select>
+
+  <!-- 회원 단건 조회 -->
+  <select id="findById" parameterType="string" resultMap="memResult">
     SELECT *
     FROM member
     WHERE id = #{id}
     LIMIT 1
   </select>
 
-  <!-- 로그인(id+password) -->
+  <!-- 회원 로그인(id + password) -->
   <select id="loginById"
           parameterType="com.myspring.eum.member.vo.MemberVO"
           resultMap="memResult">
@@ -52,5 +55,27 @@
     LIMIT 1
   </select>
 
+  <!-- (선택) 회원 정보 수정: 비밀번호가 비어있으면 SET하지 않음 -->
+  <update id="updateMember" parameterType="com.myspring.eum.member.vo.MemberVO">
+    UPDATE member
+    <set>
+      <if test="password != null and password != ''">password = #{password},</if>
+      <if test="name    != null">name = #{name},</if>
+      <if test="email   != null">email = #{email},</if>
+      <if test="address != null">address = #{address},</if>
+      <if test="age     != null">age = #{age},</if>
+      <if test="birth   != null">birth = #{birth},</if>
+      <if test="phone   != null">phone = #{phone},</if>
+      <if test="code    != null">code = #{code},</if>
+      <if test="notes   != null">notes = #{notes},</if>
+    </set>
+    WHERE id = #{id}
+  </update>
+
+  <!-- (선택) 회원 삭제 -->
+  <delete id="deleteMember" parameterType="string">
+    DELETE FROM member
+    WHERE id = #{_parameter}
+  </delete>
 
 </mapper>

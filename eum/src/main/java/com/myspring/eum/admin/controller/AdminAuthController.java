@@ -6,9 +6,9 @@ import javax.servlet.http.HttpSession;
 
 import com.myspring.eum.auth.service.AuthService;
 import com.myspring.eum.admin.vo.AdminVO;
-import java.util.List;
 import com.myspring.eum.member.vo.MemberVO;
 
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -27,47 +27,34 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/admin")
 public class AdminAuthController {
 
-  @Autowired private AuthService authService;
+    @Autowired
+    private AuthService authService;
 
-  @RequestMapping(value="/auth/listMembers.do", method=RequestMethod.GET)
-  public ModelAndView listMembers(HttpServletRequest request) throws Exception {
-    HttpSession s = request.getSession(false);
-    if (s == null || s.getAttribute("adminUser") == null) {
-      return new ModelAndView("redirect:/admin/auth/login.do");
+    /** 관리자 회원 목록 */
+    @RequestMapping(value="/auth/listMembers.do", method=RequestMethod.GET)
+    public ModelAndView listMembers(HttpServletRequest request) throws Exception {
+        HttpSession s = request.getSession(false);
+        if (s == null || s.getAttribute("adminUser") == null) {
+            return new ModelAndView("redirect:/admin/auth/login.do");
+        }
+        List<MemberVO> list = authService.listAllMembers(); // AuthService에 메서드 선언/구현 필요
+        ModelAndView mav = new ModelAndView("admin/auth/listMembers");
+        mav.addObject("membersList", list);
+        return mav;
     }
-    java.util.List<com.myspring.eum.member.vo.MemberVO> list = authService.listAllMembers();
-    ModelAndView mav = new ModelAndView("admin/auth/listMembers");
-    mav.addObject("membersList", list);
-    return mav;
-  }
 
+    /** 관리자 전용: 회원 단건 조회 페이지 */
+    @RequestMapping(value="/members/lookup.do", method=RequestMethod.GET)
+    public ModelAndView lookupPage(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("adminUser") == null) {
+            return new ModelAndView("redirect:/admin/auth/login.do");
+        }
+        // ✅ 여기! 'members' → 'member' (단수)
+        return new ModelAndView("admin/member/lookup"); // /WEB-INF/views/admin/member/lookup.jsp
+    }
 
-
-	// 관리자 전용: 회원 단건 조회 페이지
-	@RequestMapping(value="/members/lookup.do", method=RequestMethod.GET)
-	public ModelAndView lookupPage(HttpServletRequest request) {
-	    HttpSession session = request.getSession(false);
-	    if (session == null || session.getAttribute("adminUser") == null) {
-	        return new ModelAndView("redirect:/admin/auth/login.do");
-	    }
-	    return new ModelAndView("admin/members/lookup"); // /WEB-INF/views/admin/member/lookup.jsp
-	}
-
-	
-	
-//	@RequestMapping(value="/auth/listMembers.do", method=RequestMethod.GET)
-//	public ModelAndView listMembers(HttpServletRequest request) throws Exception {
-//	    HttpSession session = request.getSession(false);
-//	    if (session == null || session.getAttribute("adminUser") == null) {
-//	        return new ModelAndView("redirect:/admin/auth/login.do");
-//	    }
-//	    // ✅ AuthService로 직접 조회
-//	    java.util.List<MemberVO> list = authService.listAllMembers();
-//	    ModelAndView mav = new ModelAndView("admin/auth/listMembers");
-//	    mav.addObject("membersList", list);
-//	    return mav;
-//	}
-
+    /** 관리자 메인 */
     @RequestMapping(value="/main.do", method=RequestMethod.GET)
     public ModelAndView adminMain(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -77,11 +64,13 @@ public class AdminAuthController {
         return new ModelAndView("admin/main");
     }
 
+    /** 로그인 폼 */
     @RequestMapping(value="/auth/login.do", method=RequestMethod.GET)
     public ModelAndView loginForm(HttpServletRequest request, HttpServletResponse response) {
         return new ModelAndView("admin/auth/login");
     }
 
+    /** 로그인 처리 */
     @RequestMapping(value="/auth/login.do", method=RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> login(
@@ -90,6 +79,7 @@ public class AdminAuthController {
             HttpServletRequest request) {
         try {
             AdminVO admin = authService.authenticate(id, password);
+
             HttpHeaders h = new HttpHeaders();
             h.add("Content-Type", "text/html; charset=UTF-8");
 
@@ -97,6 +87,7 @@ public class AdminAuthController {
                 String msg = "<script>alert('아이디 또는 비밀번호를 확인하세요.'); history.back();</script>";
                 return new ResponseEntity<String>(msg, h, HttpStatus.OK);
             }
+
             HttpSession session = request.getSession(true);
             session.setAttribute("adminUser", admin);
             session.setMaxInactiveInterval(60 * 60);
@@ -105,6 +96,7 @@ public class AdminAuthController {
                        + request.getContextPath()
                        + "/admin/main.do';</script>";
             return new ResponseEntity<String>(msg, h, HttpStatus.OK);
+
         } catch (Exception ex) {
             ex.printStackTrace();
             HttpHeaders h = new HttpHeaders();
@@ -114,6 +106,7 @@ public class AdminAuthController {
         }
     }
 
+    /** 로그아웃 */
     @RequestMapping(value="/logout.do", method=RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<String> logout(HttpServletRequest request) {
@@ -127,6 +120,7 @@ public class AdminAuthController {
         return new ResponseEntity<String>(msg, h, HttpStatus.OK);
     }
 
+    /** (관리자 전용) 회원 단건 조회 API(JSON) */
     @RequestMapping(value="/api/members/{id}", method=RequestMethod.GET, produces="application/json; charset=UTF-8")
     @ResponseBody
     public ResponseEntity<?> getMember(@PathVariable("id") String id, HttpServletRequest request) {
@@ -146,6 +140,7 @@ public class AdminAuthController {
         }
     }
 
+    /** 공통 예외 처리 */
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<String> handleAny(HttpServletRequest request, Exception ex) {
