@@ -23,20 +23,19 @@ public class MemberControllerImpl implements MemberController {
     @Autowired
     private MemberService memberService;
 
-    /** 회원가입 폼 */
+    /** 회원가입 폼 (GET) */
     @RequestMapping(value="/signupForm.do", method=RequestMethod.GET)
     public ModelAndView signupForm(HttpServletRequest request, HttpServletResponse response) throws Exception {
         return new ModelAndView("member/signupForm");
     }
 
-    /** 로그인 폼 */
+    /** 로그인 폼 (GET) */
     @RequestMapping(value="/loginForm.do", method=RequestMethod.GET)
     public ModelAndView loginForm(HttpServletRequest request, HttpServletResponse response) throws Exception {
         return new ModelAndView("member/loginForm");
     }
 
-    /** 회원가입 처리: POST /member/signup.do */
-    @Override
+    /** 회원가입 처리 (POST /member/signup.do) */
     @RequestMapping(value="/signup.do", method=RequestMethod.POST)
     public ModelAndView signup(@ModelAttribute("info") MemberVO memberVO,
                                HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -52,18 +51,18 @@ public class MemberControllerImpl implements MemberController {
         }
 
         try {
-            // 저장 (운영 시 비밀번호 해싱 권장)
+            // 저장 (운영 시 비밀번호 해시 권장)
             memberVO.setId(memberVO.getId().trim());
-            memberService.signup(memberVO); // ⬅️ addMember 대신 signup 사용
+            memberService.signup(memberVO);
         } catch (DuplicateKeyException dke) {
             return new ModelAndView("redirect:/member/signupForm.do");
         }
 
+        // 가입 완료 → 로그인 폼으로
         return new ModelAndView("redirect:/member/loginForm.do");
     }
 
-    /** 로그인 처리: POST /member/login.do */
-    @Override
+    /** 로그인 처리 (POST /member/login.do) */
     @RequestMapping(value="/login.do", method=RequestMethod.POST)
     public ModelAndView login(@ModelAttribute("member") MemberVO member,
                               RedirectAttributes rAttr,
@@ -85,8 +84,7 @@ public class MemberControllerImpl implements MemberController {
         return new ModelAndView("redirect:/");
     }
 
-    /** 로그아웃 */
-    @Override
+    /** 로그아웃 (GET) */
     @RequestMapping(value="/logout.do", method=RequestMethod.GET)
     public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
         HttpSession session = request.getSession(false);

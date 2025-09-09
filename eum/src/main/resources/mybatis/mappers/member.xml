@@ -20,12 +20,12 @@
   </resultMap>
 
   <!-- ✅ 회원가입(삽입) : MemberService.signup -> DAO.insertMember 가 호출 -->
-  <insert id="insertMember" parameterType="com.myspring.eum.member.vo.MemberVO">
-    INSERT INTO member
-      (id, password, name, email, address, age, birth, phone, code, notes, createdAt)
-    VALUES
-      (#{id}, #{password}, #{name}, #{email}, #{address}, #{age}, #{birth}, #{phone}, #{code}, #{notes}, #{createdAt})
-  </insert> 
+<insert id="insertMember" parameterType="com.myspring.eum.member.vo.MemberVO">
+  INSERT INTO member
+    (id, password, name, email, address, age, birth, phone, code, notes, created_at)
+  VALUES
+    (#{id}, #{password}, #{name}, #{email}, #{address}, #{age}, #{birth}, #{phone}, #{code}, #{notes}, NOW())
+</insert>
   
   <select id="selectAllMemberList" resultMap="memResult">
   SELECT * FROM member ORDER BY created_at DESC

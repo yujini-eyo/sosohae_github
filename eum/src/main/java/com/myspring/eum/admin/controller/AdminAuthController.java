@@ -27,21 +27,46 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/admin")
 public class AdminAuthController {
 
-	@Autowired
-	private AuthService authService; // ✅ 이거만 유지
+  @Autowired private AuthService authService;
 
-	@RequestMapping(value="/auth/listMembers.do", method=RequestMethod.GET)
-	public ModelAndView listMembers(HttpServletRequest request) throws Exception {
+  @RequestMapping(value="/auth/listMembers.do", method=RequestMethod.GET)
+  public ModelAndView listMembers(HttpServletRequest request) throws Exception {
+    HttpSession s = request.getSession(false);
+    if (s == null || s.getAttribute("adminUser") == null) {
+      return new ModelAndView("redirect:/admin/auth/login.do");
+    }
+    java.util.List<com.myspring.eum.member.vo.MemberVO> list = authService.listAllMembers();
+    ModelAndView mav = new ModelAndView("admin/auth/listMembers");
+    mav.addObject("membersList", list);
+    return mav;
+  }
+
+
+
+	// 관리자 전용: 회원 단건 조회 페이지
+	@RequestMapping(value="/members/lookup.do", method=RequestMethod.GET)
+	public ModelAndView lookupPage(HttpServletRequest request) {
 	    HttpSession session = request.getSession(false);
 	    if (session == null || session.getAttribute("adminUser") == null) {
 	        return new ModelAndView("redirect:/admin/auth/login.do");
 	    }
-	    // ✅ AuthService로 직접 조회
-	    java.util.List<MemberVO> list = authService.listAllMembers();
-	    ModelAndView mav = new ModelAndView("admin/auth/listMembers");
-	    mav.addObject("membersList", list);
-	    return mav;
+	    return new ModelAndView("admin/members/lookup"); // /WEB-INF/views/admin/member/lookup.jsp
 	}
+
+	
+	
+//	@RequestMapping(value="/auth/listMembers.do", method=RequestMethod.GET)
+//	public ModelAndView listMembers(HttpServletRequest request) throws Exception {
+//	    HttpSession session = request.getSession(false);
+//	    if (session == null || session.getAttribute("adminUser") == null) {
+//	        return new ModelAndView("redirect:/admin/auth/login.do");
+//	    }
+//	    // ✅ AuthService로 직접 조회
+//	    java.util.List<MemberVO> list = authService.listAllMembers();
+//	    ModelAndView mav = new ModelAndView("admin/auth/listMembers");
+//	    mav.addObject("membersList", list);
+//	    return mav;
+//	}
 
     @RequestMapping(value="/main.do", method=RequestMethod.GET)
     public ModelAndView adminMain(HttpServletRequest request) {

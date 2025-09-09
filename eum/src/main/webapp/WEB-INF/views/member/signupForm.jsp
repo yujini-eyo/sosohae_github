@@ -1,18 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8" isELIgnored="false"%>
+    pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
-<!-- HTML 버전과 동일한 스코프/레이아웃을 위해 signup.css / signup.js 사용 -->
-<link rel="stylesheet" href="<c:url value='/resources/css/signup.css'/>"/>
+<%-- URL들을 먼저 계산해두면 따옴표/닫힘 문제를 원천 차단 --%>
+<c:url var="signupCssUrl"   value="/resources/css/signup.css"/>
+<c:url var="signupJsUrl"    value="/resources/js/signup.js"/>
+<c:url var="signupAction"   value="/member/signup.do"/>
+<c:url var="loginFormUrl"   value="/member/loginForm.do"/>
+
+<link rel="stylesheet" href="${signupCssUrl}"/>
 
 <section id="signupView" class="login-view" role="region" aria-labelledby="signupTitle" style="--gap:0px;">
   <div class="content-inner" id="fitBox">
     <h1 id="signupTitle">회원가입</h1>
 
-    <!-- HTML 디자인과 동일한 입력 UI, action은 서버연동 -->
-    <form class="login-box" method="post" action="${contextPath}/eum/loginForm.do" autocomplete="on">
+    <form class="login-box" method="post" action="${signupAction}" autocomplete="on">
       <c:if test="${not empty _csrf}">
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
       </c:if>
@@ -22,7 +24,8 @@
              autocomplete="username" autocapitalize="off" spellcheck="false" maxlength="30" required />
 
       <label for="sgPw">비밀번호 *</label>
-      <input type="password" id="sgPw" name="pwd" placeholder="비밀번호 입력"
+      <!-- 반드시 name="password" -->
+      <input type="password" id="sgPw" name="password" placeholder="비밀번호 입력"
              autocomplete="new-password" maxlength="64" required />
 
       <label for="sgEmail">이메일 *</label>
@@ -63,16 +66,11 @@
 
       <button type="submit" id="doSignup">가입하기</button>
 
-      <div class="info-text" aria-live="polite">
-        ※ 1365 자원봉사 연동이나 가족 계정 연결은<br/>
-        가입 후 <strong>‘내정보’</strong> 메뉴에서 설정하실 수 있어요.
-      </div>
-
       <div class="sub-buttons" aria-label="보조 링크" style="text-align:center; margin-top:14px;">
-        <a href="${contextPath}/eum/loginForm.do">이미 계정이 있으신가요? 로그인</a>
+        <a href="${loginFormUrl}">이미 계정이 있으신가요? 로그인</a>
       </div>
     </form>
   </div>
 </section>
 
-<script defer src="<c:url value='/resources/js/signup.js'/>"></script>
+<script defer src="${signupJsUrl}"></script>

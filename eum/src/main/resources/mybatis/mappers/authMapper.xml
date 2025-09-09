@@ -2,15 +2,47 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<!-- 회원 로그인/조회 -->
+<!-- NS는 AuthDAOImpl의 NS = "mapper.auth." 와 동일해야 합니다 -->
 <mapper namespace="mapper.auth">
-  <select id="findById" parameterType="string" resultType="com.myspring.eum.member.vo.MemberVO">
-    SELECT
-      id, password, name, email,
-      role,
-      status
+
+  <!-- AdminVO 매핑 -->
+  <resultMap id="AdminMap" type="com.myspring.eum.admin.vo.AdminVO">
+    <id     column="user_id"    property="userId"/>
+    <result column="name"       property="name"/>
+    <result column="password"   property="password"/>
+    <result column="email"      property="email"/>
+    <result column="role"       property="role"/>
+    <result column="status"     property="status"/>
+    <result column="created_at" property="createdAt"/>
+    <result column="updated_at" property="updatedAt"/>
+  </resultMap>
+
+  <!-- 기본: 아이디로 조회 (컨트롤러/서비스에서 ACTIVE/ADMIN 체크) -->
+  <select id="findById" parameterType="string" resultMap="AdminMap">
+    SELECT user_id, name, password, email, role, status, created_at, updated_at
     FROM member
-    WHERE id = #{id}
+    WHERE user_id = #{id}
     LIMIT 1
   </select>
+
+  <!-- (선택) SQL에서 바로 ADMIN & ACTIVE만 통과시키려면 이걸 쓰고 DAO 메서드 추가 -->
+  <!--
+  <select id="findAdminById" parameterType="string" resultMap="AdminMap">
+    SELECT user_id, name, password, email, role, status, created_at, updated_at
+    FROM member
+    WHERE user_id = #{id}
+      AND role = 'ADMIN'
+      AND status = 'ACTIVE'
+    LIMIT 1
+  </select>
+  -->
+
+  <!-- (선택) 해시 업그레이드/비번 변경용. DAO에 메서드 추가하면 사용 -->
+  <!--
+  <update id="updatePasswordHash">
+    UPDATE member
+    SET password = #{newHash}, updated_at = NOW()
+    WHERE user_id = #{id}
+  </update>
+  -->
 </mapper>

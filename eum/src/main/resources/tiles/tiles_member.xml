@@ -16,14 +16,6 @@
 			value="/WEB-INF/views/member/signupForm.jsp" />
 	</definition>
 
-	<definition name="member/listMembers" extends="baseLayout">
-		<put-attribute name="title" value="회원목록" />
-		<put-attribute name="body"
-			value="/WEB-INF/views/member/listMembers.jsp" />
-	</definition>
-
-
-
 
 	<!-- <definition name="/member/viewDetail" extends="baseLayout"> <put-attribute 
 		name="title" value="회원상세창" /> <put-attribute name="body" value="/WEB-INF/views/member/viewDetail.jsp" 
