@@ -17,16 +17,17 @@
 		<div>
 			<h1 style="margin: 0; font-size: 1.6rem;">관리자 메인</h1>
 			<p style="margin: 6px 0 0; color: #806A5A;">
-				<strong> <c:choose>
-						<c:when test="${not empty sessionScope.adminUser.name}">
-							<c:out value="${sessionScope.adminUser.name}" />
-						</c:when>
-						<c:when test="${not empty sessionScope.adminUser.userId}">
-							<c:out value="${sessionScope.adminUser.userId}" />
-						</c:when>
-						<c:otherwise>관리자</c:otherwise>
-					</c:choose>
-				</strong>님, 환영합니다.
+				<strong>
+          <c:choose>
+            <c:when test="${not empty sessionScope.adminUser.name}">
+              <c:out value="${sessionScope.adminUser.name}" />
+            </c:when>
+            <c:when test="${not empty sessionScope.adminUser.id}">
+              <c:out value="${sessionScope.adminUser.id}" />
+            </c:when>
+            <c:otherwise>관리자</c:otherwise>
+          </c:choose>
+        </strong>님, 환영합니다.
 			</p>
 		</div>
 		<div>
@@ -51,7 +52,6 @@
 			<h3 style="margin: 0 0 8px;">회원 목록</h3>
 			<p style="margin: 0; color: #806A5A;">가입한 회원 전체 보기</p>
 		</a>
-
 
 		<!-- (선택) 회원 등록 -->
 		<a href="<c:url value='/admin/members/createForm.do'/>"

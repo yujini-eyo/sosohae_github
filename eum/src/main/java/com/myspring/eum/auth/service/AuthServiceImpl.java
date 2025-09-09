@@ -43,15 +43,20 @@ public class AuthServiceImpl implements AuthService {
 
     public void setUsePlainText(boolean usePlainText) { this.usePlainText = usePlainText; }
 
-	@Override
-	public MemberVO loadMember(String id) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /* ===== 여기부터 TODO 구현 ===== */
 
-	@Override
-	public List<MemberVO> listAllMembers() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public MemberVO loadMember(String id) throws Exception {
+        if (id == null) return null;
+        id = id.trim();
+        if (id.length() == 0) return null;
+        // 관리자 페이지에서 회원 단건 조회
+        return authDAO.findMemberById(id);
+    }
+
+    @Override
+    public List<MemberVO> listAllMembers() throws Exception {
+        // 관리자 회원 목록 (mapper.member.selectAllMemberList 매핑)
+        return authDAO.selectAllMemberList();
+    }
 }

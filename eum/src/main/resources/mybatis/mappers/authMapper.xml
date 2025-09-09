@@ -5,7 +5,6 @@
 
 <mapper namespace="mapper.adminAuth">
 
-  <!-- AdminVO 매핑 -->
   <resultMap id="AdminMap" type="com.myspring.eum.admin.vo.AdminVO">
     <id     property="id"        column="id"/>
     <result property="password"  column="password"/>
@@ -18,25 +17,31 @@
     <result property="code"      column="code"/>
     <result property="notes"     column="notes"/>
     <result property="createdAt" column="created_at"/>
+    <!-- (있다면) role / status 매핑도 추가
+    <result property="role"      column="role"/>
+    <result property="status"    column="status"/>
+    -->
   </resultMap>
 
-  <!-- [기본] admin 테이블에서 관리자 1명 조회 -->
-  <select id="findAdminById" parameterType="string" resultMap="AdminMap">
-    SELECT *
-    FROM admin
-    WHERE id = #{id}
-    LIMIT 1
-  </select>
+  <!-- 관리자 단건 조회: AuthDAOImpl.findById() 가 호출 -->
+  <!-- admin 테이블을 쓰면 아래처럼, member 테이블에서 관리자면 role 조건 추가 -->
+  <select id="findById" parameterType="string" resultMap="AdminMap">
+  SELECT *
+  FROM member
+  WHERE id = #{id}
+    AND role = 'ADMIN'
+    AND status = 'ACTIVE'
+  LIMIT 1
+</select>
 
-  <!-- [대안: 주석 해제시 사용] member 테이블에서 role='ADMIN'만 관리자라고 보는 경우 -->
-  <!--
+  <!-- (선택) 별칭 메서드용 -->
   <select id="findAdminById" parameterType="string" resultMap="AdminMap">
-    SELECT *
-    FROM member
-    WHERE id = #{id}
-      AND role = 'ADMIN'
-    LIMIT 1
-  </select>
-  -->
+  SELECT *
+  FROM member
+  WHERE id = #{id}
+    AND role = 'ADMIN'
+    AND status = 'ACTIVE'
+  LIMIT 1
+</select>
 
 </mapper>

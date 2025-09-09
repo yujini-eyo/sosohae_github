@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="mapper.adminAuth">
+<mapper namespace="mapper.admin">
 
   <resultMap id="AdminMap" type="com.myspring.eum.admin.vo.AdminVO">
     <id     column="id"          property="userId"/>
@@ -22,5 +22,10 @@
     WHERE id = #{id}
     LIMIT 1
   </select>
+   <select id="selectDashboardCounts" resultType="map">
+      SELECT
+        (SELECT COUNT(*) FROM member)     AS member_cnt,
+        (SELECT COUNT(*) FROM board)      AS board_cnt
+    </select>
 
 </mapper>
