@@ -11,9 +11,11 @@ import com.myspring.eum.member.vo.MemberVO;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller("adminAuthController")
 @RequestMapping("/admin")
@@ -30,102 +33,100 @@ public class AdminAuthController {
     @Autowired
     private AuthService authService;
 
+    /** 공통: 관리자 로그인 여부 */
+    private boolean isAdminLoggedIn(HttpServletRequest req) {
+        HttpSession s = req.getSession(false);
+        return s != null && s.getAttribute("adminUser") != null;
+    }
+
     /** 관리자 회원 목록 */
     @RequestMapping(value="/auth/listMembers.do", method=RequestMethod.GET)
     public ModelAndView listMembers(HttpServletRequest request) throws Exception {
-        HttpSession s = request.getSession(false);
-        if (s == null || s.getAttribute("adminUser") == null) {
-            return new ModelAndView("redirect:/admin/auth/login.do");
-        }
-        List<MemberVO> list = authService.listAllMembers(); // AuthService에 메서드 선언/구현 필요
+        if (!isAdminLoggedIn(request)) return new ModelAndView("redirect:/admin/auth/login.do");
+        List<MemberVO> list = authService.listAllMembers();
         ModelAndView mav = new ModelAndView("admin/auth/listMembers");
         mav.addObject("membersList", list);
         return mav;
     }
 
-    /** 관리자 전용: 회원 단건 조회 페이지 */
-    @RequestMapping(value="/members/lookup.do", method=RequestMethod.GET)
+    /** 관리자 전용: 회원 단건 조회 페이지 (Tiles 정의와 맞춰 'members') */
+    @RequestMapping(value="/member/lookup.do", method=RequestMethod.GET)
     public ModelAndView lookupPage(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("adminUser") == null) {
-            return new ModelAndView("redirect:/admin/auth/login.do");
-        }
-        // ✅ 여기! 'members' → 'member' (단수)
-        return new ModelAndView("admin/member/lookup"); // /WEB-INF/views/admin/member/lookup.jsp
+        if (!isAdminLoggedIn(request)) return new ModelAndView("redirect:/admin/auth/login.do");
+        return new ModelAndView("admin/member/lookup");
     }
 
     /** 관리자 메인 */
     @RequestMapping(value="/main.do", method=RequestMethod.GET)
     public ModelAndView adminMain(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("adminUser") == null) {
-            return new ModelAndView("redirect:/admin/auth/login.do");
-        }
+        if (!isAdminLoggedIn(request)) return new ModelAndView("redirect:/admin/auth/login.do");
         return new ModelAndView("admin/main");
     }
 
     /** 로그인 폼 */
     @RequestMapping(value="/auth/login.do", method=RequestMethod.GET)
     public ModelAndView loginForm(HttpServletRequest request, HttpServletResponse response) {
+        if (isAdminLoggedIn(request)) return new ModelAndView("redirect:/admin/main.do");
         return new ModelAndView("admin/auth/login");
     }
 
-    /** 로그인 처리 */
+ // ... 생략 ...
     @RequestMapping(value="/auth/login.do", method=RequestMethod.POST)
-    @ResponseBody
-    public ResponseEntity<String> login(
+    public ModelAndView login(
             @RequestParam("id") String id,
             @RequestParam("password") String password,
-            HttpServletRequest request) {
-        try {
-            AdminVO admin = authService.authenticate(id, password);
+            HttpServletRequest request,
+            RedirectAttributes redirect) throws Exception {
 
-            HttpHeaders h = new HttpHeaders();
-            h.add("Content-Type", "text/html; charset=UTF-8");
-
-            if (admin == null) {
-                String msg = "<script>alert('아이디 또는 비밀번호를 확인하세요.'); history.back();</script>";
-                return new ResponseEntity<String>(msg, h, HttpStatus.OK);
-            }
-
-            HttpSession session = request.getSession(true);
-            session.setAttribute("adminUser", admin);
-            session.setMaxInactiveInterval(60 * 60);
-
-            String msg = "<script>alert('관리자 로그인 성공'); location.href='"
-                       + request.getContextPath()
-                       + "/admin/main.do';</script>";
-            return new ResponseEntity<String>(msg, h, HttpStatus.OK);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            HttpHeaders h = new HttpHeaders();
-            h.add("Content-Type", "text/html; charset=UTF-8");
-            String msg = "<script>alert('로그인 처리 중 오류가 발생했습니다.'); history.back();</script>";
-            return new ResponseEntity<String>(msg, h, HttpStatus.BAD_REQUEST);
+        AdminVO admin = authService.authenticate(id, password);
+        if (admin == null) {
+            redirect.addFlashAttribute("loginError", "아이디 또는 비밀번호를 확인하세요.");
+            return new ModelAndView("redirect:/admin/auth/login.do");
         }
+
+        // ### [추가] 세션 고정 공격 방지: 기존 세션 무효화 후 새 세션 발급
+        HttpSession old = request.getSession(false);
+        if (old != null) old.invalidate();
+        HttpSession session = request.getSession(true);
+
+        session.setAttribute("adminUser", admin);
+        session.setAttribute("userRole", "ADMIN");
+        session.setMaxInactiveInterval(30 * 60); // 30분
+
+        // 혹시 일반 회원 세션이 섞여있다면 제거
+        session.removeAttribute("member");
+
+        return new ModelAndView("redirect:/admin/main.do");
     }
 
-    /** 로그아웃 */
-    @RequestMapping(value="/logout.do", method=RequestMethod.GET)
+    // ### [개선] 로그아웃: /admin/logout.do 와 /admin/auth/logout.do 둘 다 허용
+    @RequestMapping(
+        value = { "/logout.do", "/auth/logout.do" },
+        method = { RequestMethod.GET, RequestMethod.POST },
+        produces = "text/html; charset=UTF-8"
+    )
     @ResponseBody
     public ResponseEntity<String> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        if (session != null) session.invalidate();
-        HttpHeaders h = new HttpHeaders();
-        h.add("Content-Type", "text/html; charset=UTF-8");
-        String msg = "<script>alert('로그아웃 되었습니다.'); location.href='"
-                   + request.getContextPath()
-                   + "/admin/auth/login.do';</script>";
-        return new ResponseEntity<String>(msg, h, HttpStatus.OK);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        HttpHeaders headers = new HttpHeaders(); // Java 6 OK
+        headers.add("Content-Type", "text/html; charset=UTF-8");
+
+        String loginUrl = request.getContextPath() + "/admin/auth/login.do";
+        String body = "<script>alert('로그아웃 되었습니다.'); location.href='" + loginUrl + "';</script>";
+
+        return new ResponseEntity<String>(body, headers, HttpStatus.OK);
     }
 
+
     /** (관리자 전용) 회원 단건 조회 API(JSON) */
-    @RequestMapping(value="/api/members/{id}", method=RequestMethod.GET, produces="application/json; charset=UTF-8")
+    @RequestMapping(value="/api/member/{id}", method=RequestMethod.GET, produces="application/json; charset=UTF-8")
     @ResponseBody
     public ResponseEntity<?> getMember(@PathVariable("id") String id, HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("adminUser") == null) {
+        if (!isAdminLoggedIn(request)) {
             return new ResponseEntity<String>("관리자 인증이 필요합니다.", HttpStatus.FORBIDDEN);
         }
         try {
@@ -145,9 +146,6 @@ public class AdminAuthController {
     @ResponseBody
     public ResponseEntity<String> handleAny(HttpServletRequest request, Exception ex) {
         ex.printStackTrace();
-        HttpHeaders h = new HttpHeaders();
-        h.add("Content-Type", "text/html; charset=UTF-8");
-        String msg = "<script>alert('요청 처리 중 오류가 발생했습니다.'); history.back();</script>";
-        return new ResponseEntity<String>(msg, h, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>("요청 처리 중 오류가 발생했습니다.", HttpStatus.BAD_REQUEST);
     }
 }

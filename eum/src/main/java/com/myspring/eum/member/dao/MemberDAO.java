@@ -7,4 +7,5 @@ public interface MemberDAO {
     int insertMember(MemberVO vo) throws DataAccessException;       // 가입
     MemberVO login(MemberVO memberVO) throws DataAccessException;   // 로그인
     MemberVO findById(String id) throws DataAccessException;        // 단건 조회
+    MemberVO loginById(String id) throws DataAccessException;
 }

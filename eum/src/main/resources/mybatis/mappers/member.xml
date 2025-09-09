@@ -18,6 +18,25 @@
     <result property="notes"     column="notes"/>
     <result property="createdAt" column="created_at"/>
   </resultMap>
+  
+  <!-- ✅ 회원가입 INSERT -->
+  <insert id="insertMember" parameterType="com.myspring.eum.member.vo.MemberVO">
+    INSERT INTO member
+      (id, password, name, email, address, age, birth, phone, code, notes, role, status, created_at, updated_at)
+    VALUES
+      (#{id}, #{password}, #{name}, #{email}, #{address}, #{age}, #{birth},
+       #{phone}, #{code}, #{notes}, 'USER', 'ACTIVE', NOW(), NOW())
+  </insert>
+   <!-- ✅ 아이디 + 비밀번호로 로그인 -->
+  <select id="loginById" parameterType="com.myspring.eum.member.vo.MemberVO"
+          resultType="com.myspring.eum.member.vo.MemberVO">
+    SELECT *
+    FROM member
+    WHERE id = #{id}
+      AND password = #{password}
+      AND status = 'ACTIVE'
+    LIMIT 1
+  </select>
 
   <select id="findById" parameterType="string" resultMap="memResult">
     SELECT *

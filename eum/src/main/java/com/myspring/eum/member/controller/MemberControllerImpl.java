@@ -81,7 +81,7 @@ public class MemberControllerImpl implements MemberController {
         HttpSession session = request.getSession(true);
         session.setAttribute("member", db);
         session.setMaxInactiveInterval(60 * 60);
-        return new ModelAndView("redirect:/");
+        return new ModelAndView("redirect:/main.do");
     }
 
     /** 로그아웃 (GET) */
@@ -89,7 +89,7 @@ public class MemberControllerImpl implements MemberController {
     public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
         HttpSession session = request.getSession(false);
         if (session != null) session.invalidate();
-        return new ModelAndView("redirect:/");
+        return new ModelAndView("redirect:/main.do");
     }
 
     private boolean isEmpty(String s) { return s == null || s.trim().length() == 0; }

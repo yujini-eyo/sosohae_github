@@ -30,12 +30,6 @@
         <button class="btn" id="searchBtn" type="submit">검색</button>
         <button class="btn ghost" id="resetBtn" type="button" onclick="location.href='${ctx}/eum/notice.do'">초기화</button>
       </form>
-
-      <div class="cta">
-        <c:if test="${sessionScope.userRole eq 'ADMIN' or (sessionScope.member ne null and sessionScope.member.role eq 'ADMIN')}">
-          <a class="btn primary" href="<c:url value='/admin/board/writeForm.do'/>">+ 새 공지</a>
-        </c:if>
-      </div>
     </section>
 
     <!-- 목록 -->

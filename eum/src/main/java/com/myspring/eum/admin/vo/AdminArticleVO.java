@@ -3,7 +3,6 @@ package com.myspring.eum.admin.vo;
 import java.sql.Timestamp;
 
 import org.springframework.stereotype.Component;
-import com.myspring.eum.board.vo.ArticleVO;
 
 /**
  * 관리자 전용 게시글 VO
@@ -11,91 +10,77 @@ import com.myspring.eum.board.vo.ArticleVO;
  * - 이미지 파일명 인/디코딩 로직은 ArticleVO의 구현을 그대로 상속.
  */
 @Component("adminArticleVO")
-public class AdminArticleVO extends ArticleVO {
+//com.myspring.eum.admin.vo.AdminArticleVO
+public class AdminArticleVO {
+ private Integer articleNO;
+ private Integer parentNO;
+ private String title;
+ private String content;
+ private String id;
+ private String imageFileName;
 
-    /** 게시글 고정(상단 고정) 여부 */
-    private boolean pinned;
+ // 이름을 그대로 둡니다 (Boolean 또는 boolean 가능)
+ private Boolean isNotice;
 
-    /** 노출 여부 (VISIBLE / HIDDEN) */
-    private String visibility;   // 예: "VISIBLE", "HIDDEN"
+ private java.sql.Timestamp writeDate;
 
-    /** 게시 상태 (DRAFT / PUBLISHED / ARCHIVED 등) */
-    private String status;       // 예: "PUBLISHED"
+ // ... (다른 getter/setter)
 
-    /** 조회수 */
-    private int views;
+ // ★ MyBatis가 찾는 정확한 시그니처
+ public Boolean getIsNotice() {       // 또는 primitive면: public boolean getIsNotice()
+     return isNotice;
+ }
+ public void setIsNotice(Boolean isNotice) { // 또는 primitive면: public void setIsNotice(boolean isNotice)
+     this.isNotice = isNotice;
+ }
 
-    /** 감사(Audit) 필드 */
-    private String createdBy;    // 최초 작성 관리자 ID
-    private String updatedBy;    // 최근 수정 관리자 ID
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
-
-    public AdminArticleVO() {
-        super();
-    }
-
-    public boolean isPinned() {
-        return pinned;
-    }
-
-    public void setPinned(boolean pinned) {
-        this.pinned = pinned;
-    }
-
-    public String getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(String visibility) {
-        this.visibility = visibility;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public int getViews() {
-        return views;
-    }
-
-    public void setViews(int views) {
-        this.views = views;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+ public Integer getArticleNO() {
+	return articleNO;
+}
+public void setArticleNO(Integer articleNO) {
+	this.articleNO = articleNO;
+}
+public Integer getParentNO() {
+	return parentNO;
+}
+public void setParentNO(Integer parentNO) {
+	this.parentNO = parentNO;
+}
+public String getTitle() {
+	return title;
+}
+public void setTitle(String title) {
+	this.title = title;
+}
+public String getContent() {
+	return content;
+}
+public void setContent(String content) {
+	this.content = content;
+}
+public String getId() {
+	return id;
+}
+public void setId(String id) {
+	this.id = id;
+}
+public String getImageFileName() {
+	return imageFileName;
+}
+public void setImageFileName(String imageFileName) {
+	this.imageFileName = imageFileName;
+}
+public java.sql.Timestamp getWriteDate() {
+	return writeDate;
+}
+public void setWriteDate(java.sql.Timestamp writeDate) {
+	this.writeDate = writeDate;
+}
+// (선택) 사용성 좋은 보조 메서드도 함께 두면 좋아요
+ public boolean isNotice() { // 템플릿/뷰에서 쓰기 편함
+     return Boolean.TRUE.equals(isNotice);
+ }
+ public void setNotice(boolean notice) {
+     this.isNotice = notice;
+ }
 }

@@ -4,40 +4,49 @@
 
 <mapper namespace="mapper.adminBoard">
 
-  <!-- ArticleVO에 맞춘 매핑 -->
-  <resultMap id="ArticleMap" type="com.myspring.eum.board.vo.ArticleVO">
-    <id     column="articleNO"      property="articleNO"/>
-    <result column="parentNO"       property="parentNO"/>
-    <result column="title"          property="title"/>
-    <result column="content"        property="content"/>
-    <result column="id"             property="id"/>
-    <result column="imageFileName"  property="imageFileName"/>
-    <result column="is_notice"      property="isNotice"/>    <!-- 공지 플래그 -->
-    <result column="writeDate"      property="writeDate"/>
+  <!-- AdminArticleVO 매핑: DB는 snake_case, VO는 camelCase -->
+  <resultMap id="ArticleMap" type="com.myspring.eum.admin.vo.AdminArticleVO">
+    <id     column="articleNO"     property="articleNO"/>
+    <result column="parentNO"      property="parentNO"/>
+    <result column="title"         property="title"/>
+    <result column="content"       property="content"/>
+    <result column="id"            property="id"/>
+    <result column="imageFileName" property="imageFileName"/>
+    <result column="is_notice"     property="isNotice"/>   <!-- 통일 포인트 -->
+    <result column="writeDate"     property="writeDate"/>
   </resultMap>
 
   <!-- 목록: 공지 먼저, 최신순 / limit, offset 옵션 -->
   <select id="selectAllArticles" parameterType="map" resultMap="ArticleMap">
-    SELECT articleNO, parentNO, title, content, id, imageFileName, is_notice, writeDate
-      FROM board_article
-     ORDER BY is_notice DESC, articleNO DESC
-    <if test="limit != null">  LIMIT #{limit} </if>
-    <if test="offset != null"> OFFSET #{offset}</if>
+    SELECT
+      articleNO, parentNO, title, content, id, imageFileName,
+      is_notice, writeDate
+    FROM board_article
+    ORDER BY is_notice DESC, articleNO DESC
+    <choose>
+      <when test="limit != null and offset != null">
+        LIMIT #{limit} OFFSET #{offset}
+      </when>
+      <when test="limit != null">
+        LIMIT #{limit}
+      </when>
+    </choose>
   </select>
 
-  <!-- 단건 -->
-  <!-- 주의: parameterType이 int면 일반적으로 #{value}를 쓰지만,
-       DAO에서 @Param("articleNO") 또는 Map으로 넘기면 #{articleNO}도 OK.
-       지금 프로젝트 흐름을 유지하기 위해 기존 이름을 유지합니다. -->
+  <!-- 단건: parameterType=int 이면 #{value} 사용 (단일 파라미터 규칙) -->
+  <!-- DAO에서 @Param("articleNO")를 쓰면 WHERE articleNO = #{articleNO}로 바꿔도 됩니다. -->
   <select id="selectArticle" parameterType="int" resultMap="ArticleMap">
-    SELECT articleNO, parentNO, title, content, id, imageFileName, is_notice, writeDate
-      FROM board_article
-     WHERE articleNO = #{articleNO}
-     LIMIT 1
+    SELECT
+      articleNO, parentNO, title, content, id, imageFileName,
+      is_notice, writeDate
+    FROM board_article
+    WHERE articleNO = #{value}
+    LIMIT 1
   </select>
 
-  <!-- 등록: is_notice / imageFileName은 값이 있을 때만 컬럼 포함 (DB 기본값 사용 안전) -->
-  <insert id="insertNewArticle" parameterType="map" useGeneratedKeys="true" keyProperty="articleNO">
+  <!-- 등록: is_notice / imageFileName 조건부 포함 -->
+  <insert id="insertNewArticle" parameterType="map"
+          useGeneratedKeys="true" keyProperty="articleNO">
     INSERT INTO board_article
     <trim prefix="(" suffix=")" suffixOverrides=",">
       parentNO, title, content, id,
@@ -53,34 +62,32 @@
     </trim>
   </insert>
 
-  <!-- 삭제 -->
+  <!-- 삭제: parameterType=int → #{value} -->
   <delete id="deleteArticle" parameterType="int">
-    DELETE FROM board_article WHERE articleNO = #{articleNO}
+    DELETE FROM board_article WHERE articleNO = #{value}
   </delete>
 
-  <!-- 공지 목록 (eum/notice.jsp 용) -->
+  <!-- 공지 목록 (eum/notice.jsp 등에서 사용) -->
   <select id="selectNoticeList" resultMap="ArticleMap">
-    SELECT articleNO, parentNO, title, content, id, imageFileName, is_notice, writeDate
-      FROM board_article
-     WHERE is_notice = 1
-     ORDER BY articleNO DESC
+    SELECT
+      articleNO, parentNO, title, content, id, imageFileName,
+      is_notice, writeDate
+    FROM board_article
+    WHERE is_notice = 1
+    ORDER BY articleNO DESC
   </select>
 
-  <!-- 공지 플래그 토글/설정 -->
+  <!-- 공지 플래그 업데이트 -->
   <update id="updateIsNotice" parameterType="map">
     UPDATE board_article
-       SET is_notice = #{isNotice}
-     WHERE articleNO = #{articleNO}
+    SET is_notice = #{isNotice}
+    WHERE articleNO = #{articleNO}
   </update>
 
-  <!-- (있는 그대로 유지) 개별 DB 스키마(eum12)로 직접 삽입하는 별도 쿼리
-       - 스키마가 다르면 오류이므로, 실제 사용 스키마에 맞춰 조정하거나
-         위의 insertNewArticle만 사용하도록 정리하는 것을 권장합니다. -->
+  <!-- (선택/레거시) 스키마 하드코딩 제거 버전: 필요 시만 사용하고, 가능하면 insertNewArticle만 쓰세요. -->
   <insert id="insertArticle" parameterType="map">
-    INSERT INTO eum12.board_article
-      (title, content, id, imageFileName, is_notice)
-    VALUES
-      (#{title}, #{content}, #{id}, #{imageFileName}, #{isNotice})
+    INSERT INTO board_article (title, content, id, imageFileName, is_notice)
+    VALUES (#{title}, #{content}, #{id}, #{imageFileName}, #{isNotice})
   </insert>
 
 </mapper>

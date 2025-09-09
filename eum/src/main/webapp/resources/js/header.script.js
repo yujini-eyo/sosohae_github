@@ -129,16 +129,21 @@
     });
     $$(".drawer nav a").forEach(function (a) { a.addEventListener("click", closeDrawer); });
 
-    // 로그아웃 POST
+    // === 로그아웃: 관리자(/admin/...)와 일반 사용자 경로 분기 + GET 이동
     document.addEventListener("click", function (e) {
       var t = e.target;
       if (!t) return;
       if (t.matches("[data-action='logout'], .btn-logout")) {
-        try { localStorage.removeItem("loggedInUser"); localStorage.removeItem("userPoints"); } catch(e){}
-        var form = document.createElement("form");
-        form.method = "post";
-        form.action = (CTX || "") + "/logout.do";
-        document.body.appendChild(form); form.submit();
+        try {
+          localStorage.removeItem("loggedInUser");
+          localStorage.removeItem("userPoints");
+        } catch(e){}
+
+        var isAdminPath = location.pathname.indexOf((CTX || "") + "/admin/") === 0;
+        var target = (CTX || "") + (isAdminPath ? "/admin/logout.do" : "/member/logout.do");
+
+        // GET 리다이렉트 (서버 매핑과 일치)
+        location.href = target;
       }
     });
 

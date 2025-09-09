@@ -58,10 +58,10 @@
 			value="/WEB-INF/views/admin/main.jsp" />
 	</definition>
 
-	<definition name="admin/members/lookup" extends="layout1.base">
+	<definition name="admin/member/lookup" extends="layout1.base">
 	<put-attribute name="title" value="관리자 조회 페이지" />
 		<put-attribute name="body"
-			value="/WEB-INF/views/admin/members/lookup.jsp" />
+			value="/WEB-INF/views/admin/member/lookup.jsp" />
 	</definition>
 
 

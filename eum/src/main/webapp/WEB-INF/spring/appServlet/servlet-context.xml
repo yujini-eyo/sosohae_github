@@ -47,8 +47,13 @@
 	</context:component-scan>
 
 
-	<!-- <mvc:interceptors> <mvc:interceptor> <mvc:mapping path="/*/*.do"/> 
-		<beans:bean class="com.myspring." /> </mvc:interceptor> </mvc:interceptors> -->
+<!-- 	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/*/*.do" />
+			<beans:bean
+				class="com.myspring.eum.common.interceptor.ViewNameInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors> -->
 
 	<!-- 멀티파트 리졸버 -->
 	<beans:bean id="multipartResolver"

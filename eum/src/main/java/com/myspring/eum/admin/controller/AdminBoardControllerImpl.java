@@ -8,11 +8,17 @@ import javax.servlet.http.HttpSession;
 
 import com.myspring.eum.admin.service.AdminBoardService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,35 +30,26 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/admin/board")
 public class AdminBoardControllerImpl {
 
+    private static final Logger log = LoggerFactory.getLogger(AdminBoardControllerImpl.class);
+
     @Autowired
     private AdminBoardService adminBoardService;
 
-    /** 컨트롤러 레벨 관리자 가드 (session.userRole == ADMIN 이면 통과) */
+    /** 컨트롤러 레벨 관리자 가드 (adminUser가 있거나 userRole==ADMIN이면 통과) */
     private void assertAdmin(HttpSession session){
-        boolean ok = false;
-        if (session != null) {
-            Object role = session.getAttribute("userRole");
-            if (role instanceof String && "ADMIN".equalsIgnoreCase((String) role)) {
-                ok = true;
-            }
-            // 프로젝트 정책상 member.role도 허용하려면 아래 주석 해제
-            // else {
-            //     Object member = session.getAttribute("member");
-            //     if (member != null) {
-            //         try {
-            //             String mrole = (String) member.getClass().getMethod("getRole").invoke(member);
-            //             ok = "ADMIN".equalsIgnoreCase(mrole);
-            //         } catch (Exception ignore) {}
-            //     }
-            // }
+        if (session == null) {
+            log.warn("[ADMIN GUARD] session is null");
+            throw new SecurityException("FORBIDDEN: admin only");
         }
-        if (!ok) throw new SecurityException("FORBIDDEN: admin only");
-    }
-
-    /** 루트 접근 시 목록으로 */
-    @RequestMapping(value = {"", "/", "/index.do"}, method = RequestMethod.GET)
-    public ModelAndView index(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return new ModelAndView("redirect:/admin/board/listArticles.do");
+        if (session.getAttribute("adminUser") != null) {
+            return;
+        }
+        Object role = session.getAttribute("userRole");
+        if (role instanceof String && "ADMIN".equalsIgnoreCase((String) role)) {
+            return;
+        }
+        log.warn("[ADMIN GUARD] not admin. userRole={}", role);
+        throw new SecurityException("FORBIDDEN: admin only");
     }
 
     /** 목록 */
@@ -71,7 +68,11 @@ public class AdminBoardControllerImpl {
     }
 
     /** 등록(저장) — POST : 공지 여부에 따라 리다이렉트 분기 (스크립트 응답) */
-    @RequestMapping(value = "/addNewArticle.do", method = RequestMethod.POST)
+    @RequestMapping(
+        value = "/addNewArticle.do",
+        method = RequestMethod.POST,
+        consumes = "multipart/form-data"
+    )
     public ModelAndView addNewArticle(MultipartHttpServletRequest req,
                                       HttpServletResponse res) throws Exception {
         assertAdmin(req.getSession(false));
@@ -87,8 +88,8 @@ public class AdminBoardControllerImpl {
             return null;
         }
 
-        String ctx = req.getContextPath();
-        String to  = noticeFlag ? (ctx + "/eum/notice.do")
+        String ctx = safeCtx(req);
+        String to  = noticeFlag ? (ctx + "/notice.do")
                                 : (ctx + "/admin/board/listArticles.do");
         sendScript(res, "등록되었습니다.", to);
         return null; // 스크립트로 응답 완료
@@ -101,6 +102,7 @@ public class AdminBoardControllerImpl {
                                     HttpServletResponse response) throws Exception {
         assertAdmin(request.getSession(false));
         if (articleNO == null) {
+            log.info("[viewArticle] articleNO is null -> redirect list");
             return new ModelAndView("redirect:/admin/board/listArticles.do");
         }
         return adminBoardService.viewArticle(articleNO, request, response);
@@ -121,7 +123,7 @@ public class AdminBoardControllerImpl {
         if (response.isCommitted()) {
             return null;
         }
-        sendScript(response, "삭제되었습니다.", request.getContextPath() + "/admin/board/listArticles.do");
+        sendScript(response, "삭제되었습니다.", safeCtx(request) + "/admin/board/listArticles.do");
         return null;
     }
 
@@ -132,7 +134,7 @@ public class AdminBoardControllerImpl {
         return new ModelAndView("admin/board/writeForm");
     }
 
-    /** 폼 라우팅 */
+    /** 폼 라우팅 (공통) */
     @RequestMapping(value = "/*Form.do", method = {RequestMethod.GET, RequestMethod.POST})
     public ModelAndView form(HttpServletRequest request, HttpServletResponse response) {
         assertAdmin(request.getSession(false));
@@ -141,34 +143,47 @@ public class AdminBoardControllerImpl {
         return new ModelAndView(viewName);
     }
 
-    /* ================= 예외 처리(보수적: 스크립트 응답) ================= */
+    /* ================= 예외 처리 ================= */
 
     @ExceptionHandler(SecurityException.class)
     public void handleSecurityException(HttpServletRequest request, HttpServletResponse response, SecurityException ex) throws Exception {
-        sendScript(response, "관리자만 접근할 수 있습니다.", request.getContextPath() + "/admin/auth/login.do");
+        log.warn("[SECURITY] {}", ex.getMessage());
+        sendScript(response, "관리자만 접근할 수 있습니다.", safeCtx(request) + "/admin/auth/login.do");
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public void handleMissingParam(HttpServletResponse response, MissingServletRequestParameterException ex) throws Exception {
+        log.info("[BAD REQUEST] missing param: {}", ex.getParameterName());
         sendScript(response, "잘못된 요청입니다. (" + ex.getParameterName() + ")", "javascript:history.back();");
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public void handleMethodNotAllowed(HttpServletResponse response, HttpRequestMethodNotSupportedException ex) throws Exception {
+        log.info("[METHOD NOT ALLOWED] {}", ex.getMethod());
         sendScript(response, "허용되지 않은 요청 방식입니다.", "javascript:history.back();");
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public void handleMaxUpload(HttpServletResponse response, MaxUploadSizeExceededException ex) throws Exception {
+        log.info("[UPLOAD EXCEEDED] {}", ex.getMaxUploadSize());
         sendScript(response, "업로드 용량을 초과했습니다.", "javascript:history.back();");
     }
 
     @ExceptionHandler(Exception.class)
     public void handleGeneric(HttpServletResponse response, Exception ex) throws Exception {
+        log.error("[ERROR] unhandled", ex);
         sendScript(response, "처리 중 오류가 발생했습니다.", "javascript:history.back();");
     }
 
-    /* ================= 공통 유틸 ================= */
+    /* ================= 바인딩/유틸 ================= */
+
+    /** 폼 입력 공백 → null/trim 처리 (전역 바인더) */
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        // true = 빈 문자열을 null로 변환
+        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+    }
+
     private static boolean isChecked(String v){
         return v != null && (
                "1".equals(v) ||
@@ -176,24 +191,39 @@ public class AdminBoardControllerImpl {
                "true".equalsIgnoreCase(v));
     }
 
+    private static String safeCtx(HttpServletRequest req){
+        return (req != null && req.getContextPath() != null) ? req.getContextPath() : "";
+    }
+
     private static void sendScript(HttpServletResponse response, String msg, String to) throws Exception {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
         PrintWriter out = response.getWriter();
-        out.append("<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body>")
+        out.append("<!DOCTYPE html><html><head><meta charset='UTF-8'>")
+           .append("<meta http-equiv='x-ua-compatible' content='IE=edge'>")
+           .append("</head><body>")
            .append("<script>")
            .append("alert('").append(escapeJs(msg)).append("');");
         if (to != null && to.startsWith("javascript:")) {
             out.append(to.substring("javascript:".length()));
-        } else if (to != null && to.length() > 0) {
+        } else if (to != null && !to.isEmpty()) {
             out.append("location.href='").append(escapeJs(to)).append("';");
+        } else {
+            out.append("history.back();");
         }
         out.append("</script></body></html>");
         out.flush();
     }
 
+    /** JS 문자열 안전화: 스크립트 파손/간단 XSS 방지 */
     private static String escapeJs(String s){
         if (s == null) return "";
-        return s.replace("\\", "\\\\").replace("'", "\\'").replace("\n","\\n").replace("\r","\\r");
+        String r = s;
+        r = r.replace("\\", "\\\\");
+        r = r.replace("'", "\\'");
+        r = r.replace("\n","\\n").replace("\r","\\r");
+        // 태그/슬래시도 이스케이프 (</script> 파손 방지)
+        r = r.replace("<", "\\x3C").replace(">", "\\x3E").replace("/", "\\/");
+        return r;
     }
 }
