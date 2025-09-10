@@ -3,7 +3,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="mapper.board">
-  <!-- (중요) typeAlias 등록: action-mybatis.xml에 아래 추가
+  <!-- action-mybatis.xml에 typeAlias 등록:
        <typeAlias alias="articleVO" type="com.myspring.eum.board.vo.ArticleVO"/> -->
 
   <resultMap id="ArticleMap" type="articleVO">
@@ -14,40 +14,63 @@
     <result property="content"       column="content"/>
     <result property="imageFileName" column="image_file_name"/>
     <result property="writeDate"     column="write_date"/>
+
+    <!-- 위저드 확장 -->
+    <result property="svcType"       column="svc_type"/>
+    <result property="region"        column="region"/>
+    <result property="reqAt"         column="req_at"/>
+    <result property="urgency"       column="urgency"/>
+    <result property="points"        column="points"/>
+    <result property="isNotice"      column="is_notice"/>
   </resultMap>
 
+  <!-- 목록 -->
   <select id="selectAllArticlesList" resultMap="ArticleMap">
-    SELECT article_no, parent_no, id, title, content, image_file_name, write_date
-    FROM tb_board
+    SELECT
+      article_no, parent_no, id, title, content, image_file_name, write_date,
+      svc_type, region, req_at, urgency, points, is_notice
+    FROM tb_table
     ORDER BY article_no DESC
   </select>
 
+  <!-- 단건 -->
   <select id="selectArticle" parameterType="long" resultMap="ArticleMap">
-    SELECT article_no, parent_no, id, title, content, image_file_name, write_date
-    FROM tb_board
+    SELECT
+      article_no, parent_no, id, title, content, image_file_name, write_date,
+      svc_type, region, req_at, urgency, points, is_notice
+    FROM tb_table
     WHERE article_no = #{value}
   </select>
 
-  <!-- 예시: parameterType="map" -->
-<insert id="insertNewArticle" parameterType="map"
-        useGeneratedKeys="true" keyProperty="articleNO">
-  INSERT INTO board_article
-    (parent_no, id, title, content, image_file_name)
-  VALUES
-    (#{parentNO}, #{id}, #{title}, #{content}, #{imageFileName})
-</insert>
+  <!-- 등록 -->
+  <insert id="insertNewArticle" parameterType="map"
+          useGeneratedKeys="true" keyProperty="articleNO">
+    INSERT INTO tb_table
+    (parent_no, id, title, content, image_file_name,
+     svc_type, region, req_at, urgency, points, write_date, is_notice)
+    VALUES
+    (#{parentNO}, #{id}, #{title}, #{content}, #{imageFileName},
+     #{svcType}, #{region}, #{reqAt}, #{urgency}, #{points}, NOW(), 0)
+  </insert>
 
+  <!-- 수정 -->
   <update id="updateArticle" parameterType="map">
-    UPDATE tb_board
+    UPDATE tb_table
        SET title = #{title},
            content = #{content},
            image_file_name =
              CASE WHEN #{imageFileName} IS NOT NULL AND #{imageFileName} != '' THEN #{imageFileName}
-                  ELSE image_file_name END
+                  ELSE image_file_name END,
+           svc_type = #{svcType},
+           region   = #{region},
+           req_at   = #{reqAt},
+           urgency  = #{urgency},
+           points   = #{points}
      WHERE article_no = #{articleNO}
   </update>
 
+  <!-- 삭제 (오타 주의: WHERE) -->
   <delete id="deleteArticle" parameterType="long">
-    DELETE FROM tb_board WHERE article_no = #{value}
+    DELETE FROM tb_table WHERE article_no = #{value}
   </delete>
 </mapper>

@@ -45,14 +45,11 @@
       <div class="bd step" data-step="2">
         <p class="kicker">대전 지역구를 선택하세요.</p>
         <div class="grid cols-4" id="regionBtns">
-          <button class="btn" data-val="서울">서울</button><button class="btn" data-val="경기">경기</button>
-          <button class="btn" data-val="인천">인천</button><button class="btn" data-val="강원">강원</button>
-          <button class="btn" data-val="충북">충북</button><button class="btn" data-val="충남">충남</button>
-          <button class="btn" data-val="대전">대전</button><button class="btn" data-val="전북">전북</button>
-          <button class="btn" data-val="전남">전남</button><button class="btn" data-val="광주">광주</button>
-          <button class="btn" data-val="경북">경북</button><button class="btn" data-val="경남">경남</button>
-          <button class="btn" data-val="대구">대구</button><button class="btn" data-val="부산">부산</button>
-          <button class="btn" data-val="울산">울산</button><button class="btn" data-val="제주">제주</button>
+          <button class="btn" data-val="동구">동구</button>
+          <button class="btn" data-val="중구">중구</button>
+          <button class="btn" data-val="서구">서구</button>
+          <button class="btn" data-val="유성구">유성구</button>
+          <button class="btn" data-val="대덕구">대덕구</button>
         </div>
       </div>
 
@@ -140,6 +137,13 @@
         <!-- 서버 제출용 필드들 -->
         <textarea id="content" name="content" hidden></textarea>
         <input type="file" name="imageFile" accept="image/*" />
+        
+        <!-- ✅ 여기 추가: 폼 위저드 값들을 서버로 넘기기 위한 hidden 필드 -->
+<input type="hidden" name="svcType" id="svcType">
+<input type="hidden" name="region"  id="regionHidden">
+<input type="hidden" name="reqAt"   id="reqAt">
+<input type="hidden" name="urgency" id="urgencyHidden" value="일반">
+<input type="hidden" name="points"  id="pointsHidden"  value="100">
       </div>
     </section>
 
