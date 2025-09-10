@@ -17,7 +17,7 @@ public interface BoardController {
     ModelAndView listImages(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
     /** 글 등록 (단일 이미지) */
-    ResponseEntity<String> addNewArticle(MultipartHttpServletRequest multipartRequest,
+    ModelAndView addNewArticle(MultipartHttpServletRequest multipartRequest,
                                          HttpServletResponse response) throws Exception;
 
     /** 글 상세 (단일 이미지 버전) */
@@ -25,16 +25,16 @@ public interface BoardController {
                              HttpServletRequest request, HttpServletResponse response) throws Exception;
 
     /** 글 수정 (단일 이미지 교체) */
-    ResponseEntity<String> modArticle(MultipartHttpServletRequest multipartRequest,
+    ModelAndView modArticle(MultipartHttpServletRequest multipartRequest,
                                       HttpServletResponse response) throws Exception;
 
     /** 글 삭제 */
-    ResponseEntity<String> removeArticle(@RequestParam("articleNO") long  articleNO,
+    ModelAndView removeArticle(@RequestParam("articleNO") long  articleNO,
                                          HttpServletRequest request, HttpServletResponse response) throws Exception;
 
     /** 글쓰기 폼 */
-    String articleForm() throws Exception;
+    ModelAndView articleForm() throws Exception;
 
     /** 답글 폼 */
-    String replyForm() throws Exception;
+    ModelAndView replyForm() throws Exception;
 }

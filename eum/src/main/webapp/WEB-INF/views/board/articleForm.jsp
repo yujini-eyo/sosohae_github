@@ -1,7 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+
+<tiles:putAttribute name="pageHead">
+  <link rel="stylesheet" href="<c:url value='/resources/css/articleForm.css'/>"/>
+</tiles:putAttribute>
+
+<tiles:putAttribute name="pageScripts">
+  <script defer src="<c:url value='/resources/js/articleForm.js'/>"></script>
+</tiles:putAttribute>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
 
