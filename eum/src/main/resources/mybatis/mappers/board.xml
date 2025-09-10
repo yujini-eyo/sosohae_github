@@ -28,14 +28,14 @@
     WHERE article_no = #{value}
   </select>
 
-  <insert id="insertNewArticle" parameterType="map">
-  INSERT INTO tb_board (parent_no, id, title, content, image_file_name, write_date)
-  VALUES (#{parentNO}, #{id}, #{title}, #{content}, #{imageFileName}, NOW());
-  <selectKey keyProperty="articleNO" resultType="long" order="AFTER">
-    SELECT LAST_INSERT_ID()
-  </selectKey>
+  <!-- 예시: parameterType="map" -->
+<insert id="insertNewArticle" parameterType="map"
+        useGeneratedKeys="true" keyProperty="articleNO">
+  INSERT INTO board_article
+    (parent_no, id, title, content, image_file_name)
+  VALUES
+    (#{parentNO}, #{id}, #{title}, #{content}, #{imageFileName})
 </insert>
-
 
   <update id="updateArticle" parameterType="map">
     UPDATE tb_board
