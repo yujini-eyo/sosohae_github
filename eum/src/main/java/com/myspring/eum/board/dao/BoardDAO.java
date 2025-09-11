@@ -9,9 +9,9 @@ import com.myspring.eum.board.vo.ArticleVO;
 
 
 public interface BoardDAO {
-    List<ArticleVO> selectAllArticlesList();
-    int insertNewArticle(Map<String, Object> articleMap);
-    ArticleVO selectArticle(long articleNO);
+	List<ArticleVO> selectAllArticlesList();
+    int insertNewArticle(ArticleVO article);
+    ArticleVO selectArticle(Integer articleNO);
     int updateArticle(Map<String, Object> articleMap);
-    int deleteArticle(long articleNO);
+    int deleteArticle(Integer articleNO);
 }

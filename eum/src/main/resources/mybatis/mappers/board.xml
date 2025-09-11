@@ -3,74 +3,94 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="mapper.board">
-  <!-- action-mybatis.xml에 typeAlias 등록:
-       <typeAlias alias="articleVO" type="com.myspring.eum.board.vo.ArticleVO"/> -->
 
+  <!-- ArticleVO 매핑 (DB 컬럼명을 정확히 사용) -->
   <resultMap id="ArticleMap" type="articleVO">
-    <id     property="articleNO"     column="article_no"/>
-    <result property="parentNO"      column="parent_no"/>
+    <id     property="articleNO"     column="articleNO"/>
+    <result property="parentNO"      column="parentNO"/>
     <result property="id"            column="id"/>
     <result property="title"         column="title"/>
     <result property="content"       column="content"/>
-    <result property="imageFileName" column="image_file_name"/>
-    <result property="writeDate"     column="write_date"/>
+    <result property="imageFileName" column="imageFileName"/>
+    <result property="isNotice"      column="isNotice"/>
+    <result property="writeDate"     column="writeDate"/>
 
-    <!-- 위저드 확장 -->
+    <!-- 확장 필드 (snake_case) -->
     <result property="svcType"       column="svc_type"/>
     <result property="region"        column="region"/>
     <result property="reqAt"         column="req_at"/>
     <result property="urgency"       column="urgency"/>
     <result property="points"        column="points"/>
-    <result property="isNotice"      column="is_notice"/>
   </resultMap>
 
-  <!-- 목록 -->
+  <!-- 목록: 공지 먼저, 최신순 -->
   <select id="selectAllArticlesList" resultMap="ArticleMap">
     SELECT
-      article_no, parent_no, id, title, content, image_file_name, write_date,
-      svc_type, region, req_at, urgency, points, is_notice
-    FROM tb_table
-    ORDER BY article_no DESC
+      articleNO, parentNO, id, title, content, imageFileName, isNotice, writeDate,
+      svc_type, region, req_at, urgency, points
+    FROM board_article
+    ORDER BY isNotice DESC, articleNO DESC
   </select>
 
   <!-- 단건 -->
-  <select id="selectArticle" parameterType="long" resultMap="ArticleMap">
+  <select id="selectArticle" parameterType="Integer" resultMap="ArticleMap">
     SELECT
-      article_no, parent_no, id, title, content, image_file_name, write_date,
-      svc_type, region, req_at, urgency, points, is_notice
-    FROM tb_table
-    WHERE article_no = #{value}
+      articleNO, parentNO, id, title, content, imageFileName, isNotice, writeDate,
+      svc_type, region, req_at, urgency, points
+    FROM board_article
+    WHERE articleNO = #{value}
   </select>
 
-  <!-- 등록 -->
-  <insert id="insertNewArticle" parameterType="map"
-          useGeneratedKeys="true" keyProperty="articleNO">
-    INSERT INTO tb_table
-    (parent_no, id, title, content, image_file_name,
-     svc_type, region, req_at, urgency, points, write_date, is_notice)
+  <!-- 등록: DB 기본값(공지=0, writeDate=NOW()) 활용 -->
+  <insert id="insertNewArticle" parameterType="articleVO"
+          useGeneratedKeys="true" keyProperty="articleNO" keyColumn="articleNO">
+    INSERT INTO board_article
+      (parentNO, id, title, content, imageFileName,
+       svc_type, region, req_at, urgency, points, writeDate)
     VALUES
-    (#{parentNO}, #{id}, #{title}, #{content}, #{imageFileName},
-     #{svcType}, #{region}, #{reqAt}, #{urgency}, #{points}, NOW(), 0)
+      (#{parentNO}, #{id}, #{title}, #{content}, #{imageFileName},
+       #{svcType}, #{region}, #{reqAt}, #{urgency}, #{points}, NOW())
   </insert>
 
-  <!-- 수정 -->
-  <update id="updateArticle" parameterType="map">
-    UPDATE tb_table
-       SET title = #{title},
-           content = #{content},
-           image_file_name =
-             CASE WHEN #{imageFileName} IS NOT NULL AND #{imageFileName} != '' THEN #{imageFileName}
-                  ELSE image_file_name END,
-           svc_type = #{svcType},
-           region   = #{region},
-           req_at   = #{reqAt},
-           urgency  = #{urgency},
-           points   = #{points}
-     WHERE article_no = #{articleNO}
+  <!-- (선택) 등록 시 공지를 바로 세팅하고 싶다면 동적 INSERT 버전 사용
+  <insert id="insertNewArticle" parameterType="articleVO"
+          useGeneratedKeys="true" keyProperty="articleNO" keyColumn="articleNO">
+    INSERT INTO board_article
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      parentNO, id, title, content, imageFileName,
+      svc_type, region, req_at, urgency, points,
+      <if test="isNotice != null">isNotice,</if>
+      writeDate
+    </trim>
+    <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+      #{parentNO}, #{id}, #{title}, #{content}, #{imageFileName},
+      #{svcType}, #{region}, #{reqAt}, #{urgency}, #{points},
+      <if test="isNotice != null">#{isNotice},</if>
+      NOW()
+    </trim>
+  </insert>
+  -->
+
+  <!-- 수정: 필요한 컬럼만 동적 반영 -->
+  <update id="updateArticle" parameterType="articleVO">
+    UPDATE board_article
+    <set>
+      <if test="title != null">title = #{title},</if>
+      <if test="content != null">content = #{content},</if>
+      <if test="imageFileName != null and imageFileName != ''">
+        imageFileName = #{imageFileName},
+      </if>
+      <if test="isNotice != null">isNotice = #{isNotice},</if>
+      <if test="svcType != null">svc_type = #{svcType},</if>
+      <if test="region != null">region = #{region},</if>
+      <if test="reqAt != null">req_at = #{reqAt},</if>
+      <if test="urgency != null">urgency = #{urgency},</if>
+      <if test="points != null">points = #{points},</if>
+    </set>
+    WHERE articleNO = #{articleNO}
   </update>
 
-  <!-- 삭제 (오타 주의: WHERE) -->
-  <delete id="deleteArticle" parameterType="long">
-    DELETE FROM tb_table WHERE article_no = #{value}
+  <delete id="deleteArticle" parameterType="Integer">
+    DELETE FROM board_article WHERE articleNO = #{value}
   </delete>
 </mapper>

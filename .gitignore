@@ -1,1 +1,14 @@
-/.metadata/
+# Eclipse / IDE
+.metadata/
+.project
+.classpath
+.settings/
+*.iml
+.idea/
+
+# Build
+target/
+bin/
+
+# Logs
+*.log

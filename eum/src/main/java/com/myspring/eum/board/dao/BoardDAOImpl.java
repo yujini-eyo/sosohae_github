@@ -22,11 +22,11 @@ public class BoardDAOImpl implements BoardDAO {
         return sqlSession.selectList(NS + "selectAllArticlesList");
     }
     @Override
-    public int insertNewArticle(Map<String, Object> articleMap) {
-        return sqlSession.insert(NS + "insertNewArticle", articleMap);
+    public int insertNewArticle(ArticleVO article) {
+        return sqlSession.insert(NS + "insertNewArticle", article);
     }
     @Override
-    public ArticleVO selectArticle(long articleNO) {
+    public ArticleVO selectArticle(Integer articleNO) {
         return sqlSession.selectOne(NS + "selectArticle", articleNO);
     }
     @Override
@@ -34,7 +34,7 @@ public class BoardDAOImpl implements BoardDAO {
         return sqlSession.update(NS + "updateArticle", articleMap);
     }
     @Override
-    public int deleteArticle(long articleNO) {
+    public int deleteArticle(Integer articleNO) {
         return sqlSession.delete(NS + "deleteArticle", articleNO);
     }
 }
