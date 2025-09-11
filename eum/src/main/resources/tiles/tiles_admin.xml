@@ -18,25 +18,25 @@
 	</definition>
 
 	<!-- 컨트롤러에서 반환하는 뷰 이름과 동일하게 매핑 -->
-	<definition name="admin/board/listArticles"
+	<definition name="admin/board/adminList"
 		extends="layout1.base">
 		<put-attribute name="title" value="관리자 게시글 목록" />
 		<put-attribute name="body"
-			value="/WEB-INF/views/admin/board/listArticles.jsp" />
+			value="/WEB-INF/views/admin/board/adminList.jsp" />
 	</definition>
 
-	<definition name="admin/board/viewArticle"
+	<definition name="admin/board/adminview"
 		extends="layout1.base">
 		<put-attribute name="title" value="게시글 상세" />
 		<put-attribute name="body"
-			value="/WEB-INF/views/admin/board/viewArticle.jsp" />
+			value="/WEB-INF/views/admin/board/adminview.jsp" />
 	</definition>
 
-	<definition name="admin/board/writeForm"
+	<definition name="admin/board/adminWriteForm"
 		extends="layout1.base">
 		<put-attribute name="title" value="게시글 작성" />
 		<put-attribute name="body"
-			value="/WEB-INF/views/admin/board/writeForm.jsp" />
+			value="/WEB-INF/views/admin/board/adminWriteForm.jsp" />
 	</definition>
 
 	<definition name="admin/auth/login" extends="layout1.base">

@@ -30,11 +30,18 @@
   </header>
 
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">
-    <!-- 게시판 관리 -->
-    <a href="<c:url value='/admin/board/listArticles.do'/>"
+    <!-- 게시판 관리 (목록) -->
+    <a href="<c:url value='/admin/board/adminList.do'/>"
        style="display:block;border:1px solid #FFE1CB;border-radius:16px;background:#fff;padding:16px;text-decoration:none;color:#59463E;box-shadow:0 4px 10px rgba(0,0,0,.06);">
       <h3 style="margin:0 0 8px;">게시판 관리</h3>
-      <p style="margin:0;color:#806A5A;">글 목록/등록/수정/삭제</p>
+      <p style="margin:0;color:#806A5A;">글 목록/공지 설정/삭제</p>
+    </a>
+
+    <!-- 게시글 작성 바로가기 -->
+    <a href="<c:url value='/admin/board/adminWriteFrom.do'/>"
+       style="display:block;border:1px solid #FFE1CB;border-radius:16px;background:#fff;padding:16px;text-decoration:none;color:#59463E;box-shadow:0 4px 10px rgba(0,0,0,.06);">
+      <h3 style="margin:0 0 8px;">게시글 작성</h3>
+      <p style="margin:0;color:#806A5A;">새 글 등록 (첨부 이미지 포함)</p>
     </a>
 
     <!-- 회원 목록 -->
@@ -44,7 +51,7 @@
       <p style="margin:0;color:#806A5A;">가입한 회원 전체 보기</p>
     </a>
 
-    <!-- 회원 단건/일부 조회 -->
+    <!-- 회원 일부 조회 -->
     <a href="<c:url value='/admin/member/lookup.do'/>"
        style="display:block;border:1px solid #FFE1CB;border-radius:16px;background:#fff;padding:16px;text-decoration:none;color:#59463E;box-shadow:0 4px 10px rgba(0,0,0,.06);">
       <h3 style="margin:0 0 8px;">회원 일부 목록</h3>

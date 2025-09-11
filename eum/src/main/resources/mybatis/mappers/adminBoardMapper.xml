@@ -1,93 +1,73 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="mapper.adminBoard">
 
-  <!-- AdminArticleVO 매핑: DB는 snake_case, VO는 camelCase -->
-  <resultMap id="ArticleMap" type="com.myspring.eum.admin.vo.AdminArticleVO">
-    <id     column="articleNO"     property="articleNO"/>
-    <result column="parentNO"      property="parentNO"/>
-    <result column="title"         property="title"/>
-    <result column="content"       property="content"/>
-    <result column="id"            property="id"/>
-    <result column="imageFileName" property="imageFileName"/>
-    <result column="is_notice"     property="isNotice"/>   <!-- 통일 포인트 -->
-    <result column="writeDate"     property="writeDate"/>
+  <sql id="columns">
+    articleNO, parentNO, title, content, id, imageFileName, is_notice, writeDate
+  </sql>
+
+  <resultMap id="adminArticleMap" type="com.myspring.eum.admin.vo.AdminArticleVO">
+    <id     property="articleNO"     column="articleNO"/>
+    <result property="parentNO"      column="parentNO"/>
+    <result property="title"         column="title"/>
+    <result property="content"       column="content"/>
+    <result property="id"            column="id"/>
+    <result property="imageFileName" column="imageFileName"/>
+    <result property="isNotice"      column="is_notice"/>
+    <result property="writeDate"     column="writeDate"/>
   </resultMap>
 
-  <!-- 목록: 공지 먼저, 최신순 / limit, offset 옵션 -->
-  <select id="selectAllArticles" parameterType="map" resultMap="ArticleMap">
-    SELECT
-      articleNO, parentNO, title, content, id, imageFileName,
-      is_notice, writeDate
+  <!-- 목록 -->
+  <select id="adminList" parameterType="map" resultMap="adminArticleMap">
+    SELECT <include refid="columns"/>
     FROM board_article
-    ORDER BY is_notice DESC, articleNO DESC
-    <choose>
-      <when test="limit != null and offset != null">
-        LIMIT #{limit} OFFSET #{offset}
-      </when>
-      <when test="limit != null">
-        LIMIT #{limit}
-      </when>
-    </choose>
+    ORDER BY is_notice DESC, writeDate DESC
+    <if test="offset != null and limit != null">
+      LIMIT #{offset}, #{limit}
+    </if>
   </select>
 
-  <!-- 단건: parameterType=int 이면 #{value} 사용 (단일 파라미터 규칙) -->
-  <!-- DAO에서 @Param("articleNO")를 쓰면 WHERE articleNO = #{articleNO}로 바꿔도 됩니다. -->
-  <select id="selectArticle" parameterType="int" resultMap="ArticleMap">
-    SELECT
-      articleNO, parentNO, title, content, id, imageFileName,
-      is_notice, writeDate
+  <!-- 단건 -->
+  <select id="adminselectArticleByNo" parameterType="int" resultMap="adminArticleMap">
+    SELECT <include refid="columns"/>
     FROM board_article
     WHERE articleNO = #{value}
-    LIMIT 1
   </select>
 
-  <!-- 등록: is_notice / imageFileName 조건부 포함 -->
-  <insert id="insertNewArticle" parameterType="map"
+  <!-- 등록 -->
+  <insert id="admininsertNewArticle"
+          parameterType="com.myspring.eum.admin.vo.AdminArticleVO"
           useGeneratedKeys="true" keyProperty="articleNO">
     INSERT INTO board_article
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      parentNO, title, content, id,
-      <if test="imageFileName != null and imageFileName != ''">imageFileName,</if>
-      <if test="isNotice != null">is_notice,</if>
-      writeDate
-    </trim>
-    <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
-      #{parentNO}, #{title}, #{content}, #{id},
-      <if test="imageFileName != null and imageFileName != ''">#{imageFileName},</if>
-      <if test="isNotice != null">#{isNotice},</if>
-      NOW()
-    </trim>
+      (parentNO, title, content, id, imageFileName, is_notice)
+    VALUES
+      (COALESCE(#{parentNO}, 0),
+       #{title},
+       #{content},
+       #{id},
+       #{imageFileName},
+       <choose>
+         <when test="isNotice != null">#{isNotice}</when>
+         <otherwise>0</otherwise>
+       </choose>)
   </insert>
 
-  <!-- 삭제: parameterType=int → #{value} -->
-  <delete id="deleteArticle" parameterType="int">
-    DELETE FROM board_article WHERE articleNO = #{value}
-  </delete>
-
-  <!-- 공지 목록 (eum/notice.jsp 등에서 사용) -->
-  <select id="selectNoticeList" resultMap="ArticleMap">
-    SELECT
-      articleNO, parentNO, title, content, id, imageFileName,
-      is_notice, writeDate
-    FROM board_article
-    WHERE is_notice = 1
-    ORDER BY articleNO DESC
-  </select>
-
-  <!-- 공지 플래그 업데이트 -->
-  <update id="updateIsNotice" parameterType="map">
-    UPDATE board_article
-    SET is_notice = #{isNotice}
+  <!-- 공지 토글 -->
+  <update id="adminupdateNoticeFlag" parameterType="map">
+    UPDATE board_article SET is_notice = #{isNotice}
     WHERE articleNO = #{articleNO}
   </update>
 
-  <!-- (선택/레거시) 스키마 하드코딩 제거 버전: 필요 시만 사용하고, 가능하면 insertNewArticle만 쓰세요. -->
-  <insert id="insertArticle" parameterType="map">
-    INSERT INTO board_article (title, content, id, imageFileName, is_notice)
-    VALUES (#{title}, #{content}, #{id}, #{imageFileName}, #{isNotice})
-  </insert>
+  <!-- 삭제 -->
+  <delete id="admindeleteArticle" parameterType="int">
+    DELETE FROM board_article WHERE articleNO = #{value}
+  </delete>
 
+  <!-- (선택) 이미지 제거 -->
+  <update id="adminclearImage" parameterType="int">
+    UPDATE board_article SET imageFileName = NULL
+    WHERE articleNO = #{value}
+  </update>
 </mapper>
