@@ -4,9 +4,17 @@
   --danger:#E5484D; --ok:#2F7A2E; --warn:#B47100; --radius:20px;
   --shadow:0 8px 24px rgba(0,0,0,.08); --shadow-soft:0 4px 10px rgba(0,0,0,.06);
   --header-h:72px; --maxw:1120px; --focus-color:#5B9DFF; --focus-ring:0 0 0 3px rgba(246,169,109,.35);
+  --subnav-h: 0px;
 }
 .board{background:var(--card); border:1px solid var(--line); border-radius:20px; box-shadow:0 6px 20px rgba(0,0,0,.06); overflow:hidden; margin-top:8px}
-header.board-header{position:sticky; top:var(--header-h); z-index:900; display:grid; gap:16px; padding:20px; background:#FFE8C2; border-bottom:1px solid var(--line)}
+header.board-header{position:sticky; top: calc(var(--header-h) + var(--subnav-h))72px; /* 필요시 72px + 탭높이 */  z-index: 2000; /* 다른 패널/테이블보다 위로 */ display:grid; gap:16px; padding:20px; background:#FFE8C2; border-bottom:1px solid var(--line)}
+/* 점프/스크롤 시 sticky 헤더에 가려지지 않도록 여유 */
+.panel-req,
+.board .panel,
+.board .step,
+.board .table-wrap {
+  scroll-margin-top: calc(var(--header-h) + var(--subnav-h) + 16px);
+}
 .board-title{font-size:28px; font-weight:800}
 .desc{font-size:16px; color:var(--muted)}
 .toolbar{display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center}
