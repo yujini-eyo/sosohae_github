@@ -1,5 +1,9 @@
 package com.myspring.eum.member.dao;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -35,4 +39,30 @@ public class MemberDAOImpl implements MemberDAO {
 		// TODO Auto-generated method stub
 		return sqlSession.selectOne(NS + "loginById", id);
 	}
+	
+	@Override
+	  public int updateProfile(MemberVO vo) throws DataAccessException {
+	    return sqlSession.update(NS + "updateProfile", vo);
+	  }
+
+	  @Override
+	  public int verifyPassword(String id, String password) throws DataAccessException {
+	    Map<String,Object> p = new HashMap<>();
+	    p.put("id", id);
+	    p.put("password", password); // 운영에선 해시 비교 권장
+	    Integer cnt = sqlSession.selectOne(NS + "verifyPassword", p);
+	    return cnt == null ? 0 : cnt;
+	  }
+
+	  @Override
+	  public int changePassword(String id, String newPassword) throws DataAccessException {
+	    Map<String,Object> p = new HashMap<>();
+	    p.put("id", id);
+	    p.put("password", newPassword); // 운영에선 해시 후 저장
+	    return sqlSession.update(NS + "updatePassword", p);
+	  }
+	  
+	  public List<MemberVO> selectAllMemberList() {
+		  return sqlSession.selectList(NS + "selectAllMemberList");
+	  }
 }

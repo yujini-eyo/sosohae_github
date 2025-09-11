@@ -20,6 +20,7 @@ public class MemberVO {
     private String role;     // ADMIN / USER ...
     private String status;   // ACTIVE / INACTIVE ...
     private Timestamp updatedAt;
+    private Boolean mfaEnabled;
     
     
     // ===== Getter / Setter =====
@@ -116,6 +117,12 @@ public class MemberVO {
     }
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+    public Boolean getMfaEnabled() {
+    	return mfaEnabled != null ? mfaEnabled : Boolean.FALSE;
+    }
+    public void setMfaLEnabled(Boolean mfaEnabled) {
+    	this.mfaEnabled = mfaEnabled;
     }
 
 }

@@ -16,4 +16,12 @@ public interface MemberService {
     
     List<MemberVO> listAllMembers() throws Exception;
 
+	int updateProfile(MemberVO vo) throws Exception;
+	boolean verifyPassword(String id, String curPw) throws Exception;
+	int changePassword(String id, String newPw);
+	
+	
+    
+    
+
 }

@@ -17,6 +17,7 @@
     <result property="code"      column="code"/>
     <result property="notes"     column="notes"/>
     <result property="createdAt" column="created_at"/>
+    
   </resultMap>
   
   <!-- ✅ 회원가입 INSERT -->
@@ -50,5 +51,34 @@
     FROM member
     ORDER BY created_at DESC
   </select>
+  
+    <!-- 프로필 업데이트: DAO의 updateProfile(...) 와 일치 -->
+  <update id="updateProfile" parameterType="com.myspring.eum.member.vo.MemberVO">
+    UPDATE member
+       SET name       = #{name},
+           email      = #{email},
+           address    = #{address},
+           phone      = #{phone},
+           birth      = #{birth},
+           notes      = #{notes},
+           updated_at = NOW()
+     WHERE id = #{id}
+  </update>
+
+  <!-- 현재 비밀번호 확인 (선택): DAO의 verifyPassword(...) 와 일치 -->
+  <select id="verifyPassword" parameterType="map" resultType="int">
+    SELECT COUNT(1)
+      FROM member
+     WHERE id = #{id}
+       AND password = #{password}
+  </select>
+
+  <!-- ★ 비밀번호 변경: 지금 에러가 나는 바로 그 쿼리 -->
+  <update id="updatePassword" parameterType="map">
+    UPDATE member
+       SET password  = #{password},
+           updated_at = NOW()
+     WHERE id = #{id}
+  </update>
 
 </mapper>
