@@ -8,83 +8,113 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
   <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
-  <%-- Tiles 속성을 요청 범위로 가져와 기본값 처리 --%>
+  <%-- Tiles 속성 기본값 --%>
   <tiles:importAttribute name="title" ignore="true"/>
   <tiles:importAttribute name="body_class" ignore="true"/>
 
-  <title><c:out value="${title}" default="관리자"/></title>
+  <title><c:out value="${empty title ? '관리자' : title}"/></title>
 
-  <!-- 공통 레이아웃 CSS -->
+  <%-- 관리자 고정 헤더 스타일/레이아웃 --%>
+  <link rel="stylesheet" href="${ctx}/resources/css/admin/admin_header.css"/>
   <link rel="stylesheet" href="${ctx}/resources/css/admin/board/layout.css"/>
 
-  <!-- 하위 뷰에서 head에 뭐 넣고 싶을 때 -->
+  <%-- 하위 뷰 head 삽입 포인트 --%>
   <tiles:insertAttribute name="extra_head" ignore="true"/>
 
-  <!-- 로그인 등 특정 페이지에서만 상단 글씨를 가리기 위한 간단 CSS -->
+  <%-- (선택) 인증 화면 상단 가림막 --%>
   <style>
     .page-top-occluder{display:none}
     .page-auth .page-top-occluder{
-      display:block;
-      position:fixed; left:0; top:0; width:100%; height:140px;
+      display:block; position:fixed; left:0; top:0; width:100%; height:140px;
       background:
         radial-gradient(1200px 240px at 50% -60px, #FFE8C2 0%, rgba(255,232,194,.55) 35%, rgba(255,232,194,0) 60%),
         linear-gradient(180deg, #FFF8F2 0%, rgba(255,248,242,0) 100%);
       z-index:999; pointer-events:none;
     }
   </style>
-
-  <%-- (필요 시) CSRF 메타
-  <c:if test="${not empty _csrf}">
-    <meta name="_csrf_parameter" content="${_csrf.parameterName}"/>
-    <meta name="_csrf_header" content="${_csrf.headerName}"/>
-    <meta name="_csrf" content="${_csrf.token}"/>
-  </c:if>
-  --%>
 </head>
+
+<%
+  // 세션 로그인 이름/시간 계산 (JSP 스크립틀릿 사용 피하고 싶으면 EL로만도 가능)
+%>
 <body class="${body_class}">
-  <!-- 필요 페이지에서만 보이는 상단 가림막 (Tiles에서 body_class=page-auth 줄 때) -->
   <div class="page-top-occluder" aria-hidden="true"></div>
 
-  <header class="ad-header">
-    <div class="container">
-      <!-- 기존 header 조각을 그대로 사용 (없으면 무시) -->
-      <tiles:insertAttribute name="header" ignore="true"/>
+  <%-- ===== 관리자 고정 헤더 ===== --%>
+  <%
+    // JSTL로 계산하지만, 가독성을 위해 미리 생각: 아래에서는 EL/JSTL만 사용
+  %>
+  <c:choose>
+    <c:when test="${not empty sessionScope.member}">
+      <c:set var="adminDisplayName"
+             value="${empty sessionScope.member.name
+                      ? (empty sessionScope.member.nickname
+                          ? sessionScope.member.id
+                          : sessionScope.member.nickname)
+                      : sessionScope.member.name}"/>
+    </c:when>
+    <c:otherwise>
+      <c:set var="adminDisplayName" value="${empty sessionScope.userId ? '관리자' : sessionScope.userId}"/>
+    </c:otherwise>
+  </c:choose>
 
-      <!-- 전역 네비게이션 (관리자 전용 링크) -->
-      <nav class="nav" aria-label="관리자 전역 메뉴">
-        <a href="${ctx}/admin/board/listArticles.do">게시글 목록</a>
-        <a href="${ctx}/admin/board/writeForm.do">글 작성</a>
+  <c:set var="loginMillis"
+         value="${sessionScope.loginTime ne null ? sessionScope.loginTime.time : session.creationTime}" />
 
-        <span class="nav-spacer"></span>
+  <header class="admin-header" role="banner" aria-label="관리자 상단 헤더">
+    <div class="admin-header__inner">
+      <!-- 좌측: 사이드바 토글 -->
+      <button id="adminSidebarToggle"
+              class="admin-btn-icon"
+              type="button"
+              aria-label="사이드바 토글"
+              aria-pressed="false">☰</button>
 
+      <!-- 가운데: 브랜드(관리자 메인으로) -->
+      <a class="admin-brand" href="${ctx}/admin/main.do" title="관리자 메인으로">EuM-admin</a>
+
+      <!-- 우측: 회원정보/접속시간/로그아웃 -->
+      <div id="adminMeta"
+           class="admin-meta"
+           data-ctx="${ctx}"
+           data-username="<c:out value='${adminDisplayName}'/>"
+           data-login-at="<c:out value='${loginMillis}'/>">
+        <span class="admin-user">
+          <a class="admin-link-name" href="${ctx}/member/mypage.do" title="회원 정보 보기">
+            <c:out value="${adminDisplayName}"/>
+          </a>
+        </span>
+        <span class="admin-dot">•</span>
+        <span class="admin-clock" id="adminClock">접속 —:—:—</span>
+        <span class="admin-dot">•</span>
         <c:choose>
           <c:when test="${sessionScope.userRole eq 'ADMIN' || (sessionScope.member ne null && sessionScope.member.role eq 'ADMIN')}">
-            <span class="nav-user">
-              관리자: <strong>${sessionScope.userId != null ? sessionScope.userId : (sessionScope.member != null ? sessionScope.member.id : 'admin')}</strong>
-            </span>
-            <a href="${ctx}/admin/logout.do" class="logout">로그아웃</a>
+            <a class="admin-btn admin-btn-ghost" href="${ctx}/admin/logout.do">로그아웃</a>
           </c:when>
           <c:otherwise>
-            <a href="${ctx}/admin/login.do" class="login">관리자 로그인</a>
+            <a class="admin-btn" href="${ctx}/admin/login.do">관리자 로그인</a>
           </c:otherwise>
         </c:choose>
-      </nav>
+      </div>
     </div>
   </header>
 
+  <%-- ===== 본문 ===== --%>
   <main class="ad-main" role="main">
     <div class="container">
       <tiles:insertAttribute name="body"/>
     </div>
   </main>
 
+  <%-- ===== 푸터 ===== --%>
   <footer class="ad-footer">
     <div class="container">
       <tiles:insertAttribute name="footer" ignore="true"/>
     </div>
   </footer>
 
-  <!-- 하위 뷰에서 body 끝에 스크립트를 꽂고 싶을 때 -->
-  <tiles:insertAttribute name="extra_script" ignore="true"/>
+  <%-- 헤더 스크립트(고정헤더 여백/토글/접속시간 표기) --%>
+  <script defer src="${ctx}/resources/js/admin/admin_header.js"></script>
+
 </body>
 </html>

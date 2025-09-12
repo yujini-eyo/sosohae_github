@@ -7,14 +7,14 @@
 
 	<!-- 공통 레이아웃 -->
 	<definition name="layout1.base"
-		template="/WEB-INF/views/admin/bbg/adminlayout.jsp">
+		template="/WEB-INF/views/admin/bbg/admin_layout.jsp">
 		<put-attribute name="title" value="관리자" />
 		<put-attribute name="extra_head" value="" />
 		<put-attribute name="header"
-			value="/WEB-INF/views/admin/bbg/header.jsp" />
+			value="/WEB-INF/views/admin/bbg/admin_header.jsp" />
 		<put-attribute name="body" value="" />
 		<put-attribute name="footer"
-			value="/WEB-INF/views/admin/bbg/footer.jsp" />
+			value="/WEB-INF/views/admin/bbg/admin_footer.jsp" />
 	</definition>
 
 	<!-- 컨트롤러에서 반환하는 뷰 이름과 동일하게 매핑 -->
