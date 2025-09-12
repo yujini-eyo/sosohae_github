@@ -45,11 +45,11 @@
       <div class="bd step" data-step="2">
         <p class="kicker">대전 지역구를 선택하세요.</p>
         <div class="grid cols-4" id="regionBtns">
-          <button class="btn" data-val="동구">동구</button>
-          <button class="btn" data-val="중구">중구</button>
-          <button class="btn" data-val="서구">서구</button>
-          <button class="btn" data-val="유성구">유성구</button>
-          <button class="btn" data-val="대덕구">대덕구</button>
+          <button type="button" class="btn" data-val="동구">동구</button>
+          <button type="button" class="btn" data-val="중구">중구</button>
+          <button type="button" class="btn" data-val="서구">서구</button>
+          <button type="button" class="btn" data-val="유성구">유성구</button>
+          <button type="button" class="btn" data-val="대덕구">대덕구</button>
         </div>
       </div>
 
@@ -64,14 +64,14 @@
         <div class="grid cols-3" id="dayBtns"></div>
         <div style="height:8px"></div>
         <div class="grid cols-4" id="timeBtns">
-          <button class="btn" data-val="오전 9시">오전 9시</button>
-          <button class="btn" data-val="오전 10시">오전 10시</button>
-          <button class="btn" data-val="오전 11시">오전 11시</button>
-          <button class="btn" data-val="오후 1시">오후 1시</button>
-          <button class="btn" data-val="오후 2시">오후 2시</button>
-          <button class="btn" data-val="오후 3시">오후 3시</button>
-          <button class="btn" data-val="오후 4시">오후 4시</button>
-          <button class="btn" data-val="오후 5시">오후 5시</button>
+          <button type="button" class="btn" data-val="오전 9시">오전 9시</button>
+          <button type="button" class="btn" data-val="오전 10시">오전 10시</button>
+          <button type="button" class="btn" data-val="오전 11시">오전 11시</button>
+          <button type="button" class="btn" data-val="오후 1시">오후 1시</button>
+          <button type="button" class="btn" data-val="오후 2시">오후 2시</button>
+          <button type="button" class="btn" data-val="오후 3시">오후 3시</button>
+          <button type="button" class="btn" data-val="오후 4시">오후 4시</button>
+          <button type="button" class="btn" data-val="오후 5시">오후 5시</button>
         </div>
       </div>
 
@@ -83,8 +83,8 @@
       </div>
       <div class="bd step" data-step="4">
         <div class="grid cols-3" id="urgBtns">
-          <button class="btn" data-val="일반">일반</button>
-          <button class="btn" data-val="긴급">긴급</button>
+          <button type="button" class="btn" data-val="일반">일반</button>
+          <button type="button" class="btn" data-val="긴급">긴급</button>
         </div>
       </div>
 

@@ -98,6 +98,31 @@ public class BoardAdminControllerImpl implements BoardAdminController {
         logger.debug("[admin] adminremoveArticle articleNO={} -> done", articleNO);
         return new ModelAndView("redirect:/admin/board/adminList.do");
     }
+    
+    /* 삭제시 번호 재배열*/
+	/*
+	 * @Controller
+	 * 
+	 * @RequestMapping("/admin/board") public class AdminBoardController {
+	 * 
+	 * @RequestMapping(value="/adminList.do", method=RequestMethod.GET) public
+	 * ModelAndView adminList(
+	 * 
+	 * @RequestParam(value="page", defaultValue="1") int page,
+	 * 
+	 * @RequestParam(value="size", defaultValue="10") int size) {
+	 * 
+	 * int total = boardService.countArticles(); // 총 건수 int offset = (page - 1) *
+	 * size;
+	 * 
+	 * List<ArticleVO> list = boardService.selectPagedArticles(offset, size); int
+	 * startNo = total - offset; // 이 페이지의 시작 번호
+	 * 
+	 * ModelAndView mv = new ModelAndView("admin/board/adminList");
+	 * mv.addObject("list", list); mv.addObject("page", page); mv.addObject("size",
+	 * size); mv.addObject("total", total); mv.addObject("startNo", startNo); return
+	 * mv; } }
+	 */
 
     /* 공지 on */
     @RequestMapping(value="/adminnoticeOn.do", method=RequestMethod.POST)
