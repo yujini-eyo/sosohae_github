@@ -93,7 +93,7 @@
     var avatarBtn   = document.getElementById('avatarBtn');
     var avatarInput = document.getElementById('avatarInput');
     // ✅ HTML엔 id가 없어서 .avatar를 찾도록 변경
-    var avatarPrev  = document.querySelector('avatarPreview');
+    var avatarPrev  = document.getElementById('avatarPreview');
 
     if (avatarBtn) avatarBtn.addEventListener('click', function () {
       if (readBlock && readBlock.style.display !== 'none') enterEdit();

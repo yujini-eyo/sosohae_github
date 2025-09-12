@@ -12,7 +12,7 @@
 
 
 <!-- 내정보 전용 CSS -->
-<link rel="stylesheet" href="<c:url value='/resources/css/mypage.css'/>" />
+<link rel="stylesheet" href="<c:url value='/resources/css/mypage.css'/>?v=20250912a" />
 
 <section id="mypageView"
          class="mypage-view"
@@ -209,12 +209,14 @@
               <span class="slider"></span>
             </label>
           </div>
-          style="<c:out value='${member.mfaEnabled ? "display:none" : ""}'/>"
+          <div id="mfaHint" class="help"
+               style="<c:out value='${member.mfaEnabled ? "display:none" : ""}'/>">
             아래 QR을 인증앱으로 스캔한 뒤 생성되는 6자리 코드를 입력해 완료하세요.
           </div>
-          <div id="qrBox" class="qr" style="display:none">QR 코드 자리</div>
-        </section>
-      </div>
+          <div id="qrBox" class="qr"
+               style="<c:out value='${member.mfaEnabled ? "display:none" : ""}'/>">
+            QR 코드 자리
+          </div>
     </article>
 
     <!-- 봉사포인트 -->
@@ -345,4 +347,4 @@
 </section>
 
 <!-- 내정보 전용 JS -->
-<script defer src="<c:url value='/resources/js/mypage.js'/>"></script>
+<script defer src="<c:url value='/resources/js/mypage.js'/>?v=20250912a"></script>
