@@ -8,7 +8,6 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <!-- Tiles 'title'를 변수로 가져와서 안전하게 사용 -->
   <tiles:importAttribute name="title" scope="request" ignore="true" />
   <title>${empty title ? 'EuM:' : title}</title>
 
@@ -21,7 +20,7 @@
   <link rel="stylesheet" href="<c:url value='/resources/css/header.css'/>" />
   <link rel="stylesheet" href="<c:url value='/resources/css/footer.css'/>" />
 
-  <!-- (선택) 전역 토큰 폴백: 프로젝트 전역에서 이미 선언되어 있으면 삭제 가능 -->
+  <!-- 전역 토큰/레이아웃 -->
   <style>
     :root{
       --bg:#FFF8F2; --text:#59463E; --muted:#806A5A;
@@ -35,26 +34,18 @@
     body{
       margin:0; background:#fff; color:#222;
       font-family:'SUIT', system-ui, -apple-system, Segoe UI, Roboto, Arial, Apple SD Gothic Neo, 'Noto Sans KR', sans-serif;
+      min-height:100dvh; display:flex; flex-direction:column;
     }
-    main#content{ max-width: var(--maxw); margin: 0 auto; padding: 24px 16px; box-sizing: border-box; }
-    
-    html, body{ height:100%; }
-	body{
-  		min-height:100dvh;
- 		display:flex;
-  		flex-direction:column;
-	}
-	main{ flex:1 0 auto; }         /* 본문이 남는 공간을 채우고 */
-	footer.site-footer{ position: static; }  /* 푸터는 고정 해제 */
-    
+    main#content{ max-width: var(--maxw); margin: 0 auto; padding: 24px 16px; box-sizing: border-box; flex:1 0 auto; }
+    footer.site-footer{ position: static; }
   </style>
 
-  <!-- (선택) 페이지별 head 리소스 주입: 각 definition에서 name="pageHead"로 전달 -->
+  <!-- (선택) 페이지별 head 리소스 -->
   <tiles:insertAttribute name="pageHead" ignore="true" />
 </head>
 
 <body>
-  <!-- 공통 헤더 (Tiles) -->
+  <!-- 공통 헤더 -->
   <tiles:insertAttribute name="header" ignore="true" />
 
   <!-- 본문 -->
@@ -62,16 +53,30 @@
     <tiles:insertAttribute name="body" ignore="true" />
   </main>
 
-  <!-- 공통 푸터 (Tiles) -->
+  <!-- 공통 푸터 -->
   <tiles:insertAttribute name="footer" ignore="true" />
+
+  <!-- 🔧 브리지: 컨텍스트/링크 기본값 주입 (header.script.js 전에 실행) -->
+  <script>
+    window.EUM_CTX = '${ctx}';
+    (function () {
+      var ra = document.getElementById('rightArea');
+      if (!ra) return;
+      if (!ra.dataset.mypage) ra.dataset.mypage = '<c:url value="/member/mypage.do"/>';
+      if (!ra.dataset.point)  ra.dataset.point  = '<c:url value="/member/point.do"/>';
+      if (!ra.dataset.notify) ra.dataset.notify = '<c:url value="/notify.do"/>';
+      if (!ra.dataset.logout) ra.dataset.logout = '<c:url value="/logout.do"/>';
+      if (!ra.dataset.login)  ra.dataset.login  = '<c:url value="/member/loginForm.do"/>';
+      if (!ra.dataset.signup) ra.dataset.signup = '<c:url value="/member/signupForm.do"/>';
+    })();
+  </script>
 
   <!-- 공통 스크립트 -->
   <script defer src="<c:url value='/resources/js/header.script.js'/>"></script>
-  <script defer src="<c:url value='/resources/js/header.patch.script.js'/>"></script>
   <script defer src="<c:url value='/resources/js/footer.script.js'/>"></script>
   <script defer src="<c:url value='/resources/js/footer.pad.js'/>"></script>
 
-  <!-- (선택) 페이지별 스크립트 주입: 각 definition에서 name="pageScripts"로 전달 -->
+  <!-- (선택) 페이지별 스크립트 -->
   <tiles:insertAttribute name="pageScripts" ignore="true" />
 </body>
 </html>
