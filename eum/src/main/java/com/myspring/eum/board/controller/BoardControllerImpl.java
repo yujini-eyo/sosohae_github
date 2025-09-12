@@ -63,7 +63,7 @@ public class BoardControllerImpl implements BoardController {
     @RequestMapping(value = "/listArticles.do", method = { RequestMethod.GET, RequestMethod.POST })
     public ModelAndView listArticles(HttpServletRequest request, HttpServletResponse response) throws Exception {
         List<ArticleVO> articlesList = boardService.listArticles();
-        ModelAndView mav = new ModelAndView("board.listArticles"); // Tiles 정의명
+        ModelAndView mav = new ModelAndView("board/listArticles"); // Tiles 정의명
         mav.addObject("articlesList", articlesList);
 
         String msg = request.getParameter("msg");
@@ -76,7 +76,7 @@ public class BoardControllerImpl implements BoardController {
     @RequestMapping(value = "/listImages.do", method = { RequestMethod.GET, RequestMethod.POST })
     public ModelAndView listImages(HttpServletRequest request, HttpServletResponse response) throws Exception {
         List<ArticleVO> imageFileList = boardService.listArticles();
-        ModelAndView mav = new ModelAndView("board.listImages"); // Tiles 정의명
+        ModelAndView mav = new ModelAndView("board/listImages"); // Tiles 정의명
         mav.addObject("imageFileList", imageFileList);
         return mav;
     }

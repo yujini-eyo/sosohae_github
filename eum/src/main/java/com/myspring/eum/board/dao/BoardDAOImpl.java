@@ -9,7 +9,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
 import com.myspring.eum.board.vo.ArticleVO;
-import com.myspring.eum.board.vo.ImageVO;
+/*import com.myspring.eum.board.vo.ImageVO;*/
 
 
 @Repository("boardDAO")

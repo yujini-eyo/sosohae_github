@@ -4,7 +4,7 @@
 
 <mapper namespace="mapper.board">
 
-  <!-- ArticleVO 매핑 (DB 컬럼명을 정확히 사용) -->
+  <!-- ArticleVO 매핑 (DB 컬럼: snake_case / VO: camelCase) -->
   <resultMap id="ArticleMap" type="articleVO">
     <id     property="articleNO"     column="articleNO"/>
     <result property="parentNO"      column="parentNO"/>
@@ -12,10 +12,10 @@
     <result property="title"         column="title"/>
     <result property="content"       column="content"/>
     <result property="imageFileName" column="imageFileName"/>
-    <result property="isNotice"      column="isNotice"/>
+    <result property="isNotice"      column="is_notice"/>
     <result property="writeDate"     column="writeDate"/>
 
-    <!-- 확장 필드 (snake_case) -->
+    <!-- 확장 필드 -->
     <result property="svcType"       column="svc_type"/>
     <result property="region"        column="region"/>
     <result property="reqAt"         column="req_at"/>
@@ -23,55 +23,38 @@
     <result property="points"        column="points"/>
   </resultMap>
 
-  <!-- 목록: 공지 먼저, 최신순 -->
+  <!-- 목록 -->
   <select id="selectAllArticlesList" resultMap="ArticleMap">
     SELECT
-      articleNO, parentNO, id, title, content, imageFileName, isNotice, writeDate,
+      articleNO, parentNO, id, title, content, imageFileName,
+      is_notice, writeDate,
       svc_type, region, req_at, urgency, points
     FROM board_article
-    ORDER BY isNotice DESC, articleNO DESC
+    ORDER BY is_notice DESC, articleNO DESC
   </select>
 
-  <!-- 단건 -->
-  <select id="selectArticle" parameterType="Integer" resultMap="ArticleMap">
+  <!-- 단건 조회 -->
+  <select id="selectArticle" parameterType="int" resultMap="ArticleMap">
     SELECT
-      articleNO, parentNO, id, title, content, imageFileName, isNotice, writeDate,
+      articleNO, parentNO, id, title, content, imageFileName,
+      is_notice, writeDate,
       svc_type, region, req_at, urgency, points
     FROM board_article
     WHERE articleNO = #{value}
   </select>
 
-  <!-- 등록: DB 기본값(공지=0, writeDate=NOW()) 활용 -->
+  <!-- 등록: writeDate는 DB 기본값(CURRENT_TIMESTAMP) 사용 권장 -->
   <insert id="insertNewArticle" parameterType="articleVO"
           useGeneratedKeys="true" keyProperty="articleNO" keyColumn="articleNO">
     INSERT INTO board_article
       (parentNO, id, title, content, imageFileName,
-       svc_type, region, req_at, urgency, points, writeDate)
+       svc_type, region, req_at, urgency, points)
     VALUES
       (#{parentNO}, #{id}, #{title}, #{content}, #{imageFileName},
-       #{svcType}, #{region}, #{reqAt}, #{urgency}, #{points}, NOW())
+       #{svcType}, #{region}, #{reqAt}, #{urgency}, #{points})
   </insert>
 
-  <!-- (선택) 등록 시 공지를 바로 세팅하고 싶다면 동적 INSERT 버전 사용
-  <insert id="insertNewArticle" parameterType="articleVO"
-          useGeneratedKeys="true" keyProperty="articleNO" keyColumn="articleNO">
-    INSERT INTO board_article
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      parentNO, id, title, content, imageFileName,
-      svc_type, region, req_at, urgency, points,
-      <if test="isNotice != null">isNotice,</if>
-      writeDate
-    </trim>
-    <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
-      #{parentNO}, #{id}, #{title}, #{content}, #{imageFileName},
-      #{svcType}, #{region}, #{reqAt}, #{urgency}, #{points},
-      <if test="isNotice != null">#{isNotice},</if>
-      NOW()
-    </trim>
-  </insert>
-  -->
-
-  <!-- 수정: 필요한 컬럼만 동적 반영 -->
+  <!-- 수정 -->
   <update id="updateArticle" parameterType="articleVO">
     UPDATE board_article
     <set>
@@ -80,7 +63,7 @@
       <if test="imageFileName != null and imageFileName != ''">
         imageFileName = #{imageFileName},
       </if>
-      <if test="isNotice != null">isNotice = #{isNotice},</if>
+      <if test="isNotice != null">is_notice = #{isNotice},</if>
       <if test="svcType != null">svc_type = #{svcType},</if>
       <if test="region != null">region = #{region},</if>
       <if test="reqAt != null">req_at = #{reqAt},</if>
@@ -90,7 +73,8 @@
     WHERE articleNO = #{articleNO}
   </update>
 
-  <delete id="deleteArticle" parameterType="Integer">
+  <!-- 삭제 -->
+  <delete id="deleteArticle" parameterType="int">
     DELETE FROM board_article WHERE articleNO = #{value}
   </delete>
 </mapper>
