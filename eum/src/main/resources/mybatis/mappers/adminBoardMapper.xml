@@ -1,73 +1,66 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="mapper.adminBoard">
 
-  <sql id="columns">
-    articleNO, parentNO, title, content, id, imageFileName, is_notice, writeDate
-  </sql>
-
-  <resultMap id="adminArticleMap" type="com.myspring.eum.admin.vo.AdminArticleVO">
-    <id     property="articleNO"     column="articleNO"/>
-    <result property="parentNO"      column="parentNO"/>
+  <!-- ResultMap: DB는 snake_case, VO는 camelCase -->
+  <resultMap id="adminArticleMap" type="adminArticleVO">
+    <id     property="articleNO"     column="article_no"/>
+    <result property="parentNO"      column="parent_no"/>
+    <result property="id"            column="id"/>
     <result property="title"         column="title"/>
     <result property="content"       column="content"/>
-    <result property="id"            column="id"/>
-    <result property="imageFileName" column="imageFileName"/>
+    <result property="imageFileName" column="image_file_name"/>
     <result property="isNotice"      column="is_notice"/>
-    <result property="writeDate"     column="writeDate"/>
+    <result property="writeDate"     column="write_date"/>
   </resultMap>
 
+  <sql id="adminColumns">
+    article_no, parent_no, id, title, content, image_file_name, is_notice, write_date
+  </sql>
+
   <!-- 목록 -->
-  <select id="adminList" parameterType="map" resultMap="adminArticleMap">
-    SELECT <include refid="columns"/>
-    FROM board_article
-    ORDER BY is_notice DESC, writeDate DESC
-    <if test="offset != null and limit != null">
-      LIMIT #{offset}, #{limit}
-    </if>
+  <select id="adminList" resultMap="adminArticleMap">
+    SELECT <include refid="adminColumns"/>
+    FROM admin_article
+    ORDER BY article_no DESC
   </select>
 
   <!-- 단건 -->
   <select id="adminselectArticleByNo" parameterType="int" resultMap="adminArticleMap">
-    SELECT <include refid="columns"/>
-    FROM board_article
-    WHERE articleNO = #{value}
+    SELECT <include refid="adminColumns"/>
+    FROM admin_article
+    WHERE article_no = #{value}
   </select>
 
-  <!-- 등록 -->
-  <insert id="admininsertNewArticle"
-          parameterType="com.myspring.eum.admin.vo.AdminArticleVO"
+  <!-- 등록: ★ 컬럼명은 is_notice 로! (값은 VO의 isNotice 사용) -->
+  <insert id="admininsertNewArticle" parameterType="adminArticleVO"
           useGeneratedKeys="true" keyProperty="articleNO">
-    INSERT INTO board_article
-      (parentNO, title, content, id, imageFileName, is_notice)
+    INSERT INTO admin_article
+      (parent_no, id, title, content, image_file_name, is_notice)
     VALUES
-      (COALESCE(#{parentNO}, 0),
-       #{title},
-       #{content},
-       #{id},
-       #{imageFileName},
-       <choose>
-         <when test="isNotice != null">#{isNotice}</when>
-         <otherwise>0</otherwise>
-       </choose>)
+      (COALESCE(#{parentNO},0), #{id}, #{title}, #{content}, #{imageFileName},
+       COALESCE(#{isNotice}, 0))
   </insert>
 
-  <!-- 공지 토글 -->
+  <!-- 공지 플래그 업데이트 -->
   <update id="adminupdateNoticeFlag" parameterType="map">
-    UPDATE board_article SET is_notice = #{isNotice}
-    WHERE articleNO = #{articleNO}
+    UPDATE admin_article
+    SET is_notice = #{isNotice}
+    WHERE article_no = #{articleNO}
+  </update>
+
+  <!-- 이미지 제거 -->
+  <update id="adminclearImage" parameterType="int">
+    UPDATE admin_article
+    SET image_file_name = NULL
+    WHERE article_no = #{value}
   </update>
 
   <!-- 삭제 -->
   <delete id="admindeleteArticle" parameterType="int">
-    DELETE FROM board_article WHERE articleNO = #{value}
+    DELETE FROM admin_article WHERE article_no = #{value}
   </delete>
 
-  <!-- (선택) 이미지 제거 -->
-  <update id="adminclearImage" parameterType="int">
-    UPDATE board_article SET imageFileName = NULL
-    WHERE articleNO = #{value}
-  </update>
 </mapper>
