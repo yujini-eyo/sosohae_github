@@ -26,7 +26,7 @@
       </div>
       <div class="cta">
         <button class="btn ghost" id="resetBtn" type="button">초기화</button>
-        <button class="btn primary" type="button" id="writeBtn" aria-label="새 글 쓰기">글쓰기</button>
+        <a class="btn primary" href="<c:url value='/board/articleForm.do'/>">글쓰기</a>
       </div>
     </div>
   </header>
