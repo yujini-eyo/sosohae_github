@@ -1,8 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ taglib prefix="c"    uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt"  uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}"/>
+
 <tiles:putAttribute name="pageHead">
   <link rel="stylesheet" href="<c:url value='/resources/css/board.css'/>"/>
 </tiles:putAttribute>
@@ -58,7 +59,7 @@
           <input type="hidden" name="originalFileName" value="${article.imageFileName}"/>
           <input type="text" name="title" value="${article.title}" placeholder="제목" required style="min-width:240px"/>
           <textarea name="content" placeholder="내용" required style="min-width:240px">${article.content}</textarea>
-          <input type="file" name="imageFileName" accept="image/*"/>
+          <input type="file" name="imageFile" accept="image/*"/>
           <button class="btn" type="submit">수정</button>
         </form>
 

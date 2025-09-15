@@ -23,6 +23,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
@@ -97,7 +101,7 @@ public class BoardControllerImpl implements BoardController {
         //return new ModelAndView("forward:/WEB-INF/views/board/articleForm.jsp");
     }
 
-    /** 글 등록 (VO 기반, PRG) */
+    /** 글 등록 (VO 기반, PRG: 등록 → 상세) */
     @Override
     @RequestMapping(value = "/addNewArticle.do", method = RequestMethod.POST)
     public String addNewArticle(
@@ -114,7 +118,7 @@ public class BoardControllerImpl implements BoardController {
 
         // 기본값 보정
         if (article.getParentNO() == null) article.setParentNO(0);
-        if (article.getPoints() == null) article.setPoints(0);
+        if (article.getPoints() == null)   article.setPoints(0);
         if (article.getIsNotice() == null) article.setIsNotice(false);
 
         // 이미지 temp 저장
@@ -125,62 +129,35 @@ public class BoardControllerImpl implements BoardController {
         }
 
         try {
-            int articleNO = boardService.addNewArticle(article); // useGeneratedKeys로 PK 채워짐
+            // 등록 (반환형이 int면 그대로, void면 article.getArticleNO() 사용)
+            int articleNO = boardService.addNewArticle(article);
+            if (articleNO == 0 && article.getArticleNO() != null) {
+                articleNO = article.getArticleNO(); // useGeneratedKeys로 채워졌을 때
+            }
 
             // 이미지가 있으면 temp → {articleNO}/ 로 이동
-            if (imageFileName != null && !imageFileName.isEmpty()) {
+            if (imageFileName != null && imageFileName.length() > 0) {
                 File srcFile = new File(ARTICLE_IMAGE_REPO + File.separator + "temp" + File.separator + imageFileName);
                 File destDir = new File(ARTICLE_IMAGE_REPO + File.separator + articleNO);
                 FileUtils.moveFileToDirectory(srcFile, destDir, true);
             }
-            rttr.addAttribute("msg", "등록되었습니다.");
-            return "redirect:/board/listArticles.do";
+
+            rttr.addFlashAttribute("msg", "등록되었습니다.");
+            // ✅ 등록 직후 상세로 리다이렉트 (여기만 바뀐 핵심)
+            return "redirect:/board/viewArticle.do?articleNO=" + articleNO;
 
         } catch (Exception e) {
             // 실패 시 temp 정리
-            if (imageFileName != null && !imageFileName.isEmpty()) {
+            if (imageFileName != null && imageFileName.length() > 0) {
                 File srcFile = new File(ARTICLE_IMAGE_REPO + File.separator + "temp" + File.separator + imageFileName);
                 if (srcFile.exists()) srcFile.delete();
             }
-            rttr.addAttribute("msg", "오류가 발생했습니다. 다시 시도해 주세요.");
+            rttr.addFlashAttribute("msg", "오류가 발생했습니다. 다시 시도해 주세요.");
             return "redirect:/board/articleForm.do";
         }
     }
+
     
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        binder.registerCustomEditor(Timestamp.class, new PropertyEditorSupport() {
-            @Override
-            public void setAsText(String text) throws IllegalArgumentException {
-                if (text == null) { setValue(null); return; }
-                String t = text.trim();
-                if (t.isEmpty()) { setValue(null); return; }
-
-                try {
-                    // 1) HTML5 datetime-local: "yyyy-MM-dd'T'HH:mm"
-                    if (t.contains("T")) {
-                        LocalDateTime ldt = LocalDateTime.parse(
-                            t, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
-                        setValue(Timestamp.valueOf(ldt));
-                        return;
-                    }
-                    // 2) 공백 구분: "yyyy-MM-dd HH:mm" or "yyyy-MM-dd HH:mm:ss"
-                    if (t.contains(" ")) {
-                        // "yyyy-MM-dd HH:mm"인 경우 초를 보정
-                        if (t.length() == 16) t = t + ":00";
-                        setValue(Timestamp.valueOf(t));
-                        return;
-                    }
-                    // 3) 날짜만 온 경우: "yyyy-MM-dd" → 00:00:00
-                    LocalDate d = LocalDate.parse(t, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                    setValue(Timestamp.valueOf(d.atStartOfDay()));
-                } catch (Exception ex) {
-                    throw new IllegalArgumentException("Invalid reqAt format: " + t);
-                }
-            }
-        });
-    }
-
     /** 상세보기 — (중요) 인터페이스와 동일하게 Integer 사용 */
     @Override
     @RequestMapping(value = "/viewArticle.do", method = RequestMethod.GET)
@@ -196,58 +173,134 @@ public class BoardControllerImpl implements BoardController {
         return mav;
     }
 
-    /** 글 수정 (PRG) — 현 구조(Map) 유지 */
-    @Override
-    @RequestMapping(value = "/modArticle.do", method = RequestMethod.POST)
-    public ModelAndView modArticle(MultipartHttpServletRequest multipartRequest, HttpServletResponse response)
-            throws Exception {
-        multipartRequest.setCharacterEncoding("utf-8");
+    /** 글 수정 (VO 기반, JRE 1.6 호환) */
+    @RequestMapping(
+    		  value="/modArticle.do",   // ✅ FIX: "/board/modArticle.do" → "/modArticle.do"
+    		  method=RequestMethod.POST,
+    		  produces="text/html; charset=UTF-8"
+    		)
+    
+    @ResponseBody
+    public ResponseEntity<String> modArticle(
+        @ModelAttribute("article") ArticleVO article,
+        @RequestParam(value="imageFile", required=false) MultipartFile imageFile,
+        @RequestParam(value="originalFileName", required=false) String originalFileName,
+        HttpServletRequest request
+    ) {
+    	
+        // TODO: 환경에 맞게 외부화(@Value) 권장
+        final String REPO = "D:\\eum\\article_images";
 
-        Map<String, Object> articleMap = new HashMap<>();
-        Enumeration<?> enu = multipartRequest.getParameterNames();
-        while (enu.hasMoreElements()) {
-            String name = (String) enu.nextElement();
-            articleMap.put(name, multipartRequest.getParameter(name));
-        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "text/html; charset=UTF-8");
 
-        String imageFileName = uploadToTemp(multipartRequest);
-        if (imageFileName != null && !imageFileName.isEmpty()) {
-            articleMap.put("imageFileName", imageFileName);
-        }
-
-        String articleNO = (String) articleMap.get("articleNO");
+        String newImageFileName = null;
 
         try {
-            boardService.modArticle(articleMap);
+            // 1) 파일 업로드 처리(있을 때만)
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String orig = imageFile.getOriginalFilename();
+                long now = System.currentTimeMillis();
+                newImageFileName = now + "_" + (orig == null ? "upload.bin" : orig);
 
-            if (imageFileName != null && !imageFileName.isEmpty()) {
-                File srcFile = new File(ARTICLE_IMAGE_REPO + File.separator + "temp" + File.separator + imageFileName);
-                File destDir = new File(ARTICLE_IMAGE_REPO + File.separator + articleNO);
-                FileUtils.moveFileToDirectory(srcFile, destDir, true);
+                File tempDir = new File(REPO + File.separator + "temp");
+                if (!tempDir.exists()) {
+                    tempDir.mkdirs();
+                }
+                File tempFile = new File(tempDir, newImageFileName);
+                imageFile.transferTo(tempFile);
 
-                String originalFileName = (String) articleMap.get("originalFileName");
-                if (originalFileName != null && !originalFileName.isEmpty()) {
-                    File oldFile = new File(ARTICLE_IMAGE_REPO + File.separator + articleNO + File.separator + originalFileName);
-                    if (oldFile.exists()) oldFile.delete();
+                // VO에 파일명 세팅
+                article.setImageFileName(newImageFileName);
+            }
+
+            // 2) DB 업데이트 (제목/내용/이미지파일명 등)
+            //    구현체에 이미 존재하는 시그니처: updateArticle(ArticleVO) 사용. :contentReference[oaicite:2]{index=2}
+            boardService.modArticle(article);
+
+            // 3) 파일 이동/정리
+            if (newImageFileName != null && newImageFileName.length() > 0) {
+                File src = new File(REPO + File.separator + "temp", newImageFileName);
+                File artDir = new File(REPO + File.separator + article.getArticleNO());
+                if (!artDir.exists()) {
+                    artDir.mkdirs();
+                }
+                File dest = new File(artDir, newImageFileName);
+                // Java 6: commons-io로 이동
+                org.apache.commons.io.FileUtils.moveFile(src, dest);
+
+                // 기존 파일 삭제
+                if (originalFileName != null && originalFileName.length() > 0) {
+                    File old = new File(artDir, originalFileName);
+                    if (old.exists()) {
+                        old.delete();
+                    }
                 }
             }
 
-            ModelAndView mav = new ModelAndView("redirect:/board/viewArticle.do");
-            mav.addObject("articleNO", articleNO);
-            mav.addObject("msg", "수정되었습니다.");
-            return mav;
+            String ok = "<script>"
+                      + "alert('글을 수정했습니다.');"
+                      + "location.href='" + request.getContextPath()
+                      + "/board/viewArticle.do?articleNO=" + article.getArticleNO() + "';"
+                      + "</script>";
+            return new ResponseEntity<String>(ok, headers, HttpStatus.OK);
 
-        } catch (Exception e) {
-            if (imageFileName != null && !imageFileName.isEmpty()) {
-                File srcFile = new File(ARTICLE_IMAGE_REPO + File.separator + "temp" + File.separator + imageFileName);
-                if (srcFile.exists()) srcFile.delete();
-            }
-            ModelAndView mav = new ModelAndView("redirect:/board/viewArticle.do");
-            mav.addObject("articleNO", articleNO);
-            mav.addObject("msg", "오류가 발생했습니다. 다시 수정해 주세요.");
-            return mav;
+        } catch (Exception ex) {
+            // 실패 시 temp 정리
+            try {
+                if (newImageFileName != null && newImageFileName.length() > 0) {
+                    File src = new File(REPO + File.separator + "temp", newImageFileName);
+                    if (src.exists()) src.delete();
+                }
+            } catch (Exception ignore) {}
+
+            String fail = "<script>"
+                        + "alert('오류가 발생했습니다. 다시 수정해주세요.');"
+                        + "history.back();"
+                        + "</script>";
+            return new ResponseEntity<String>(fail, headers, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    /** 글 수정을 위한 바인더 */
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        // ✅ Java6 호환: SimpleDateFormat 기반 (java.time.* 제거)
+        binder.registerCustomEditor(java.sql.Timestamp.class, new java.beans.PropertyEditorSupport() {
+            public void setAsText(String text) throws IllegalArgumentException {
+                if (text == null) { setValue(null); return; }
+                String t = text.trim();
+                if (t.length() == 0) { setValue(null); return; }
+
+                java.util.Date date = null;
+                java.text.ParsePosition pos;
+
+                // yyyy-MM-dd HH:mm:ss
+                java.text.SimpleDateFormat f1 = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                f1.setLenient(false);
+                pos = new java.text.ParsePosition(0);
+                date = f1.parse(t, pos);
+                if (date != null && pos.getIndex() == t.length()) { setValue(new java.sql.Timestamp(date.getTime())); return; }
+
+                // yyyy-MM-dd HH:mm
+                java.text.SimpleDateFormat f2 = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm");
+                f2.setLenient(false);
+                pos = new java.text.ParsePosition(0);
+                date = f2.parse(t, pos);
+                if (date != null && pos.getIndex() == t.length()) { setValue(new java.sql.Timestamp(date.getTime())); return; }
+
+                // yyyy-MM-dd
+                java.text.SimpleDateFormat f3 = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                f3.setLenient(false);
+                pos = new java.text.ParsePosition(0);
+                date = f3.parse(t, pos);
+                if (date != null && pos.getIndex() == t.length()) { setValue(new java.sql.Timestamp(date.getTime())); return; }
+
+                throw new IllegalArgumentException("Invalid reqAt format: " + t);
+            }
+        });
+    }
+
 
     /** 글 삭제 (PRG) */
     @Override
@@ -272,23 +325,23 @@ public class BoardControllerImpl implements BoardController {
     }
 
     /** (바이너리) 이미지 보기 — 인터페이스 외 유틸 */
-    @RequestMapping(value = "/image.do", method = RequestMethod.GET)
-    public void image(@RequestParam("articleNO") Integer articleNO,
-                      @RequestParam("file") String file,
-                      HttpServletResponse resp) throws IOException {
-        File target = new File(ARTICLE_IMAGE_REPO + File.separator + articleNO + File.separator + file);
-        if (!target.exists()) {
-            resp.setStatus(404);
-            return;
-        }
-        resp.setContentType("image/*");
-        try (FileInputStream fis = new FileInputStream(target);
-             ServletOutputStream os = resp.getOutputStream()) {
-            byte[] buf = new byte[8192];
-            int len;
-            while ((len = fis.read(buf)) != -1) os.write(buf, 0, len);
-        }
-    }
+//    @RequestMapping(value = "/image.do", method = RequestMethod.GET)
+//    public void image(@RequestParam("articleNO") Integer articleNO,
+//                      @RequestParam("file") String file,
+//                      HttpServletResponse resp) throws IOException {
+//        File target = new File(ARTICLE_IMAGE_REPO + File.separator + articleNO + File.separator + file);
+//        if (!target.exists()) {
+//            resp.setStatus(404);
+//            return;
+//        }
+//        resp.setContentType("image/*");
+//        try (FileInputStream fis = new FileInputStream(target);
+//             ServletOutputStream os = resp.getOutputStream()) {
+//            byte[] buf = new byte[8192];
+//            int len;
+//            while ((len = fis.read(buf)) != -1) os.write(buf, 0, len);
+//        }
+//    }
 
     /** 업로드 공통: temp 저장 (MultipartHttpServletRequest 버전) — 수정/구코드용 */
     private String uploadToTemp(MultipartHttpServletRequest req) throws Exception {

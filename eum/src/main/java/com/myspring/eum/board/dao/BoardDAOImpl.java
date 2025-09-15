@@ -30,9 +30,14 @@ public class BoardDAOImpl implements BoardDAO {
         return sqlSession.selectOne(NS + "selectArticle", articleNO);
     }
     @Override
-    public int updateArticle(Map<String, Object> articleMap) {
-        return sqlSession.update(NS + "updateArticle", articleMap);
+    public void updateArticle(ArticleVO article) throws Exception {
+        sqlSession.update(NS + "updateArticle", article);   // mapper: <update id="updateArticle" parameterType="articleVO">
     }
+
+    public void updateArticle(Map<String, Object> articleMap) throws Exception {
+        sqlSession.update(NS + "updateArticleDynamic", articleMap); // mapper: <update id="updateArticleDynamic" ...>
+    }
+    
     @Override
     public int deleteArticle(Integer articleNO) {
         return sqlSession.delete(NS + "deleteArticle", articleNO);

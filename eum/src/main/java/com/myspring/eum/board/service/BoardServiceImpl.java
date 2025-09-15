@@ -1,7 +1,6 @@
 package com.myspring.eum.board.service;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,11 +37,20 @@ public class BoardServiceImpl implements BoardService {
     public ArticleVO viewArticle(Integer articleNO) throws Exception {
         return boardDAO.selectArticle(articleNO);
     }
-
-    /** 수정 (현 구조 유지: Map 기반 동적 업데이트) */
+    
+    /** 수정 */
     @Override
-    public void modArticle(Map<String, Object> articleMap) throws Exception {
-        boardDAO.updateArticle(articleMap);
+    public void modArticle(ArticleVO article) throws Exception {
+        // 한 곳에 로직을 모으기 위해 기존 update를 재사용
+        updateArticle(article);
+        // 또는 바로 DAO 호출도 가능:
+        // boardDAO.updateArticle(article);
+    }
+    
+    // ② VO 기반 수정(추가)
+    @Override
+    public void updateArticle(ArticleVO article) throws Exception {
+        boardDAO.updateArticle(article);
     }
 
     /** 삭제 */

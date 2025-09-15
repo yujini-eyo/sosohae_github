@@ -15,10 +15,12 @@ public interface BoardService {
     /** 상세 */
     ArticleVO viewArticle(Integer articleNO) throws Exception;
 
-    /** 수정: (현 구조 유지) Map 기반 동적 업데이트 */
-    void modArticle(Map<String, Object> articleMap) throws Exception;
+ // ① VO 기반 수정(추가)
+    void updateArticle(ArticleVO article) throws Exception;
 
-    /** 삭제 */
+    // (레거시 유지 시) Map 기반 수정도 남겨둘 수 있음
+    void modArticle(ArticleVO article) throws Exception;
+
     void removeArticle(Integer articleNO) throws Exception;
 
     // (선택) 향후 VO 기반 수정으로 전환하고 싶다면 아래 시그니처 추가:

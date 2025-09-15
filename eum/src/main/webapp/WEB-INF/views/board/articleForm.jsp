@@ -132,7 +132,7 @@
       </div>
       <div class="bd">
         <!-- 아래 textarea는 사용자가 쓰는 상세내용 -->
-        <textarea id="contentDetail" rows="8" placeholder="상세 요청 내용을 작성해 주세요. 예) 병원 동행, 접수/수납 도움, 예상 소요 1시간 등"></textarea>
+        <textarea id="content" name="content" rows="8" placeholder="상세 요청 내용을 작성해 주세요. 예) 병원 동행, 접수/수납 도움, 예상 소요 1시간 등"></textarea>
 
         <!-- 서버 제출용 필드들 -->
         <textarea id="content" name="content" hidden></textarea>
@@ -154,7 +154,7 @@
         <div>
           <button class="cta secondary" type="button" id="prev">이전</button>
           <button class="cta primary"   type="button" id="next">다음</button>
-          <button class="cta primary hide" type="button" id="submit">등록하기</button>
+          <button class="cta primary hide" type="submit" id="submit">등록하기</button>
         </div>
       </div>
     </div>
