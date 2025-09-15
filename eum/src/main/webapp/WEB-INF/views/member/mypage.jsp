@@ -1,17 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn"  uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-
-
-<!-- 내정보 전용 CSS -->
 <link rel="stylesheet" href="<c:url value='/resources/css/mypage.css'/>?v=20250912a" />
 
 <section id="mypageView"
@@ -27,7 +23,7 @@
       <small class="muted">개인정보 및 보안을 관리하고 업데이트하세요</small>
     </header>
 
-    <!-- 알림영역 (쿼리 파라미터/플래시 메시지용) -->
+    <!-- 알림영역 -->
     <c:if test="${param.result == 'profileUpdated'}">
       <div class="alert success" role="status">내 정보가 저장되었습니다.</div>
     </c:if>
@@ -36,6 +32,15 @@
     </c:if>
     <c:if test="${param.result == 'pwMismatch'}">
       <div class="alert error" role="alert">비밀번호가 일치하지 않습니다. 다시 시도해 주세요.</div>
+    </c:if>
+    <c:if test="${param.result == 'avatarBadType'}">
+      <div class="alert error" role="alert">JPG/PNG만 업로드할 수 있어요.</div>
+    </c:if>
+    <c:if test="${param.result == 'avatarTooLarge'}">
+      <div class="alert error" role="alert">이미지는 2MB 이하만 가능해요.</div>
+    </c:if>
+    <c:if test="${param.result == 'avatarSaveError'}">
+      <div class="alert error" role="alert">파일 저장에 실패했습니다. 다시 시도해 주세요.</div>
     </c:if>
 
     <!-- 개인정보 카드 -->
@@ -51,54 +56,40 @@
 
       <!-- 아바타/프로필 사진 -->
       <div class="avatar-row">
-        <div class="avatar" id="avatarPreview">
-          <c:out value="${empty member.name ? 'U' : fn:substring(member.name,0,1)}" />
-        </div>
+        <c:choose>
+          <c:when test="${not empty member.profileImage}">
+            <div class="avatar" id="avatarPreview"
+                 style="background-image:url('<c:url value='${member.profileImage}'/>');background-size:cover;background-position:center;"></div>
+          </c:when>
+          <c:otherwise>
+            <div class="avatar" id="avatarPreview">
+              <c:out value="${empty member.name ? 'U' : fn:substring(member.name,0,1)}" />
+            </div>
+          </c:otherwise>
+        </c:choose>
         <div class="avatar-meta">
           <div class="help">프로필 사진은 JPG/PNG, 최대 2MB</div>
           <button type="button" class="btn ghost" id="avatarBtn"><i class="fa-regular fa-image"></i> 사진 변경</button>
         </div>
       </div>
-      <!-- 실제 파일 입력은 폼 내부에 있음 -->
 
       <!-- 읽기 모드 -->
       <dl class="info-grid" id="readBlock">
-        <div>
-          <dt>아이디</dt>
-          <dd id="v_id"><c:out value="${member.id}" /></dd>
-        </div>
-        <div>
-          <dt>이름</dt>
-          <dd id="v_name"><c:out value="${member.name}" /></dd>
-        </div>
-        <div>
-          <dt>이메일</dt>
-          <dd id="v_email"><c:out value="${member.email}" /></dd>
-        </div>
-        <div>
-          <dt>전화번호</dt>
-          <dd id="v_phone"><c:out value="${member.phone}" /></dd>
-        </div>
-        <div>
-          <dt>생년월일</dt>
-          <dd id="v_birth"><fmt:formatDate value="${member.birth}" pattern="yyyy-MM-dd"/></dd>
-        </div>
-        <div style="grid-column:1/-1">
-          <dt>주소</dt>
-          <dd id="v_address"><c:out value="${member.address}" /></dd>
-        </div>
-        <div style="grid-column:1/-1">
-          <dt>특이사항</dt>
-          <dd id="v_notes"><c:out value="${member.notes}" /></dd>
-        </div>
+        <div><dt>아이디</dt><dd id="v_id"><c:out value="${member.id}" /></dd></div>
+        <div><dt>이름</dt><dd id="v_name"><c:out value="${member.name}" /></dd></div>
+        <div><dt>이메일</dt><dd id="v_email"><c:out value="${member.email}" /></dd></div>
+        <div><dt>전화번호</dt><dd id="v_phone"><c:out value="${member.phone}" /></dd></div>
+        <div><dt>생년월일</dt><dd id="v_birth"><fmt:formatDate value="${member.birth}" pattern="yyyy-MM-dd"/></dd></div>
+        <div style="grid-column:1/-1"><dt>주소</dt><dd id="v_address"><c:out value="${member.address}" /></dd></div>
+        <div style="grid-column:1/-1"><dt>특이사항</dt><dd id="v_notes"><c:out value="${member.notes}" /></dd></div>
       </dl>
 
-      <!-- 편집 모드 (multipart로 아바타까지 함께 전송) -->
+      <!-- 편집 모드 -->
       <form id="profileForm"
             class="edit-grid"
             method="post"
             enctype="multipart/form-data"
-            action="${contextPath}/eum/updateProfile.do"
+            action="<c:url value='/member/updateProfile.do'/>"
             style="display:none">
         <c:if test="${not empty _csrf}">
           <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -152,7 +143,7 @@
         <!-- 비밀번호 변경 -->
         <section class="section" aria-labelledby="pwTitle">
           <h3 id="pwTitle"><i class="fa-regular fa-key" aria-hidden="true"></i> 비밀번호 변경</h3>
-          <form id="pwForm" class="grid-2" method="post" action="${contextPath}/member/changePassword.do" novalidate>
+          <form id="pwForm" class="grid-2" method="post" action="<c:url value='/member/changePassword.do'/>" novalidate>
             <c:if test="${not empty _csrf}">
               <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             </c:if>
@@ -217,134 +208,10 @@
                style="<c:out value='${member.mfaEnabled ? "display:none" : ""}'/>">
             QR 코드 자리
           </div>
-    </article>
-
-    <!-- 봉사포인트 -->
-    <article class="card" aria-labelledby="pointsTitle" id="pointsCard">
-      <div class="card-head">
-        <h2 class="card-title" id="pointsTitle">봉사포인트</h2>
-        <div class="card-actions">
-          <button class="btn ghost" type="button" id="sendPoint"><i class="fa-solid fa-paper-plane"></i> 포인트 보내기</button>
-          <button class="btn primary" type="button" id="redeemPoint"><i class="fa-regular fa-gift"></i> 보상 교환</button>
-        </div>
-      </div>
-
-      <!-- 요약 -->
-      <div class="kpis" role="group" aria-label="포인트 요약">
-        <div class="kpi">
-          <strong>보유 포인트</strong>
-          <div class="num" id="pt_current"><fmt:formatNumber value='${pointSummary.current}' pattern='#,###'/> P</div>
-        </div>
-        <div class="kpi">
-          <strong>이번 달 적립 / 사용</strong>
-          <div class="num">
-            <span id="pt_month_gain">+<fmt:formatNumber value='${pointSummary.monthGain}' pattern='#,###'/></span>
-            /
-            <span id="pt_month_spend">-<fmt:formatNumber value='${pointSummary.monthSpend}' pattern='#,###'/></span> P
-          </div>
-        </div>
-      </div>
-
-      <!-- 등급 -->
-      <div class="tier" aria-live="polite">
-        <div>
-          <div class="name">등급: <span id="pt_tier"><c:out value="${pointSummary.tier}" default="나무"/></span></div>
-          <div class="next"><span id="pt_next_text">다음 등급까지 <fmt:formatNumber value='${pointSummary.nextNeeded}' pattern='#,###'/> P</span></div>
-        </div>
-        <div class="tier-bar">
-          <div class="progress" aria-label="등급 진행도">
-            <div class="bar" id="pt_progress" style="width:0%"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 탭 -->
-      <div class="tabs" role="tablist" aria-label="봉사포인트 탭">
-        <button class="tab-btn" role="tab" aria-selected="true" data-tab="overview">개요</button>
-        <button class="tab-btn" role="tab" aria-selected="false" data-tab="history">적립/사용 내역</button>
-        <button class="tab-btn" role="tab" aria-selected="false" data-tab="rules">포인트 정책</button>
-      </div>
-
-      <!-- 패널: 개요 -->
-      <div class="tab-panel active" id="panel-overview" role="tabpanel">
-        <div class="kpis three">
-          <div class="kpi"><strong>누적 적립</strong><div class="num" id="pt_total_gain"><fmt:formatNumber value='${pointSummary.totalGain}' pattern='#,###'/> P</div></div>
-        <div class="kpi"><strong>누적 사용</strong><div class="num" id="pt_total_spend"><fmt:formatNumber value='${pointSummary.totalSpend}' pattern='#,###'/> P</div></div>
-          <div class="kpi"><strong>누적 봉사시간</strong><div class="num" id="pt_total_hours"><fmt:formatNumber value='${pointSummary.totalHours}' pattern='#,##0.##'/> h</div></div>
-        </div>
-
-        <div class="goal">
-          <div><strong>이달의 목표</strong> — 봉사 <span id="goalTarget"><c:out value='${pointSummary.goalTarget}' default='5'/></span>건 / 현재 <span id="goalNow"><c:out value='${pointSummary.goalNow}' default='0'/></span>건</div>
-          <div class="progress" aria-label="이달 목표 진행도">
-            <div class="bar" id="pt_goal_bar" style="width:0%"></div>
-          </div>
-          <small class="help">목표 달성 시 보너스 +500 P</small>
-        </div>
-      </div>
-
-      <!-- 패널: 내역 -->
-      <div class="tab-panel" id="panel-history" role="tabpanel">
-        <div class="field" style="max-width:260px">
-          <label for="typeSelect">유형 필터</label>
-          <select id="typeSelect" class="input">
-            <option value="all" selected>전체</option>
-            <option value="earn">적립</option>
-            <option value="spend">사용</option>
-            <option value="donate">기부</option>
-            <option value="transfer">송금/수신</option>
-          </select>
-        </div>
-
-        <table class="table" aria-label="포인트 내역">
-          <thead>
-          <tr>
-            <th>일시</th>
-            <th>사유</th>
-            <th>변동</th>
-            <th>유형</th>
-            <th>상태</th>
-          </tr>
-          </thead>
-          <tbody id="pt_rows">
-          <c:forEach items="${pointHistory}" var="h">
-            <tr data-type="${h.type}">
-              <td><fmt:formatDate value="${h.ts}" pattern="yyyy-MM-dd HH:mm"/></td>
-              <td><c:out value="${h.reason}"/></td>
-              <td>
-                <c:choose>
-                  <c:when test="${h.type == 'earn'}">+<fmt:formatNumber value='${h.amount}' pattern='#,###'/> P</c:when>
-                  <c:otherwise>-<fmt:formatNumber value='${h.amount}' pattern='#,###'/> P</c:otherwise>
-                </c:choose>
-              </td>
-              <td>
-                <c:choose>
-                  <c:when test="${h.type=='earn'}">적립</c:when>
-                  <c:when test="${h.type=='spend'}">사용</c:when>
-                  <c:when test="${h.type=='donate'}">기부</c:when>
-                  <c:otherwise>송금</c:otherwise>
-                </c:choose>
-              </td>
-              <td><span class="badge success">완료</span></td>
-            </tr>
-          </c:forEach>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 패널: 정책 -->
-      <div class="tab-panel" id="panel-rules" role="tabpanel">
-        <ul class="rules">
-          <li><b>적립:</b> 봉사 1건 기본 <b>+500 P</b>, 시간/난이도/거리 등에 따라 가중.</li>
-          <li><b>보너스:</b> 피드백 “매우 만족” 시 <b>+10%</b>, 이달 목표 달성 시 <b>+500 P</b>.</li>
-          <li><b>차감:</b> 사전 통보 없는 취소/노쇼 <b>-300 P</b>.</li>
-          <li><b>유효기간:</b> 적립 후 <b>24개월</b> (최근 사용/적립 시 갱신).</li>
-          <li><b>교환/기부:</b> 파트너 보상으로 교환, 공용 나눔풀 기부 가능.</li>
-          <li><b>현금화 불가:</b> 포인트는 현금이 아니며 환전 불가.</li>
-        </ul>
+        </section>
       </div>
     </article>
   </div>
 </section>
 
-<!-- 내정보 전용 JS -->
 <script defer src="<c:url value='/resources/js/mypage.js'/>?v=20250912a"></script>

@@ -34,7 +34,7 @@
            data-auth="${not empty sessionScope.member}"
            data-username="<c:out value='${userDisplayName}'/>"
            data-mypage="/member/mypage.do"     <%-- 사용자명 클릭 → 마이페이지 --%>
-           data-point="/point.do"              <%-- 포인트 --%>
+           data-point="/member/point.do"              <%-- 포인트 --%>
            data-notify="/notify.do"            <%-- 알림 --%>
            data-logout="/member/logout.do"     <%-- ★ 로그아웃 (멤버 서버 매핑에 맞춤) --%>
            data-login="/member/loginForm.do"
@@ -63,7 +63,8 @@
       <a href="<c:url value='/guide.do'/>">이용방법</a>
       <a href="<c:url value='/notice.do'/>">공지</a>
       <a href="<c:url value='/board/listArticles.do'/>">도움 주기</a>
-      <a href="<c:url value='/help/write.do'/>">도움 요청하기</a>
+      <a href="<c:url value='/board/articleForm.do'/>">도움 요청하기</a>
+      <a href="<c:url value='/member/mypage.do'/>">도움 요청하기</a>      
       <a href="<c:url value='/chat.do'/>">채팅</a>
     </nav>
   </noscript>

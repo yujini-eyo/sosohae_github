@@ -1,8 +1,6 @@
 /* ===== Footer / Mobile Tabbar ===== */
 :root{
   --footer-bg: var(--footer, #FFECD6);
-  --text: var(--text, #59463E);
-  --muted: var(--muted, #806A5A);
   --brand-200: var(--brand-200, #FADFCB);
   --maxw: var(--maxw, 1200px);
   --tabbar-bg: #ffffff;
@@ -12,98 +10,112 @@
 .site-footer{
   background: var(--footer-bg);
   border-top: 1px solid var(--brand-200);
-  color: var(--text);
+  /* 페이지의 기본 텍스트 색을 그대로 사용 */
+  color: inherit;
 }
 
-/* 데스크톱/태블릿용 내용 */
+/* 데스크톱/태블릿 내용 */
 .site-footer .container{
   max-width: var(--maxw);
   margin: 0 auto;
   padding: 28px 24px;
   box-sizing: border-box;
 }
-.footer-top{
-  display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px;
-}
+.footer-top{ display:flex; align-items:baseline; gap:10px; margin-bottom:14px; }
 .footer-brand{
-  font-weight: 900; font-size: 18px; text-decoration: none; color: var(--text);
+  font-weight:900; font-size:18px; text-decoration:none;
+  color: inherit; /* 상속 */
 }
-.footer-tagline{ font-size: 13px; color: var(--muted); margin: 0; }
-.footer-contact-plain p{
-  margin: 4px 0; font-size: 14px;
-}
-.footer-contact-plain a{ color: var(--text); text-decoration:none; }
-.footer-contact-plain a:hover{ text-decoration: underline; }
-.footer-bottom{
-  margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--brand-200);
-  display: flex; justify-content: space-between; align-items: center; gap: 10px;
-}
-.footer-copy{ font-size: 12px; color: var(--muted); margin: 0; }
+/* 데스크톱 링크 색/상태 통일 */
+.footer-brand:link,
+.footer-brand:visited,
+.footer-brand:hover,
+.footer-brand:active{ color: inherit; }
 
-/* 모바일 탭바(기본 숨김, 모바일에서만 표시) */
-.mobile-tabbar{
-  display: none; /* <= 기본은 숨김 */
+.footer-tagline{ font-size:13px; margin:0; color: inherit; } /* 상속 */
+.footer-contact-plain p{ margin:4px 0; font-size:14px; color: inherit; } /* 상속 */
+.footer-contact-plain a{
+  color: inherit;               /* 상속 */
+  text-decoration:none;
 }
+.footer-contact-plain a:link,
+.footer-contact-plain a:visited,
+.footer-contact-plain a:hover,
+.footer-contact-plain a:active{ color: inherit; }  /* 상태별 통일 */
+.footer-contact-plain a:hover{ text-decoration:underline; }
+
+.footer-bottom{
+  margin-top:18px; padding-top:12px; border-top:1px solid var(--brand-200);
+  display:flex; justify-content:space-between; align-items:center; gap:10px;
+}
+.footer-copy{ font-size:12px; margin:0; color: inherit; } /* 상속 */
+
+/* 모바일 탭바(기본 숨김) */
+.mobile-tabbar{ display:none; color: inherit; } /* 탭바도 기본색 상속 */
 
 /* ===== 반응형: 모바일(<=900px) ===== */
 @media (max-width: 900px){
-  /* 데스크톱/태블릿 내용 숨김 */
-  .footer-desktop{ display: none !important; }
+  /* 데스크톱용 푸터 숨김 */
+  .footer-desktop{ display:none !important; }
 
   /* 하단 고정 탭바 표시 */
   .mobile-tabbar{
-    display: flex;
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 1200;
-    background: var(--tabbar-bg);
-    border-top: 1px solid var(--tabbar-br);
-    box-shadow: 0 -6px 16px rgba(0,0,0,.06);
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
-    padding-top: 6px;
-    height: 56px; /* 안전패딩 제외한 높이 */
-    align-items: center; justify-content: space-around;
+    display:flex;
+    position:fixed; left:0; right:0; bottom:0; z-index:1200;
+    background:var(--tabbar-bg);
+    border-top:1px solid var(--tabbar-br);
+    box-shadow:0 -6px 16px rgba(0,0,0,.06);
+    padding-bottom:max(8px, env(safe-area-inset-bottom));
+    padding-top:6px;
+    height:56px;
+    align-items:center; justify-content:space-around;
   }
+
   .mobile-tabbar .tab{
-    flex: 1 1 25%;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    flex:1 1 25%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-decoration:none;
+    color: inherit;              /* 상속 */
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* 모바일 탭 링크 상태도 전부 상속 */
+  .mobile-tabbar .tab:link,
+  .mobile-tabbar .tab:visited,
+  .mobile-tabbar .tab:hover,
+  .mobile-tabbar .tab:active{
+    color: inherit;
     text-decoration: none;
   }
+  /* 포커스 접근성 */
+  .mobile-tabbar .tab:focus-visible{
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+
   .mobile-tabbar .tab-label{
-    font-size: 12px; font-weight: 800; color: var(--text);
+    font-size:12px; font-weight:800;
+    color: inherit;              /* 상속 */
   }
   .mobile-tabbar .tab.active .tab-label{
-    background: #ffdcae; border-radius: 10px; padding: 6px 10px;
+    background:#ffdcae; border-radius:10px; padding:6px 10px;
+    /* 텍스트 색은 그대로 상속 */
   }
 }
 
 /* 접근성 보조 */
 .visually-hidden{
-  position: absolute !important; clip: rect(1px,1px,1px,1px);
+  position:absolute !important; clip:rect(1px,1px,1px,1px);
   width:1px; height:1px; margin:-1px; overflow:hidden; white-space:nowrap; border:0;
 }
+
 /* ===== Desktop footer centering ===== */
 @media (min-width: 901px){
-  /* 텍스트와 블록을 가운데로 */
-  .footer-desktop{
-    text-align: center;
-  }
-
-  /* 상단 로고/태그라인 가운데 정렬 */
-  .footer-desktop .footer-top{
-    justify-content: center;   /* 가로 가운데 */
-  }
-
-  /* 연락처 문단도 가운데 배치 */
+  .footer-desktop{ text-align:center; }
+  .footer-desktop .footer-top{ justify-content:center; }
   .footer-desktop .footer-contact-plain{
-    margin: 8px auto 0;        /* 컨테이너 안에서 중앙 배치 */
-    max-width: 720px;          /* (선택) 너무 넓지 않게 */
+    margin:8px auto 0; max-width:720px;
   }
-  .footer-desktop .footer-contact-plain p{
-    text-align: center;
-  }
-
-  /* 하단 카피도 가운데 정렬 */
-  .footer-desktop .footer-bottom{
-    justify-content: center;
-  }
+  .footer-desktop .footer-contact-plain p{ text-align:center; }
+  .footer-desktop .footer-bottom{ justify-content:center; }
 }
-

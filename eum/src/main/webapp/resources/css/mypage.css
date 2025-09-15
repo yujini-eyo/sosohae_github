@@ -1,4 +1,39 @@
-/* MyPage scope only */
+:root{
+  --bg:#FFF8F2;
+  --text:#59463E;
+  --muted:#806A5A;
+  --primary:#F6A96D;
+  --primary-600:#e98c45;
+  --brand:#FFE8C2;
+  --brand-200:#FADFCB;
+  --card:#FFFFFF;
+  --card-br:#FFE1CB;
+  --shadow-soft:0 4px 10px rgba(0,0,0,.06);
+  --radius:20px;
+  --maxw:1100px;
+  --header-h:72px;
+  --footer-h:0px;
+  --focus:0 0 0 3px rgba(246,169,109,.35);
+  --content-pad:24px;
+}
+
+/* === 배경/폰트 (전역 덮어쓰기 방지) === */
+html, body{ height:100%; margin:0; background:var(--bg) !important; }
+#main, .page-body, .content-wrap, .container, .wrap{ background:transparent !important; }
+.login-view{ font-family:'SUIT',sans-serif; }
+
+/* 이 페이지의 래퍼·공통 섹션은 배경을 투명 처리(전역 배경을 그대로 보이게) */
+.mypage-view,
+.mypage-view .content-wrap,
+.mypage-view .section-title,
+.mypage-view .tabs,
+.mypage-view .table {
+  background: transparent !important;
+}
+
+/* ===========================
+   MyPage scope only
+   =========================== */
 .mypage-view, .mypage-view * { box-sizing:border-box; }
 
 /* 페이지 여백만 부여 (배경·폰트는 전역 유지) */
@@ -11,7 +46,7 @@
 
 /* 카드 */
 .mypage-view .card{
-  background:#fff;
+  background: var(--card-bg, #fff);
   border:1px solid #EADBC8;
   border-radius:20px;
   box-shadow:0 8px 24px rgba(0,0,0,.08);

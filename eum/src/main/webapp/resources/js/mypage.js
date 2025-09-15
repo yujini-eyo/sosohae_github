@@ -17,6 +17,18 @@
     return Math.min(score, 5);
   }
 
+  // 👇 [추가] 컨텍스트 경로 안전 계산 (meta[name=ctx] → __CTX__ → URL 추론)
+  function getCtx() {
+    var meta = document.querySelector('meta[name="ctx"]');
+    var fromMeta = meta ? meta.getAttribute('content') : null;
+    if (fromMeta && fromMeta !== '/' ) return fromMeta;
+    if (window.__CTX__ && window.__CTX__ !== '/') return window.__CTX__;
+    var parts = (window.location.pathname || '').split('/');
+    // ex) /eum/member/mypage.do → "/eum"
+    var ctx = parts.length > 1 ? '/' + (parts[1] || '') : '';
+    return (ctx === '/' ? '' : ctx);
+  }
+
   ready(function () {
     var view = document.getElementById('mypageView');
     if (!view) return;
@@ -37,8 +49,22 @@
     var cancelBtn = document.getElementById('cancelBtn');
     var saveBtn   = document.getElementById('saveBtn');
     var readBlock = document.getElementById('readBlock');
-    // ✅ HTML에 맞춰서: form id 는 editBlock
     var form      = document.getElementById('profileForm');
+
+    // 👇 [추가] 잘못된 action 교정: /eum/eum/updateProfile.do 같은 이중 컨텍스트 방지
+    (function fixActions(){
+      var ctx = getCtx();
+      if (form) {
+        form.setAttribute('method','post');
+        form.setAttribute('enctype','multipart/form-data');
+        form.setAttribute('action', ctx + '/member/updateProfile.do');
+      }
+      var pwForm = document.getElementById('pwForm');
+      if (pwForm) {
+        pwForm.setAttribute('method','post');
+        pwForm.setAttribute('action', ctx + '/member/changePassword.do');
+      }
+    })();
 
     var initial = {};
     if (form) {
@@ -92,7 +118,6 @@
     // ===== 아바타 업로드 =====
     var avatarBtn   = document.getElementById('avatarBtn');
     var avatarInput = document.getElementById('avatarInput');
-    // ✅ HTML엔 id가 없어서 .avatar를 찾도록 변경
     var avatarPrev  = document.getElementById('avatarPreview');
 
     if (avatarBtn) avatarBtn.addEventListener('click', function () {
@@ -138,7 +163,6 @@
       r4: document.getElementById('r4')
     };
 
-    // show/hide password
     var toggles = document.querySelectorAll('.toggle-eye');
     Array.prototype.forEach.call(toggles, function (btn) {
       btn.addEventListener('click', function () {
@@ -243,7 +267,6 @@
     var progressEl = document.getElementById('pt_progress');
     var nextTextEl = document.getElementById('pt_next_text');
     var nextText   = nextTextEl ? nextTextEl.textContent : '';
-    // ✅ replaceAll 대신 정규식
     var m = nextText.replace(/,/g, '').match(/(\d+)/);
     var approxPct = m ? Math.max(0, Math.min(100, 100 - Math.min(100, Math.round((parseInt(m[1],10) / 10000) * 100)))) : 60;
     setTimeout(function () { if (progressEl) progressEl.style.width = approxPct + '%'; }, 100);

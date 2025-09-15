@@ -1,4 +1,4 @@
-/* header.script.js — 헤더/드로어 + 실시간 포인트 (logout: 단순 링크 이동) */
+/* header.script.js — 헤더/드로어 + 실시간 포인트 (logout: 단순 링크 이동, CTX 적용) */
 (function () {
   "use strict";
   if (window.__EUM_HEADER_INITED__) return;
@@ -7,12 +7,6 @@
   var $  = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 
-  /* ---------- utils ---------- */
-  function escapeHTML(s){
-    return String(s || "").replace(/[&<>"']/g, function(m){
-      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];
-    });
-  }
   function getHeaderEl(){
     var h = document.getElementById("header") || document.querySelector("header.site-header");
     if (h && !h.id) h.id = "header";
@@ -38,7 +32,6 @@
       document.body.insertBefore(h, document.body.firstChild || null);
       h.classList.add("header-fixed-root");
     }
-    /* 고정력 강화(인라인) */
     h.style.position = "fixed";
     h.style.top = "0px";
     h.style.left = "0";
@@ -72,27 +65,25 @@
   function url(p){
     if(!p) return "#";
     p = String(p);
-    if(/^https?:\/\//i.test(p) || p.indexOf("//")===0) return p;          // 절대 URL은 그대로
-    return (CTX || "") + (p.charAt(0)==="/" ? p : "/"+p);                 // 그 외에는 컨텍스트 붙이기
+    if(/^https?:\/\//i.test(p)) return p;
+    return (CTX || "") + (p.charAt(0)==="/" ? p : "/"+p);
   }
 
-  /* dataset 링크 */
+  /* dataset 링크: 모든 항목에 CTX 적용 */
   function getLinkFromData(name, fallback){
     var ra = document.getElementById('rightArea');
     var v = (ra && ra.dataset) ? ra.dataset[name] : "";
-    if (v && typeof v === "string") {
-      return url(v.trim());                                               // ★ 모든 data-* 경로에 url() 적용
-    }
+    if (v && typeof v === "string") return url(v.trim());
     return fallback || "#";
   }
   function getMyPageLink(){ return getLinkFromData("mypage", url("/member/mypage.do")); }
-  function getPointLink(){  return getLinkFromData("point",  url("/point.do"));  }
+  function getPointLink(){  return getLinkFromData("point",  url("/member/point.do"));  }
   function getNotifyLink(){ return getLinkFromData("notify", url("/notify.do")); }
   function getLogoutLink(){ return getLinkFromData("logout", url("/member/logout.do")); }
   function getLoginLink(){  return getLinkFromData("login",  url("/member/loginForm.do")); }
   function getSignupLink(){ return getLinkFromData("signup", url("/member/signupForm.do")); }
 
-  /* 인증 상태(프론트 임시 표시용) */
+  /* 인증 표시 관련(프론트 전용) */
   function isAuthed() {
     var right = document.getElementById('rightArea');
     if (right && right.dataset && typeof right.dataset.auth !== "undefined") {
@@ -118,7 +109,6 @@
     return { isLogged: isAuthed() && !!name, name: name, points: getPoints() };
   }
 
-  /* 노드 캐시 */
   var rightArea = null, leftArea = null;
   function RA(){ return rightArea || (rightArea = $("#rightArea")); }
   function LA(){ return leftArea  || (leftArea  = $("#leftArea"));  }
@@ -130,7 +120,7 @@
       '</svg><span class="badge" id="notifyBadge" hidden></span>' +
     '</button>';
 
-  /* ---------- 드로어 ---------- */
+  /* 드로어 */
   var isOpen = false;
   function openDrawer() {
     var d = $("#drawer"), b = $("#drawerBackdrop"), ham = $("#hamburger");
@@ -157,7 +147,6 @@
   }
   function toggleDrawer(){ isOpen ? closeDrawer() : openDrawer(); }
 
-  /* 헤더 드롭 방지 */
   function preventDrop(){
     ensureHeaderRoot(true);
     var h = getHeaderEl(); if (!h) return;
@@ -184,36 +173,16 @@
     }
   }
 
-  /* 우측 영역 히트 테스트 */
-  function setupRightAreaHitTest(){
-    var area = RA();
-    if (!area || area.__hitTestBound__) return;
-    area.addEventListener("click", function(e){
-      var nameEl   = $("#userNameLink");
-      var pointEl  = $("#userPointsLink");
-      var nameHref = getMyPageLink();
-      var pointHref= getPointLink();
-      function within(el){
-        if (!el) return false;
-        var r = el.getBoundingClientRect();
-        var x = e.clientX, y = e.clientY;
-        return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
-      }
-      if (within(nameEl))  { e.preventDefault(); e.stopPropagation(); goSafely(nameHref); }
-      if (within(pointEl)) { e.preventDefault(); e.stopPropagation(); goSafely(pointHref); }
-    }, true);
-    area.__hitTestBound__ = true;
-  }
-
-  /* ---------- 렌더러 ---------- */
   function buildLeftNavHTML(){
     return ''
       + '<a href="'+url('/main.do')+'">홈</a>'
       + '<a href="'+url('/about.do')+'">서비스 소개</a>'
       + '<a href="'+url('/guide.do')+'">이용방법</a>'
       + '<a href="'+url('/notice.do')+'">공지</a>'
+      + '<a href="'+url('/board/articleForm.do')+'">도움 요청하기</a>'
       + '<a href="'+url('/board/listArticles.do')+'">도움 주기</a>'
-      + '<a href="'+url('/help/write.do')+'">도움 요청하기</a>'
+      + '<a href="'+url('/member/mypage.do')+'">내 정보</a>'
+      + '<a href="'+url('/member/point.do')+'">포인트</a>'
       + '<a href="'+url('/chat.do')+'">채팅</a>';
   }
   function renderLeftNav(){
@@ -221,30 +190,26 @@
     if (!left.children.length) left.innerHTML = buildLeftNavHTML();
   }
 
-  function buildDrawerInnerHTML() {
+  function renderDrawerMenu() {
     var state = readUser();
+    var mount = document.getElementById("drawerMenu");
+    if (!mount) return;
     var common =
       '<a href="'+url('/main.do')+'">홈</a>' +
       '<a href="'+url('/about.do')+'">서비스 소개</a>' +
       '<a href="'+url('/guide.do')+'">이용방법</a>' +
       '<a href="'+url('/notice.do')+'">공지</a>';
-    if (state.isLogged) {
-      return common +
+    var html = state.isLogged
+      ? common +
+    	'<a href="'+url('/board/articleForm.do')+'">도움 요청하기</a>' +
         '<a href="'+url('/board/listArticles.do')+'">도움 주기</a>' +
-        '<a href="'+url('/help/write.do')+'">도움 요청하기</a>' +
+        '<a href="'+url('/member/mypage.do')+'">내 정보</a>' +
         '<a href="'+url('/chat.do')+'">채팅</a>' +
-        /* 로그아웃: 그냥 GET 엔드포인트로 이동 */
-        '<a href="'+ getLogoutLink() +'" class="auth-btn btn-ghost">로그아웃</a>';
-    } else {
-      return common +
+        '<a href="'+ getLogoutLink() +'">로그아웃</a>'
+      : common +
         '<a href="'+getLoginLink()+'">로그인</a>' +
         '<a href="'+getSignupLink()+'">회원가입</a>';
-    }
-  }
-  function renderDrawerMenu() {
-    var mount = document.getElementById("drawerMenu");
-    if (!mount) return;
-    var html = buildDrawerInnerHTML() || '';
+
     if (!(mount.dataset.filled === '1' && mount.innerHTML.trim() === html.trim())) {
       mount.innerHTML = html;
       mount.dataset.filled = '1';
@@ -255,7 +220,7 @@
     if (!mount._observerAttached) {
       var obs = new MutationObserver(function(){
         if (!mount.firstElementChild || !mount.innerHTML.trim()) {
-          mount.innerHTML = buildDrawerInnerHTML() || html;
+          mount.innerHTML = html;
           $$('#drawerMenu a, #drawerMenu button').forEach(function (el) {
             el.addEventListener("click", function(){ closeDrawer(); }, { passive:true });
           });
@@ -307,7 +272,6 @@
     });
   }
 
-  /* 우측 사용자 영역 */
   function renderRightArea() {
     var area = RA(); if (!area) return;
     var state = readUser();
@@ -321,13 +285,12 @@
           '<a href="'+POINT_LINK+'" class="user-points" id="userPointsLink" aria-live="polite">'+state.points+'P</a>' +
           '<span class="sep" aria-hidden="true">|</span>' +
         '</span>' +
-        '<a href="'+MYPAGE_LINK+'" class="user-name" id="userNameLink">'+ escapeHTML(state.name) +' 님</a>' +
+        '<a href="'+MYPAGE_LINK+'" class="user-name" id="userNameLink">'+ (state.name||"") +' 님</a>' +
         '<span class="sep" aria-hidden="true">|</span>' +
         '<span class="hide-600">' +
           bellBtnSVG +
           '<span class="sep" aria-hidden="true">|</span>' +
         '</span>' +
-        /* 로그아웃: a 태그 그대로 — JS에서 가로채지 않음 */
         '<a href="'+ getLogoutLink() +'" class="auth-btn btn-ghost">로그아웃</a>';
     } else {
       area.innerHTML =
@@ -343,20 +306,15 @@
 
     var nb = $("#notifyBtn");
     if (nb && !nb.__bound__) {
-      nb.addEventListener("click", function(e){ e.preventDefault(); goSafely(getNotifyLink()); });
+      nb.addEventListener("click", function(e){ e.preventDefault(); goSafely(NOTIFY_LINK); });
       nb.__bound__ = true;
     }
 
     ensureNav($("#userNameLink"),   MYPAGE_LINK);
     ensureNav($("#userPointsLink"), POINT_LINK);
-
-    var notifyBadge = $("#notifyBadge");
-    if (notifyBadge) notifyBadge.hidden = false;
-
     renderDrawerMenu();
   }
 
-  /* 이벤트 바인딩 */
   function bindEvents() {
     var ham = $("#hamburger"), closeBtn = $("#drawerClose"), backdrop = $("#drawerBackdrop");
     if (ham && !ham.__bound__) { ham.addEventListener("click", toggleDrawer); ham.__bound__=true; }
@@ -380,6 +338,26 @@
       highlightCurrent();
       preventDrop();
     });
+  }
+
+  function setupRightAreaHitTest(){
+    var area = RA();
+    if (!area || area.__hitTestBound__) return;
+    area.addEventListener("click", function(e){
+      var nameEl   = $("#userNameLink");
+      var pointEl  = $("#userPointsLink");
+      var nameHref = getMyPageLink();
+      var pointHref= getPointLink();
+      function within(el){
+        if (!el) return false;
+        var r = el.getBoundingClientRect();
+        var x = e.clientX, y = e.clientY;
+        return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+      }
+      if (within(nameEl))  { e.preventDefault(); e.stopPropagation(); goSafely(nameHref); }
+      if (within(pointEl)) { e.preventDefault(); e.stopPropagation(); goSafely(pointHref); }
+    }, true);
+    area.__hitTestBound__ = true;
   }
 
   function attachRecovery(){

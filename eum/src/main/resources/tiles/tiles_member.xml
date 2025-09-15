@@ -22,9 +22,14 @@
 			value="/WEB-INF/views/member/listMembers.jsp" />
 	</definition>
 	
-	<definition name="/member/mypage" extends="baseLayout">
+	<definition name="member/mypage" extends="baseLayout">
     	<put-attribute name="title" value="내 정보"/>
     	<put-attribute name="body"  value="/WEB-INF/views/member/mypage.jsp"/>
+  	</definition>
+  	
+  		<definition name="member/point" extends="baseLayout">
+    	<put-attribute name="title" value="포인트"/>
+    	<put-attribute name="body"  value="/WEB-INF/views/member/point.jsp"/>
   	</definition>
 
 	<!-- <definition name="/member/viewDetail" extends="baseLayout"> <put-attribute 

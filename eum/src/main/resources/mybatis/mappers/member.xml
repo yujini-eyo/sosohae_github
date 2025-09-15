@@ -17,10 +17,16 @@
     <result property="code"      column="code"/>
     <result property="notes"     column="notes"/>
     <result property="createdAt" column="created_at"/>
-    
+
+    <!-- ★ 프로필 이미지 매핑 추가 -->
+    <result property="profileImage"      column="profile_image"/>
+    <result property="profileImageOrig"  column="profile_image_orig"/>
+    <result property="profileImageType"  column="profile_image_type"/>
+    <result property="profileImageSize"  column="profile_image_size"/>
+    <result property="profileUpdatedAt"  column="profile_updated_at"/>
   </resultMap>
   
-  <!-- ✅ 회원가입 INSERT -->
+  <!-- ✅ 회원가입 INSERT (그대로 사용: 프로필 컬럼은 NULL로 저장됨) -->
   <insert id="insertMember" parameterType="com.myspring.eum.member.vo.MemberVO">
     INSERT INTO member
       (id, password, name, email, address, age, birth, phone, code, notes, role, status, created_at, updated_at)
@@ -28,9 +34,11 @@
       (#{id}, #{password}, #{name}, #{email}, #{address}, #{age}, #{birth},
        #{phone}, #{code}, #{notes}, 'USER', 'ACTIVE', NOW(), NOW())
   </insert>
-   <!-- ✅ 아이디 + 비밀번호로 로그인 -->
+
+  <!-- ✅ 아이디 + 비밀번호로 로그인 -->
+  <!-- ★ resultType -> resultMap으로 변경해서 프로필 컬럼도 매핑되게 함 -->
   <select id="loginById" parameterType="com.myspring.eum.member.vo.MemberVO"
-          resultType="com.myspring.eum.member.vo.MemberVO">
+          resultMap="memResult">
     SELECT *
     FROM member
     WHERE id = #{id}
@@ -52,7 +60,8 @@
     ORDER BY created_at DESC
   </select>
   
-    <!-- 프로필 업데이트: DAO의 updateProfile(...) 와 일치 -->
+  <!-- 내정보 수정 -->
+  <!-- ★ 이미지가 넘어온 경우에만 이미지 컬럼을 갱신하도록 <if> 추가 -->
   <update id="updateProfile" parameterType="com.myspring.eum.member.vo.MemberVO">
     UPDATE member
        SET name       = #{name},
@@ -61,11 +70,43 @@
            phone      = #{phone},
            birth      = #{birth},
            notes      = #{notes},
+           <!-- 이미지가 들어온 경우에만 업데이트 -->
+           <if test="profileImage != null and profileImage != ''">
+             profile_image       = #{profileImage},
+             profile_image_orig  = #{profileImageOrig},
+             profile_image_type  = #{profileImageType},
+             profile_image_size  = #{profileImageSize},
+             profile_updated_at  = NOW(),
+           </if>
            updated_at = NOW()
      WHERE id = #{id}
   </update>
 
-  <!-- 현재 비밀번호 확인 (선택): DAO의 verifyPassword(...) 와 일치 -->
+  <!-- ★ 이미지 전용 업데이트(선택): 파일만 바꿀 때 사용 -->
+  <update id="updateProfileImage" parameterType="com.myspring.eum.member.vo.MemberVO">
+    UPDATE member
+       SET profile_image       = #{profileImage},
+           profile_image_orig  = #{profileImageOrig},
+           profile_image_type  = #{profileImageType},
+           profile_image_size  = #{profileImageSize},
+           profile_updated_at  = NOW(),
+           updated_at          = NOW()
+     WHERE id = #{id}
+  </update>
+
+  <!-- ★ 이미지 제거(선택): 삭제 버튼 등에서 사용 -->
+  <update id="clearProfileImage" parameterType="string">
+    UPDATE member
+       SET profile_image       = NULL,
+           profile_image_orig  = NULL,
+           profile_image_type  = NULL,
+           profile_image_size  = NULL,
+           profile_updated_at  = NOW(),
+           updated_at          = NOW()
+     WHERE id = #{id}
+  </update>
+
+  <!-- 현재 비밀번호 확인 -->
   <select id="verifyPassword" parameterType="map" resultType="int">
     SELECT COUNT(1)
       FROM member
@@ -73,7 +114,7 @@
        AND password = #{password}
   </select>
 
-  <!-- ★ 비밀번호 변경: 지금 에러가 나는 바로 그 쿼리 -->
+  <!-- 비밀번호 변경 -->
   <update id="updatePassword" parameterType="map">
     UPDATE member
        SET password  = #{password},

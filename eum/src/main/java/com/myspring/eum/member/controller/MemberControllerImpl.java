@@ -98,6 +98,7 @@ public class MemberControllerImpl implements MemberController {
         return new ModelAndView("redirect:/main.do");
     }
     
+ // 마이페이지
     @RequestMapping(value="/mypage.do", method=RequestMethod.GET)
     public String mypage(HttpSession session, Model model) {
         MemberVO login = (MemberVO) session.getAttribute("member");
@@ -107,29 +108,41 @@ public class MemberControllerImpl implements MemberController {
         }
         model.addAttribute("member", login);
 
-        // 포인트 요약 기본값
         Map<String, Object> ps = new HashMap<>();
-        ps.put("current",     0);
-        ps.put("monthGain",   0);
-        ps.put("monthSpend",  0);
-        ps.put("totalGain",   0);
-        ps.put("totalSpend",  0);
-        ps.put("totalHours",  0);
-        ps.put("tier",        "나무");
-        ps.put("nextNeeded",  0);
-        ps.put("goalTarget",  5);
-        ps.put("goalNow",     0);
+        ps.put("current", 0); ps.put("monthGain", 0); ps.put("monthSpend", 0);
+        ps.put("totalGain", 0); ps.put("totalSpend", 0); ps.put("totalHours", 0);
+        ps.put("tier","나무"); ps.put("nextNeeded", 0); ps.put("goalTarget", 5); ps.put("goalNow", 0);
         model.addAttribute("pointSummary", ps);
-
-        // 내역 기본값
         model.addAttribute("pointHistory", java.util.Collections.emptyList());
 
-        return "/member/mypage";
+        // ✅ 여기: /WEB-INF/views/mypage/mypage.jsp
+        return "member/mypage";
+    }
+    
+ // 포인트 페이지
+    @RequestMapping(value="/point.do", method=RequestMethod.GET)
+    public String point(HttpSession session, Model model) {
+        MemberVO login = (MemberVO) session.getAttribute("member");
+        if (login == null) {
+            session.setAttribute("action", "/member/point.do");
+            return "redirect:/member/loginForm.do";
+        }
+        model.addAttribute("member", login);
+
+        Map<String, Object> ps = new HashMap<>();
+        ps.put("current", 0); ps.put("monthGain", 0); ps.put("monthSpend", 0);
+        ps.put("totalGain", 0); ps.put("totalSpend", 0); ps.put("totalHours", 0);
+        ps.put("tier","나무"); ps.put("nextNeeded", 1000); ps.put("goalTarget", 5); ps.put("goalNow", 0);
+        model.addAttribute("pointSummary", ps);
+        model.addAttribute("pointHistory", java.util.Collections.emptyList());
+
+        // ✅ 여기: 슬래시 없이, /WEB-INF/views/mypage/point.jsp 를 가리키게
+        return "member/point";
     }
     
     @RequestMapping(value="/updateProfile.do", method=RequestMethod.POST)
     public String updateProfile(
-            @ModelAttribute MemberVO form,                     // id, name, email, phone, birth, addr, note 등
+            @ModelAttribute MemberVO form,                     // id, name, email, phone, birth, address, notes …
             @RequestParam(value="avatar", required=false) MultipartFile avatar,
             HttpSession session,
             RedirectAttributes rAttr) throws Exception {
@@ -137,22 +150,85 @@ public class MemberControllerImpl implements MemberController {
         MemberVO login = (MemberVO) session.getAttribute("member");
         if (login == null) return "redirect:/member/loginForm.do";
 
-        // id 보호
+        // 본인 보호
         form.setId(login.getId());
 
-        // TODO: avatar 저장이 필요하면 여기서 처리 (null/empty 체크 후 저장)
-        // if (avatar != null && !avatar.isEmpty()) { ... 저장 후 form.setProfileImagePath(...); }
+        // === 아바타 저장 (선택) ===
+        if (avatar != null && !avatar.isEmpty()) {
+            String contentType = avatar.getContentType();
+            String original    = avatar.getOriginalFilename();
+            if (contentType == null) contentType = "";
 
-        // 서비스 호출 (네 서비스에 맞게 메서드명 조정)
+            // 1) 타입/확장자 검증 (jpg/png)
+            boolean okType = "image/jpeg".equalsIgnoreCase(contentType)
+                          || "image/jpg".equalsIgnoreCase(contentType)
+                          || "image/png".equalsIgnoreCase(contentType);
+            String ext = "";
+            if (original != null) {
+                int dot = original.lastIndexOf('.');
+                if (dot > -1 && dot < original.length()-1) {
+                    ext = original.substring(dot).toLowerCase();
+                }
+            }
+            if (!okType) {
+                if (".jpg".equals(ext) || ".jpeg".equals(ext)) { contentType = "image/jpeg"; okType = true; }
+                else if (".png".equals(ext)) { contentType = "image/png"; okType = true; }
+            }
+            if (!okType) {
+                rAttr.addAttribute("result", "avatarBadType"); // JSP에서 안내문구 띄우면 좋음
+                return "redirect:/member/mypage.do";
+            }
+
+            // 2) 크기 제한 (<= 2MB)
+            if (avatar.getSize() > 2L * 1024L * 1024L) {
+                rAttr.addAttribute("result", "avatarTooLarge");
+                return "redirect:/member/mypage.do";
+            }
+
+            // 3) 저장 경로 (/resources/upload/profile/{userId}/)
+            String baseDir = session.getServletContext().getRealPath("/resources/upload/profile");
+            if (baseDir == null) {
+                // 톰캣 realPath를 못 받는 환경 대비 임시/외부 경로 대체
+                baseDir = System.getProperty("java.io.tmpdir") + java.io.File.separator + "profile";
+            }
+            java.io.File userDir = new java.io.File(baseDir, login.getId());
+            if (!userDir.exists()) userDir.mkdirs();
+
+            // 4) 파일명 생성
+            String fileExt = ext;
+            if (fileExt == null || fileExt.length() == 0) {
+                fileExt = "image/png".equalsIgnoreCase(contentType) ? ".png" : ".jpg";
+            }
+            String fileName = java.util.UUID.randomUUID().toString().replace("-", "") + fileExt;
+
+            // 5) 저장
+            java.io.File dest = new java.io.File(userDir, fileName);
+            try {
+                avatar.transferTo(dest);
+            } catch (Exception e) {
+                rAttr.addAttribute("result", "avatarSaveError");
+                return "redirect:/member/mypage.do";
+            }
+
+            // 6) DB에 저장할 상대경로 및 메타
+            String relativePath = "/resources/upload/profile/" + login.getId() + "/" + fileName;
+            form.setProfileImage(relativePath);
+            form.setProfileImageOrig(original);
+            form.setProfileImageType(contentType);
+            form.setProfileImageSize(Long.valueOf(avatar.getSize()));
+        }
+
+        // 프로필 정보 저장
         memberService.updateProfile(form);
 
-        // 세션값도 최신화
+        // 세션 최신화
         MemberVO refreshed = memberService.findById(form.getId());
         session.setAttribute("member", refreshed != null ? refreshed : form);
 
         rAttr.addAttribute("result", "profileUpdated");
         return "redirect:/member/mypage.do";
     }
+
     
     @RequestMapping(value="/changePassword.do", method=RequestMethod.POST)
     public String changePassword(
