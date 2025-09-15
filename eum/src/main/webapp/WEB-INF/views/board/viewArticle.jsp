@@ -43,7 +43,22 @@
     <article class="card" style="padding:20px">
       <div class="article-body" style="white-space:pre-wrap;line-height:1.7">
         <c:out value="${article.content}"/>
-      </div>
+        
+        <!-- 도와주기 버튼 -->
+        <c:url var="applyUrl" value="/volunteer/apply.do">
+  <c:param name="reqId" value="${article.articleNO}"/>
+</c:url>
+
+<!-- 도와주기 CTA -->
+<div class="help-cta">
+  <a class="btn help" href="${applyUrl}" role="button" aria-label="도와주기">도와주기</a>
+</div>
+       <!--  JSP – POST 전송형(바로 신청 처리) 바로 처리하는 엔드포인트가 있다면 이걸로 교체. -->
+     <%--   <form action="<c:url value='/volunteer/apply.do'/>" method="post" class="help-cta">
+  <input type="hidden" name="reqId" value="${article.articleNO}"/>
+  <button type="submit" class="btn help" aria-label="도와주기">도와주기</button>
+</form> --%>
+       </div>
 
       <c:if test="${not empty article.imageFileName}">
         <div style="margin-top:16px">

@@ -43,3 +43,9 @@ tr:hover td{background:var(--hover)}
   tbody td[data-label]{display:flex; gap:10px}
   tbody td[data-label]::before{content:attr(data-label); flex:0 0 110px; width:110px; color:var(--muted); font-weight:900}
 }
+/* ===== 도와주기 대형 CTA ===== */
+.help-cta{
+  display:flex;
+  justify-content:center;
+  margin:48px 0 16px;
+}

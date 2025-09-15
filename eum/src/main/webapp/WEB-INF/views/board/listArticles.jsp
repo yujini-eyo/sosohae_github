@@ -40,8 +40,8 @@
           <th scope="col">제목</th>
           <th scope="col">작성자</th>
           <th scope="col">작성일</th>
-          <th scope="col">이미지</th>
-          <th scope="col">액션</th>
+          <th scope="col">도와주기</th>
+          <!-- <th scope="col">액션</th> -->
         </tr>
       </thead>
       <tbody id="tbody-req">
@@ -65,17 +65,17 @@
                     <c:otherwise>-</c:otherwise>
                   </c:choose>
                 </td>
-                <td data-label="이미지">
-                  <c:choose>
-                    <c:when test="${not empty a.imageFileName}">첨부</c:when>
-                    <c:otherwise>-</c:otherwise>
-                  </c:choose>
-                </td>
                 <td data-label="액션">
                   <div class="row-actions">
                     <a class="btn primary" style="padding:8px 12px"
                        href="<c:url value='/board/viewArticle.do'><c:param name='articleNO' value='${a.articleNO}'/></c:url>">상세</a>
                   </div>
+               <%--  <td data-label="이미지">
+                  <c:choose>
+                    <c:when test="${not empty a.imageFileName}">첨부</c:when>
+                    <c:otherwise>-</c:otherwise>
+                  </c:choose>
+                </td> --%>
                 </td>
               </tr>
             </c:forEach>
