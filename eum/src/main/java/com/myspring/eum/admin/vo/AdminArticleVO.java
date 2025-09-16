@@ -11,6 +11,10 @@ public class AdminArticleVO {
     private String imageFileName;      // 저장 파일명
     private Boolean isNotice;          // 공지 여부
     private Date writeDate;
+    private Integer viewCnt;          // 또는 int
+    
+    public Integer getViewCnt() { return viewCnt; }
+    public void setViewCnt(Integer viewCnt) { this.viewCnt = viewCnt; }
 
     public int getArticleNO() { return articleNO; }
     public void setArticleNO(int articleNO) { this.articleNO = articleNO; }

@@ -34,7 +34,7 @@
     WHERE article_no = #{value}
   </select>
 
-  <!-- 등록: ★ 컬럼명은 is_notice 로! (값은 VO의 isNotice 사용) -->
+  <!-- 등록 -->
   <insert id="admininsertNewArticle" parameterType="adminArticleVO"
           useGeneratedKeys="true" keyProperty="articleNO">
     INSERT INTO admin_article
@@ -62,5 +62,42 @@
   <delete id="admindeleteArticle" parameterType="int">
     DELETE FROM admin_article WHERE article_no = #{value}
   </delete>
+
+  <!-- ====== [추가] 공지 전용 목록/카운트/최근 N건 ====== -->
+
+  <!-- ✅ 공지 전용 목록 -->
+  <select id="adminListNotice" parameterType="map" resultMap="adminArticleMap">
+    SELECT
+      <include refid="adminColumns"/>
+    FROM admin_article
+    WHERE is_notice = 1
+      <if test="q != null and q != ''">
+        AND (title LIKE CONCAT('%', #{q}, '%') OR content LIKE CONCAT('%', #{q}, '%'))
+      </if>
+    <choose>
+      <when test="sort == 'popular'">
+        ORDER BY /* 조회수 컬럼이 있다면 교체하세요 */ article_no DESC
+      </when>
+      <when test="sort == 'oldest'">
+        ORDER BY article_no ASC
+      </when>
+      <otherwise>
+        ORDER BY article_no DESC
+      </otherwise>
+    </choose>
+    <if test="offset != null and size != null">
+      LIMIT #{size} OFFSET #{offset}
+    </if>
+  </select>
+
+  <!-- ✅ 공지 총개수 -->
+  <select id="adminCountNotice" parameterType="map" resultType="int">
+    SELECT COUNT(1)
+    FROM admin_article
+    WHERE is_notice = 1
+      <if test="q != null and q != ''">
+        AND (title LIKE CONCAT('%', #{q}, '%') OR content LIKE CONCAT('%', #{q}, '%'))
+      </if>
+  </select>
 
 </mapper>

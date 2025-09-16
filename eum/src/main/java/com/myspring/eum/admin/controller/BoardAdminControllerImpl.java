@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +28,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller("boardAdminController")
-@RequestMapping("/admin/board")
 public class BoardAdminControllerImpl implements BoardAdminController {
 
     private static final Logger logger = LoggerFactory.getLogger(BoardAdminControllerImpl.class);
@@ -36,7 +36,7 @@ public class BoardAdminControllerImpl implements BoardAdminController {
     private BoardAdminService boardAdminService;
 
     /* 목록 */
-    @RequestMapping(value="/adminList.do", method=RequestMethod.GET)
+    @RequestMapping(value="/admin/board/adminList.do", method=RequestMethod.GET)
     public ModelAndView adminList(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Map<String,Object> param = new HashMap<String,Object>();
         List<AdminArticleVO> list = boardAdminService.adminList(param);
@@ -47,7 +47,7 @@ public class BoardAdminControllerImpl implements BoardAdminController {
     }
 
     /* 상세 */
-    @RequestMapping(value="/adminview.do", method=RequestMethod.GET)
+    @RequestMapping(value="/admin/board/adminview.do", method=RequestMethod.GET)
     public ModelAndView adminview (HttpServletRequest request, HttpServletResponse response,
                                          @RequestParam("articleNO") int articleNO) throws Exception {
         AdminArticleVO vo = boardAdminService.adminselectArticleByNo(articleNO);
@@ -58,13 +58,13 @@ public class BoardAdminControllerImpl implements BoardAdminController {
     }
 
     /* 작성폼 */
-    @RequestMapping(value="/adminWriteFrom.do", method=RequestMethod.GET)
+    @RequestMapping(value="/admin/board/adminWriteFrom.do", method=RequestMethod.GET)
     public ModelAndView adminWriteForm(HttpServletRequest request, HttpServletResponse response) throws Exception {
         return new ModelAndView("admin/board/adminWriteForm");
     }
 
     /* 등록 - 일반 시그니처 */
-    @RequestMapping(value="/adminaddNewArticle.do", method=RequestMethod.POST)
+    @RequestMapping(value="/admin/board/adminaddNewArticle.do", method=RequestMethod.POST)
     public ModelAndView adminaddNewArticle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setCharacterEncoding("UTF-8");
         MultipartFile imageFile = null;
@@ -81,7 +81,7 @@ public class BoardAdminControllerImpl implements BoardAdminController {
     }
 
     /* 등록 - Multipart 파라미터 시그니처 */
-    @RequestMapping(value="/adminaddNewArticle.do", method=RequestMethod.POST, params="title")
+    @RequestMapping(value="/admin/board/adminaddNewArticle.do", method=RequestMethod.POST, params="title")
     public ModelAndView adminaddNewArticleMultipart(HttpServletRequest request,
                                                     HttpServletResponse response,
                                                     @RequestParam(value="imageFile", required=false) MultipartFile imageFile) throws Exception {
@@ -91,7 +91,7 @@ public class BoardAdminControllerImpl implements BoardAdminController {
     }
 
     /* 삭제 */
-    @RequestMapping(value="/adminremoveArticle.do", method=RequestMethod.POST)
+    @RequestMapping(value="/admin/board/adminremoveArticle.do", method=RequestMethod.POST)
     public ModelAndView adminremoveArticle(HttpServletRequest request, HttpServletResponse response,
                                            @RequestParam("articleNO") int articleNO) throws Exception {
         boardAdminService.adminremoveArticle(articleNO);
@@ -99,33 +99,10 @@ public class BoardAdminControllerImpl implements BoardAdminController {
         return new ModelAndView("redirect:/admin/board/adminList.do");
     }
     
-    /* 삭제시 번호 재배열*/
-	/*
-	 * @Controller
-	 * 
-	 * @RequestMapping("/admin/board") public class AdminBoardController {
-	 * 
-	 * @RequestMapping(value="/adminList.do", method=RequestMethod.GET) public
-	 * ModelAndView adminList(
-	 * 
-	 * @RequestParam(value="page", defaultValue="1") int page,
-	 * 
-	 * @RequestParam(value="size", defaultValue="10") int size) {
-	 * 
-	 * int total = boardService.countArticles(); // 총 건수 int offset = (page - 1) *
-	 * size;
-	 * 
-	 * List<ArticleVO> list = boardService.selectPagedArticles(offset, size); int
-	 * startNo = total - offset; // 이 페이지의 시작 번호
-	 * 
-	 * ModelAndView mv = new ModelAndView("admin/board/adminList");
-	 * mv.addObject("list", list); mv.addObject("page", page); mv.addObject("size",
-	 * size); mv.addObject("total", total); mv.addObject("startNo", startNo); return
-	 * mv; } }
-	 */
+    /* 삭제시 번호 재배열 예시(주석) */
 
     /* 공지 on */
-    @RequestMapping(value="/adminnoticeOn.do", method=RequestMethod.POST)
+    @RequestMapping(value="/admin/board/adminnoticeOn.do", method=RequestMethod.POST)
     public ModelAndView adminnoticeOn(HttpServletRequest request, HttpServletResponse response,
                                       @RequestParam("articleNO") int articleNO) throws Exception {
         boardAdminService.adminupdateNoticeFlag(articleNO, true);
@@ -134,7 +111,7 @@ public class BoardAdminControllerImpl implements BoardAdminController {
     }
 
     /* 공지 off */
-    @RequestMapping(value="/adminnoticeOff.do", method=RequestMethod.POST)
+    @RequestMapping(value="/admin/board/adminnoticeOff.do", method=RequestMethod.POST)
     public ModelAndView adminnoticeOff(HttpServletRequest request, HttpServletResponse response,
                                        @RequestParam("articleNO") int articleNO) throws Exception {
         boardAdminService.adminupdateNoticeFlag(articleNO, false);
@@ -142,10 +119,8 @@ public class BoardAdminControllerImpl implements BoardAdminController {
         return new ModelAndView("redirect:/admin/board/adminList.do");
     }
 
-    // ---------- (호환용) 예전/잘못된 URL 별칭 ----------
-    // 잘못된 경로만 새 경로로 리다이렉트 (중복 매핑 방지)
-    // /admin/board/adminWriteForm(.do) -> /admin/board/adminWriteFrom.do
-    @RequestMapping(value={"/adminWriteForm","/adminWriteForm.do"}, method=RequestMethod.GET)
+    // ---------- (호환용) 잘못된 URL 별칭 ----------
+    @RequestMapping(value={"/admin/board/adminWriteForm","/admin/board/adminWriteForm.do"}, method=RequestMethod.GET)
     public ModelAndView adminWriteFormAlias() {
         return new ModelAndView("redirect:/admin/board/adminWriteFrom.do");
     }
@@ -241,4 +216,47 @@ public class BoardAdminControllerImpl implements BoardAdminController {
         }
         return name;
     }
+
+    /* ================== 공지 목록(공개) ================== */
+
+    /** 주 경로: /eum/notice.do (컨텍스트가 /eum일 때) */
+    @RequestMapping(value="/notice.do", method=RequestMethod.GET)
+    public ModelAndView noticeList(HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   Model model) throws Exception {
+
+        String q       = request.getParameter("q");
+        String sort    = request.getParameter("sort");
+        String pageStr = request.getParameter("page");
+
+        int page = 1;
+        try {
+            if (pageStr != null && pageStr.length() > 0) {
+                page = Integer.parseInt(pageStr);
+            }
+        } catch (Exception ignore) {}
+        int size = 10;
+
+        List<AdminArticleVO> noticeList = boardAdminService.getNoticeList(q, sort, page, size);
+        int total = boardAdminService.getNoticeTotal(q);
+
+        model.addAttribute("noticeList", noticeList);
+        model.addAttribute("total", Integer.valueOf(total));
+        model.addAttribute("page",  Integer.valueOf(page));
+        model.addAttribute("size",  Integer.valueOf(size));
+        model.addAttribute("q",     q == null ? "" : q);
+        model.addAttribute("sort",  (sort == null || sort.length() == 0) ? "recent" : sort);
+
+        // ✅ 여기! admin 폴더가 아닌 일반 경로로 렌더링
+        // /WEB-INF/views/notice.jsp
+        return new ModelAndView("notice");
+    }
+
+    /** 호환 별칭: /notice/list.do -> 동일 화면 (필요 없으면 삭제해도 됨) */
+	/*
+	 * @RequestMapping(value="/notice/list.do", method=RequestMethod.GET) public
+	 * ModelAndView noticeListAlias(HttpServletRequest request, HttpServletResponse
+	 * response, Model model) throws Exception { return noticeList(request,
+	 * response, model); }
+	 */
 }

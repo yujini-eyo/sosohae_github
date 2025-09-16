@@ -21,7 +21,7 @@ public interface MainController {
 	public ModelAndView main(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 	/**
-	 * GET:  "/guide.do", "/intro.do", "/about.do", "/notice.do", "/contact.do" (extend
+	 * GET:  "/guide.do", "/intro.do", "/about.do", "/contact.do" (extend
 	 * as needed)
 	 */
 	public ModelAndView pages(HttpServletRequest request, HttpServletResponse response) throws Exception;
