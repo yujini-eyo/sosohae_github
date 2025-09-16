@@ -17,5 +17,8 @@
 			alias="adminVO" />
 		<!-- 관리자와 게시판 DB를 서로 같이 쓰기 위한 alias -->
   		<typeAlias alias="adminArticleVO" type="com.myspring.eum.admin.vo.AdminArticleVO"/>
+  		<!-- 지원자 VO 사용을 위해 추가 -->
+  		 <typeAlias type="com.myspring.eum.support.vo.SupportApplicationVO"
+               alias="supportApplicationVO"/>
 	</typeAliases>
 </configuration>

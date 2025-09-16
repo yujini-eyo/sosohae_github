@@ -1,90 +1,236 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
-<%@ taglib prefix="c"    uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fmt"  uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
-<c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 
-<tiles:putAttribute name="pageHead">
-  <link rel="stylesheet" href="<c:url value='/resources/css/board.css'/>"/>
-</tiles:putAttribute>
+<%-- 
+  viewArticle.jsp
+  - 상세 페이지
+  - 비로그인: 글만 보기 + "로그인하고 도와주기" 버튼 노출
+  - 로그인 & 작성자 아님: "도와주기" 신청 폼 노출 (POST /support/apply.do)
+  - 로그인 & 작성자: 같은 페이지 하단에 "지원자 목록" 표시 + "선정" 버튼 제공
+  - 컨트롤러에서 article, (작성자일 경우) applicants, msg/err 플래시 메시지를 모델로 제공한다고 가정
+--%>
 
-<tiles:putAttribute name="pageScripts">
-  <script defer src="<c:url value='/resources/js/board.js'/>"></script>
-</tiles:putAttribute>
+<%-- 컨텍스트 경로 필요시 주석 해제하여 사용 가능
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+--%>
 
-<c:url var="imageUrl" value="/board/image.do">
-  <c:param name="articleNO" value="${article.articleNO}"/>
-  <c:param name="file"      value="${article.imageFileName}"/>
-</c:url>
+<%-- 현재 로그인 사용자 ID (세션에 member가 없으면 null) --%>
+<c:set var="me"
+	value="${sessionScope.member != null ? sessionScope.member.id : null}" />
 
-<c:url var="downloadUrl" value="/board/download.do">
-  <c:param name="articleNO"     value="${article.articleNO}"/>
-  <c:param name="imageFileName" value="${article.imageFileName}"/>
-</c:url>
+<%-- 플래시 메시지 영역: 등록/신청/선정 결과 안내 --%>
+<c:if test="${not empty msg}">
+	<div class="alert success" role="status" style="margin-bottom: 12px">${msg}</div>
+</c:if>
+<c:if test="${not empty err}">
+	<div class="alert danger" role="alert" style="margin-bottom: 12px">${err}</div>
+</c:if>
 
-<div class="container">
-  <section class="board" aria-labelledby="viewTitle">
-    <header class="board-header">
-      <div>
-        <h1 id="viewTitle" class="board-title"><c:out value="${article.title}"/></h1>
-        <p class="desc">
-          글번호 <strong><c:out value="${article.articleNO}"/></strong> · 작성일
-          <strong><fmt:formatDate value="${article.writeDate}" pattern="yyyy-MM-dd HH:mm"/></strong>
-        </p>
-      </div>
-      <div class="cta">
-        <c:if test="${not empty article.imageFileName}">
-          <img src="${imageUrl}" alt="첨부 이미지" style="max-height:64px"/>
-        </c:if>
-        <a class="btn ghost" href="<c:url value='/board/listArticles.do'/>">목록</a>
-      </div>
-    </header>
-
-    <article class="card" style="padding:20px">
-      <div class="article-body" style="white-space:pre-wrap;line-height:1.7">
-        <c:out value="${article.content}"/>
-        
-        <!-- 도와주기 버튼 -->
-        <c:url var="applyUrl" value="/volunteer/apply.do">
-  <c:param name="reqId" value="${article.articleNO}"/>
-</c:url>
-
-<!-- 도와주기 CTA -->
-<div class="help-cta">
-  <a class="btn help" href="${applyUrl}" role="button" aria-label="도와주기">도와주기</a>
-</div>
-       <!--  JSP – POST 전송형(바로 신청 처리) 바로 처리하는 엔드포인트가 있다면 이걸로 교체. -->
-     <%--   <form action="<c:url value='/volunteer/apply.do'/>" method="post" class="help-cta">
-  <input type="hidden" name="reqId" value="${article.articleNO}"/>
-  <button type="submit" class="btn help" aria-label="도와주기">도와주기</button>
-</form> --%>
-       </div>
-
-      <c:if test="${not empty article.imageFileName}">
-        <div style="margin-top:16px">
-          <img alt="첨부 이미지" style="max-width:100%;height:auto" src="${downloadUrl}"/>
-        </div>
+<section class="article-view">
+	<%-- 1) 글 헤더(제목/메타) --%>
+	<header class="article-header" style="margin-bottom: 16px">
+		<h1 style="margin: 0 0 8px 0">
+			<c:out value="${article.title}" />
+		</h1>
+		<div class="meta" style="color: #666; font-size: 0.9rem">
+			글번호 #
+			<c:out value="${article.articleNO}" />
+			· 작성자 <strong><c:out value="${article.id}" /></strong> · 작성일
+			<fmt:formatDate value="${article.writeDate}"
+				pattern="yyyy-MM-dd HH:mm" />
+			<%-- (선택) 상태/선정자 표시: board_article.state/selectedVolunteerId 를 사용 중이면 주석 해제
+      · 상태 <c:out value="${article.state}"/>
+      <c:if test="${not empty article.selectedVolunteerId}">
+        · 선정자 <c:out value="${article.selectedVolunteerId}"/>
       </c:if>
+      --%>
+		</div>
+	</header>
 
-      <footer class="article-actions" style="margin-top:24px;display:flex;gap:8px;justify-content:flex-end">
-        <!-- 수정 -->
-        <form action="<c:url value='/board/modArticle.do'/>" method="post" enctype="multipart/form-data"
-              style="display:inline-flex;gap:8px;align-items:center">
-          <input type="hidden" name="articleNO" value="${article.articleNO}"/>
-          <input type="hidden" name="originalFileName" value="${article.imageFileName}"/>
-          <input type="text" name="title" value="${article.title}" placeholder="제목" required style="min-width:240px"/>
-          <textarea name="content" placeholder="내용" required style="min-width:240px">${article.content}</textarea>
-          <input type="file" name="imageFile" accept="image/*"/>
-          <button class="btn" type="submit">수정</button>
-        </form>
+	<%-- 2) 첨부 이미지(있을 때만) --%>
+	<c:if test="${not empty article.imageFileName}">
+		<figure style="margin: 16px 0">
+			<img alt="첨부 이미지"
+				style="max-width: 100%; height: auto; border-radius: 12px"
+				src="<c:url value='/board/download.do'>
+                  <c:param name='imageFileName' value='${article.imageFileName}'/>
+                  <c:param name='articleNO' value='${article.articleNO}'/>
+                </c:url>" />
+		</figure>
+	</c:if>
 
-        <!-- 삭제 -->
-        <form action="<c:url value='/board/removeArticle.do'/>" method="post"
-              onsubmit="return confirm('정말 삭제하시겠습니까?');">
-          <input type="hidden" name="articleNO" value="${article.articleNO}"/>
-          <button class="btn danger" type="submit">삭제</button>
-        </form>
-      </footer>
-    </article>
-  </section>
-</div>
+	<%-- 3) 본문 (개행 보존) --%>
+	<article class="article-content"
+		style="white-space: pre-wrap; line-height: 1.6; margin: 16px 0 24px">
+		<c:out value="${article.content}" />
+	</article>
+
+	<%-- 4) 상단 액션 바: 목록/로그인유도/도와주기폼/작성자 버튼 --%>
+	<div class="actions"
+		style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px">
+
+		<%-- 4-1) 모두에게 보이는 "목록" 버튼 --%>
+		<a class="btn ghost" href="<c:url value='/board/listArticles.do'/>">목록</a>
+
+		<%-- 4-2) 비로그인: 로그인 유도 버튼만 노출 --%>
+		<c:if test="${me == null}">
+			<a class="btn primary" href="<c:url value='/member/loginForm.do'/>">
+				로그인하고 도와주기 </a>
+		</c:if>
+
+		<%-- 4-3) 로그인 & 작성자 아님: 도와주기 신청 폼(POST /support/apply.do) --%>
+		<c:if test="${me != null and me ne article.id}">
+			<form action="<c:url value='/support/apply.do'/>" method="post"
+				style="display: flex; gap: 8px; flex-wrap: wrap">
+				<%-- 필수: 어떤 글에 대한 신청인지 --%>
+				<input type="hidden" name="articleNO" value="${article.articleNO}" />
+				<%-- 선택: 지원자가 남기는 메시지 --%>
+				<input type="text" name="message" placeholder="간단한 메세지(선택)"
+					style="min-width: 260px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px" />
+				<button type="submit" class="btn help">도와주기</button>
+			</form>
+		</c:if>
+
+		<%-- 4-4) 로그인 & 작성자: 별도 페이지 이동 버튼(선택) --%>
+		<c:if test="${me != null and me eq article.id}">
+			<a class="btn secondary"
+				href="<c:url value='/support/applicants.do'>
+                                        <c:param name='articleNO' value='${article.articleNO}'/>
+                                      </c:url>">
+				지원자 목록(별도 페이지) </a>
+		</c:if>
+	</div>
+
+	<%-- 5) (핵심) 작성자에게 "같은 페이지"에서 지원자 목록 바로 보여주기
+        - 컨트롤러에서 me==article.id 일 때 applicants 를 모델에 담아온다고 가정
+        - applicants 가 비어도 안내 문구 출력
+  --%>
+	<c:if test="${me != null and me eq article.id}">
+		<section class="applicant-list" style="margin-top: 24px">
+			<h2 style="font-size: 1.1rem; margin: 0 0 12px">지원자 목록</h2>
+
+			<c:choose>
+				<c:when test="${empty applicants}">
+					<div
+						style="padding: 12px; border: 1px dashed #ddd; border-radius: 8px; color: #666">
+						아직 지원자가 없습니다.</div>
+				</c:when>
+				<c:otherwise>
+					<table class="tbl" style="width: 100%; border-collapse: collapse">
+						<thead>
+							<tr>
+								<th
+									style="text-align: left; border-bottom: 1px solid #eee; padding: 8px">지원자</th>
+								<th
+									style="text-align: left; border-bottom: 1px solid #eee; padding: 8px">메시지</th>
+								<th
+									style="text-align: left; border-bottom: 1px solid #eee; padding: 8px">상태</th>
+								<th
+									style="text-align: left; border-bottom: 1px solid #eee; padding: 8px">신청일</th>
+								<th
+									style="text-align: left; border-bottom: 1px solid #eee; padding: 8px">액션</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach var="app" items="${applicants}">
+								<tr>
+									<td style="border-bottom: 1px solid #f5f5f5; padding: 8px">
+										<%-- 지원자 아이디 --%> <c:out value="${app.volunteerId}" />
+									</td>
+									<td style="border-bottom: 1px solid #f5f5f5; padding: 8px">
+										<%-- 지원자가 남긴 메시지 --%> <c:out value="${app.message}" />
+									</td>
+									<td style="border-bottom: 1px solid #f5f5f5; padding: 8px">
+										<%-- APPLIED / SELECTED / REJECTED / WITHDRAWN --%> <c:out
+											value="${app.status}" />
+									</td>
+									<td style="border-bottom: 1px solid #f5f5f5; padding: 8px">
+										<%-- 신청일시 --%> <fmt:formatDate value="${app.createdAt}"
+											pattern="yyyy-MM-dd HH:mm" />
+									</td>
+									<td style="border-bottom: 1px solid #f5f5f5; padding: 8px">
+										<%-- 상태에 따른 액션: APPLIED만 "선정" 버튼 노출 --%> <c:choose>
+											<c:when test="${app.status eq 'APPLIED'}">
+												<form action="<c:url value='/support/select.do'/>"
+													method="post" style="display: inline">
+													<%-- 어떤 신청(application)을 선정하는지 --%>
+													<input type="hidden" name="applicationId"
+														value="${app.applicationId}" />
+													<button type="submit" class="btn primary"
+														style="padding: 6px 10px">선정</button>
+												</form>
+											</c:when>
+											<c:when test="${app.status eq 'SELECTED'}">
+												<span class="badge"
+													style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 8px">
+													선정됨 </span>
+											</c:when>
+											<c:otherwise>
+												<span style="color: #999">-</span>
+											</c:otherwise>
+										</c:choose>
+									</td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</c:otherwise>
+			</c:choose>
+		</section>
+	</c:if>
+</section>
+
+<%-- (선택) 간단 스타일: 프로젝트 공용 CSS 있으면 삭제해도 무방 --%>
+<style>
+.btn {
+	display: inline-block;
+	padding: 8px 12px;
+	border-radius: 8px;
+	text-decoration: none;
+	border: 1px solid #ddd
+}
+
+.btn.primary {
+	border-color: #ffb86c;
+	background: #ffb86c;
+	color: #222
+}
+
+.btn.secondary {
+	border-color: #a3a3a3;
+	background: #f5f5f5;
+	color: #222
+}
+
+.btn.ghost {
+	background: #fff;
+	color: #333
+}
+
+.btn.help {
+	border-color: #54c2a8;
+	background: #54c2a8;
+	color: #fff
+}
+
+.alert {
+	padding: 10px 12px;
+	border-radius: 8px
+}
+
+.alert.success {
+	background: #f0fff4;
+	border: 1px solid #a7f3d0
+}
+
+.alert.danger {
+	background: #fff5f5;
+	border: 1px solid #fecaca
+}
+
+.tbl th, .tbl td {
+	font-size: 0.95rem
+}
+</style>

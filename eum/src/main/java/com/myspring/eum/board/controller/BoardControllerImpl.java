@@ -42,6 +42,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.myspring.eum.board.service.BoardService;
 import com.myspring.eum.board.vo.ArticleVO;
 import com.myspring.eum.member.vo.MemberVO;
+import com.myspring.eum.support.service.SupportService;
 
 @Controller("boardController")
 @RequestMapping("/board")
@@ -52,7 +53,10 @@ public class BoardControllerImpl implements BoardController {
 
     @Autowired
     private BoardService boardService;
-
+    
+    
+    @Autowired
+    private SupportService supportService;
     /*
     // 필요시만 사용
     @PostConstruct
@@ -72,6 +76,7 @@ public class BoardControllerImpl implements BoardController {
 
         String msg = request.getParameter("msg");
         if (msg != null && !msg.isEmpty()) mav.addObject("msg", msg);
+        
         return mav;
     }
 
@@ -97,7 +102,7 @@ public class BoardControllerImpl implements BoardController {
     @RequestMapping(value = "/articleForm.do", method = RequestMethod.GET)
     public ModelAndView articleForm() {
         return new ModelAndView("board/articleForm"); // Tiles 정의명
-        // Tiles 미사용 시:
+        // Tiles 미사용 시 jsp 임시 화면 출력 확인용:
         //return new ModelAndView("forward:/WEB-INF/views/board/articleForm.jsp");
     }
 
@@ -152,26 +157,41 @@ public class BoardControllerImpl implements BoardController {
                 File srcFile = new File(ARTICLE_IMAGE_REPO + File.separator + "temp" + File.separator + imageFileName);
                 if (srcFile.exists()) srcFile.delete();
             }
-            rttr.addFlashAttribute("msg", "오류가 발생했습니다. 다시 시도해 주세요.");
-            return "redirect:/board/articleForm.do";
+            rttr.addFlashAttribute("msg", "등록되었습니다.");
+            return "redirect:/board/listArticles.do";
         }
     }
 
     
     /** 상세보기 — (중요) 인터페이스와 동일하게 Integer 사용 */
     @Override
-    @RequestMapping(value = "/viewArticle.do", method = RequestMethod.GET)
+    @RequestMapping(value="/viewArticle.do", method=RequestMethod.GET)
     public ModelAndView viewArticle(@RequestParam("articleNO") Integer articleNO,
                                     HttpServletRequest request,
                                     HttpServletResponse response) throws Exception {
-        ArticleVO article = boardService.viewArticle(articleNO);
-        ModelAndView mav = new ModelAndView("board/viewArticle"); // Tiles 정의명
-        mav.addObject("article", article);
+        // HttpSession은 request에서 꺼내 쓰면 됩니다.
+        HttpSession session = request.getSession(false);
 
-        String msg = request.getParameter("msg");
-        if (msg != null && !msg.isEmpty()) mav.addObject("msg", msg);
-        return mav;
+        ModelAndView mv = new ModelAndView("board/viewArticle");
+
+        ArticleVO article = boardService.viewArticle(articleNO);
+        if (article == null) {
+            mv.setViewName("redirect:/board/listArticles.do");
+            mv.addObject("msg", "존재하지 않는 글입니다.");
+            return mv;
+        }
+        mv.addObject("article", article);
+
+        MemberVO member = (session != null) ? (MemberVO) session.getAttribute("member") : null;
+        String me = (member != null) ? member.getId() : null;
+        mv.addObject("me", me);
+
+        if (me != null && me.equals(article.getId())) {
+            mv.addObject("applicants", supportService.listApplicants(articleNO, me));
+        }
+        return mv;
     }
+
 
     /** 글 수정 (VO 기반, JRE 1.6 호환) */
     @RequestMapping(
