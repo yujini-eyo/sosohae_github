@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace는 그대로 -->
+<mapper namespace="mapper.support">
+
+  <resultMap id="SupportApplicationMap" type="supportApplicationVO">
+    <id     property="applicationId" column="application_id"/>
+    <result property="articleNo"     column="articleNO"/>           <!-- ★ -->
+    <result property="volunteerId"   column="volunteer_id"/>
+    <result property="status"        column="status"/>
+    <result property="message"       column="message"/>
+    <result property="createdAt"     column="created_at"/>
+    <result property="updatedAt"     column="updated_at"/>
+  </resultMap>
+
+  <!-- 중복 신청 방지 체크 -->
+  <select id="existsByArticleAndVolunteer" parameterType="map" resultType="int">
+    SELECT COUNT(*) FROM support_application
+    WHERE articleNO = #{articleNo} AND volunteer_id = #{volunteerId}
+  </select>
+
+  <!-- 신청 저장 -->
+  <insert id="insertApplication" parameterType="supportApplicationVO"
+          useGeneratedKeys="true" keyProperty="applicationId">
+    INSERT INTO support_application (articleNO, volunteer_id, status, message)
+    VALUES (#{articleNo}, #{volunteerId}, 'APPLIED', #{message})
+  </insert>
+
+  <!-- 상태 변경 -->
+  <update id="updateApplicationStatus" parameterType="map">
+    UPDATE support_application
+    SET status = #{status}, updated_at = CURRENT_TIMESTAMP
+    WHERE application_id = #{applicationId}
+  </update>
+
+  <!-- 글의 전체 지원자 목록 -->
+  <select id="findApplicantsByArticle" parameterType="int" resultMap="SupportApplicationMap">
+    SELECT application_id, articleNO, volunteer_id, status, message, created_at, updated_at
+    FROM support_application
+    WHERE articleNO = #{articleNo}
+    ORDER BY created_at ASC
+  </select>
+
+  <!-- 선정 시: 나머지 APPLIED는 일괄 REJECTED -->
+  <update id="bulkRejectOthers" parameterType="map">
+	UPDATE support_application
+	SET status = 'REJECTED', updated_at = CURRENT_TIMESTAMP
+	WHERE articleNO = #{articleNo}
+	  AND application_id &lt;&gt; #{exceptApplicationId}
+	  AND status = 'APPLIED'
+</update>
+
+  <!-- board_article에 선정자 기록 -->
+  <update id="setArticleSelectedVolunteer" parameterType="map">
+    UPDATE board_article
+    SET selectedVolunteerId = #{volunteerId}
+    WHERE articleNO = #{articleNo}
+  </update>
+
+  <!-- 글 상태 갱신 -->
+  <update id="updateArticleState" parameterType="map">
+    UPDATE board_article
+    SET state = #{state}
+    WHERE articleNO = #{articleNo}
+  </update>
+
+  <!-- 카운트 편의 함수(선택) -->
+  <update id="increaseApplicantCount" parameterType="int">
+    UPDATE board_article
+    SET applicantCount = applicantCount + 1
+    WHERE articleNO = #{value}
+  </update>
+
+  <update id="decreaseApplicantCount" parameterType="int">
+    UPDATE board_article
+    SET applicantCount = GREATEST(applicantCount - 1, 0)
+    WHERE articleNO = #{value}
+  </update>
+
+  <!-- 단건 -->
+  <select id="findById" parameterType="long" resultMap="SupportApplicationMap">
+    SELECT application_id, articleNO, volunteer_id, status, message, created_at, updated_at
+    FROM support_application
+    WHERE application_id = #{applicationId}
+  </select>
+
+  <!-- 내 신청 목록 (미구현 오류 해결) -->
+  <select id="findByVolunteerId" parameterType="string" resultMap="SupportApplicationMap">
+    SELECT application_id, articleNO, volunteer_id, status, message, created_at, updated_at
+    FROM support_application
+    WHERE volunteer_id = #{volunteerId}
+    ORDER BY created_at DESC
+  </select>
+
+  <!-- 상태 전이: OPEN일 때만 IN_PROGRESS로 -->
+  <update id="articleOpenToInProgress" parameterType="int">
+    UPDATE board_article
+    SET state = 'IN_PROGRESS'
+    WHERE articleNO = #{value}
+      AND state = 'OPEN'
+  </update>
+
+</mapper>

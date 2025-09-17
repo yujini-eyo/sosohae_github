@@ -1,0 +1,225 @@
+/* 전역 스타일: 메인화면과 통일성 유지 */
+:root {
+    --bg-color: #FBF7F2; /* 연한 베이지 */
+    --card-color: #FFFFFF; /* 카드 배경 */
+    --accent-color: #FFDDAA; /* 강조색 (연한 오렌지) */
+    --text-dark: #333;
+    --text-medium: #666;
+    --text-light: #999;
+    --border-color: #E0E0E0;
+    --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+body {
+    background-color: var(--bg-color);
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    color: var(--text-dark);
+}
+
+/* 메인 컨테이너 */
+.wrap {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* 헤더와 제목 */
+h1 {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 카드 스타일: 둥근 모서리와 그림자 */
+.card {
+    background-color: var(--card-color);
+    border-radius: 15px;
+    box-shadow: var(--box-shadow);
+    padding: 20px 30px;
+    margin-bottom: 14px;
+}
+
+.card .hd {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--text-dark);
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.card .hd .stepnum {
+    background-color: var(--accent-color);
+    color: var(--text-dark);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.card .hd .label {
+    flex-grow: 1;
+}
+
+.card .hd .hint {
+    font-size: 0.9em;
+    color: var(--text-medium);
+}
+
+.card .bd {
+    padding-top: 20px;
+}
+
+/* 폼 위저드 단계 표시 */
+.step {
+    display: none;
+}
+.step.active {
+    display: block;
+}
+
+.kicker {
+    font-size: 0.9em;
+    color: var(--text-medium);
+    margin-bottom: 15px;
+}
+
+/* 버튼 그리드 */
+.grid {
+    display: grid;
+    gap: 10px;
+}
+.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* 버튼 스타일: 둥근 모서리, 부드러운 전환 */
+.btn {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 25px;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 0.95em;
+    transition: all 0.2s ease;
+    color: var(--text-medium);
+}
+.btn:hover {
+    background-color: #F8F8F8;
+    color: var(--text-dark);
+}
+.btn.selected {
+    background-color: var(--accent-color);
+    border-color: #FFC988;
+    color: var(--text-dark);
+    font-weight: bold;
+}
+
+/* 폼 요소 스타일 */
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 1em;
+    color: var(--text-dark);
+    resize: vertical;
+}
+input[type="text"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 5px rgba(255, 221, 170, 0.5);
+}
+
+/* 제목 입력 필드와 버튼 */
+.field {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.field #regen {
+    white-space: nowrap;
+}
+
+/* 요약 섹션 */
+.sum {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.chip {
+    background-color: #F0F0F0;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    color: var(--text-medium);
+}
+.tiny {
+    font-size: 0.8em;
+    color: var(--text-light);
+}
+
+/* 하단 고정 바 */
+.dock {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--card-color);
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    padding: 15px 0;
+    z-index: 1000;
+}
+
+.dock .bar {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+/* CTA 버튼 (메인/보조) */
+.cta {
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 1em;
+}
+
+.cta.primary {
+    background-color: var(--accent-color);
+    color: var(--text-dark);
+}
+.cta.primary:hover {
+    background-color: #FFC988;
+}
+
+.cta.secondary {
+    background-color: #F0F0F0;
+    color: var(--text-medium);
+}
+.cta.secondary:hover {
+    background-color: #E8E8E8;
+}
+
+/* 숨기기/보이기 */
+.hide {
+    display: none;
+}

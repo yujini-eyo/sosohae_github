@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+	<definition name="support/applicants" extends="baseLayout">
+		<put-attribute name="title" value="지원자 목록" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/support/applicants.jsp" />
+	</definition>
+	
+	<definition name="support/myApplications"
+		extends="baseLayout">
+		<put-attribute name="title" value="내 지원" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/support/myApplications.jsp" />
+	</definition>
+	
+	<definition name="support/myRequests" extends="baseLayout">
+		<put-attribute name="title" value="내 요청" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/support/myRequests.jsp" />
+	</definition>
+	
+</tiles-definitions>
