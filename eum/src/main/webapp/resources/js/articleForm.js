@@ -1,5 +1,5 @@
 // articleForm.js
-// 폼 단계 이동 + 숨김필드 반영 + 제출 직전 content 세팅까지 한 번에 처리합니다.
+// 폼 단계 이동 + 숨김필드 반영 + 제출 시 content는 상세만 전송합니다.
 (() => {
   // ===== 유틸 셀렉터 =====
   const $  = (s, p = document) => p.querySelector(s);
@@ -13,9 +13,9 @@
   const titleInput    = $('#title');
 
   // 보이는 본문(사용자 입력), 숨김 본문(서버 전송용)
-  const contentDetail = $('#contentDetail') || $('#content'); 
-  const contentHidden = $('#contentHidden') 
-    || $('textarea[name="content"][hidden]') 
+  const contentDetail = $('#contentDetail') || $('#content');
+  const contentHidden = $('#contentHidden')
+    || $('textarea[name="content"][hidden]')
     || $('input[name="content"][type="hidden"]');
 
   // 숨은 필드(서버 전송용)
@@ -48,8 +48,8 @@
   const MAX_STEP  = 5;
 
   // ===== 헬퍼 =====
-  const clamp     = (n, min, max) => Math.max(min, Math.min(max, n));
-  const scrollInto= (el) => { try { el?.scrollIntoView({ behavior:'smooth', block:'start' }); } catch {} };
+  const clamp      = (n, min, max) => Math.max(min, Math.min(max, n));
+  const scrollInto = (el) => { try { el?.scrollIntoView({ behavior:'smooth', block:'start' }); } catch {} };
 
   // 버튼 그룹 내 .active 토글
   const setActiveButton = (groupEl, value) => {
@@ -83,7 +83,7 @@
     return parts.join(' · ') || '도움 요청';
   };
 
-  // 요약 텍스트(본문 앞에 붙일 한 덩어리)
+  // (남겨두기) 요약 문자열 — 화면 칩/숨은필드 반영에만 사용, 본문 전송엔 사용하지 않음
   const buildSummary = () => {
     const svc = svcTypeHidden?.value || '';
     const reg = regionHidden?.value   || '';
@@ -121,6 +121,20 @@
     if (urgencyHidden) urgencyHidden.value = state.urgency;
     if (pointsHidden)  pointsHidden.value  = state.points;
   };
+
+  // ===== 상세 → 숨김 본문 동기화 (상세만 전송) =====
+  const normalize = (s) => (s || '')
+    .replace(/\r\n/g, '\n')       // CRLF → LF
+    .replace(/\u00A0/g, ' ')      // NBSP → space
+    .replace(/\n{3,}/g, '\n\n')   // 3줄 이상 빈줄 → 2줄
+    .trim();
+
+  const syncContent = () => {
+    if (contentHidden) contentHidden.value = normalize(contentDetail?.value || '');
+  };
+
+  contentDetail?.addEventListener('input', syncContent);
+  syncContent(); // 초기 1회
 
   // 단계 이동
   const goToStep = (n) => {
@@ -213,7 +227,7 @@
   prevBtn?.addEventListener('click', () => goToStep(currentStep - 1));
   nextBtn?.addEventListener('click', () => goToStep(currentStep + 1));
 
-  // 제출 직전: contentHidden에 "요약 + 상세"를 합쳐 넣고, 필수 선택 검증
+  // 제출 직전: 필수 선택 검증 + 숨김필드 보정 + 상세만 전송
   form.addEventListener('submit', (e) => {
     // 필수 4요소 체크
     if (!state.type || !state.region || !state.day || !state.time) {
@@ -226,18 +240,9 @@
     // 서버 전송용 숨김 필드 재확인(마지막 보정)
     renderSummary();
 
-    // 본문 합성: [요약] 블록 + 사용자가 쓴 상세
-    const lines = [
-      `[요약] ${generateTitle()}`,
-      `- 유형: ${state.type}`,
-      `- 지역: ${state.region}`,
-      `- 요청 시각: ${buildRequestAt() || '-'}`,
-      `- 긴급도/권장포인트: ${state.urgency} / ${state.points}P`,
-      '',
-      (contentDetail?.value || '').trim()
-    ];
+    // (핵심) 본문은 상세만 전송
+    syncContent();
     if (contentHidden) {
-      contentHidden.value = lines.join('\n');
       console.log('[JS] contentHidden.length =', contentHidden.value.length);
     }
 
@@ -253,7 +258,6 @@
   // 초기 표시
   goToStep(1);
 
-  // (호환용) 혹시 JSP 어딘가에 onclick="makeSummary()"가 남아있다면 에러 방지
-  // 인라인 호출은 제거하는 게 정답이지만, 안전빵으로 별칭을 노출합니다.
+  // (호환) 혹시 JSP 어딘가에 onclick="makeSummary()"가 남아있어도 에러 안 나게
   window.makeSummary = buildSummary;
 })();

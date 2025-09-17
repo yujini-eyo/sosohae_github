@@ -4,10 +4,7 @@
 
 <mapper namespace="mapper.board">
 
-  <!-- action-mybatis.xml에 typeAlias 등록:
-       <typeAlias alias="articleVO" type="com.myspring.eum.board.vo.ArticleVO"/> -->
-
-  <!-- DB 컬럼명 ↔ VO 속성 매핑 (DDL 기준) -->
+  <!-- ArticleVO 매핑 (DB: camelCase + is_notice만 스네이크) -->
   <resultMap id="ArticleMap" type="articleVO">
     <id     property="articleNO"     column="articleNO"/>
     <result property="parentNO"      column="parentNO"/>
@@ -26,63 +23,46 @@
 
   <!-- 목록 -->
   <select id="selectAllArticlesList" resultMap="ArticleMap">
-    SELECT articleNO, parentNO, id, title, content, imageFileName,
-           is_notice, writeDate, svc_type, region, req_at, urgency, points
+    SELECT
+      articleNO, parentNO, id, title, content, imageFileName,
+      is_notice, writeDate, svc_type, region, req_at, urgency, points
     FROM board_article
     ORDER BY is_notice DESC, articleNO DESC
   </select>
 
   <!-- 단건 -->
   <select id="selectArticle" parameterType="int" resultMap="ArticleMap">
-    SELECT articleNO, parentNO, id, title, content, imageFileName,
-           is_notice, writeDate, svc_type, region, req_at, urgency, points
+    SELECT
+      articleNO, parentNO, id, title, content, imageFileName,
+      is_notice, writeDate, svc_type, region, req_at, urgency, points
     FROM board_article
     WHERE articleNO = #{value}
   </select>
 
-  <!-- 등록: 필수(parentNO,id,title,content) + 선택값은 있을 때만, writeDate는 NOW() -->
- <insert id="insertNewArticle" parameterType="articleVO"
-        useGeneratedKeys="true" keyProperty="articleNO" keyColumn="articleNO">
-  INSERT INTO board_article
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      parentNO, id, title, content,
-      <if test="isNotice != null">is_notice,</if>
-      <if test="imageFileName != null and imageFileName != ''">imageFileName,</if>
-      <if test="svcType != null">svc_type,</if>
-      <if test="region  != null">region,</if>
-      <if test="reqAt   != null">req_at,</if>
-      <if test="urgency != null">urgency,</if>
-      <if test="points  != null">points,</if>
-      writeDate
-    </trim>
-    <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
-      #{parentNO}, #{id}, #{title}, #{content},
-      <if test="isNotice != null">#{isNotice},</if>
-      <if test="imageFileName != null and imageFileName != ''">#{imageFileName},</if>
-      <if test="svcType != null">#{svcType},</if>
-      <if test="region  != null">#{region},</if>
-      <if test="reqAt   != null">#{reqAt},</if>
-      <if test="urgency != null">#{urgency},</if>
-      <if test="points  != null">#{points},</if>
-      NOW()
-    </trim>
-</insert>
-
+  <!-- 등록 (카멜 컬럼 사용, PK 반환) -->
+  <insert id="insertNewArticle" parameterType="articleVO"
+          useGeneratedKeys="true" keyProperty="articleNO" keyColumn="articleNO">
+    INSERT INTO board_article
+      (parentNO, id, title, content, writeDate,
+       imageFileName, is_notice, svc_type, region, req_at, urgency, points)
+    VALUES
+      (#{parentNO}, #{id}, #{title}, #{content}, NOW(),
+       #{imageFileName}, #{isNotice}, #{svcType}, #{region}, #{reqAt}, #{urgency}, #{points})
+  </insert>
 
   <!-- 수정 -->
   <update id="updateArticle" parameterType="articleVO">
     UPDATE board_article
-    <set>
-      <if test="title != null">title = #{title},</if>
-      <if test="content != null">content = #{content},</if>
-      <if test="imageFileName != null">imageFileName = #{imageFileName},</if>
-      <if test="isNotice != null">is_notice = #{isNotice},</if>
-      <if test="svcType != null">svc_type = #{svcType},</if>
-      <if test="region != null">region = #{region},</if>
-      <if test="reqAt != null">req_at = #{reqAt},</if>
-      <if test="urgency != null">urgency = #{urgency},</if>
-      <if test="points != null">points = #{points},</if>
-    </set>
+    SET
+      title         = #{title},
+      content       = #{content},
+      imageFileName = #{imageFileName},
+      is_notice     = #{isNotice},
+      svc_type      = #{svcType},
+      region        = #{region},
+      req_at        = #{reqAt},
+      urgency       = #{urgency},
+      points        = #{points}
     WHERE articleNO = #{articleNO}
   </update>
 
@@ -90,5 +70,4 @@
   <delete id="deleteArticle" parameterType="int">
     DELETE FROM board_article WHERE articleNO = #{value}
   </delete>
-
 </mapper>

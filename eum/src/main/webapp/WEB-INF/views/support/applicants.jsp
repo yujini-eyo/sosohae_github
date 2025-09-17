@@ -1,47 +1,69 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8" isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
-<div class="container">
-	<h2>지원자 목록</h2>
-	<c:choose>
-		<c:when test="${empty applicants}">
-			<p>아직 지원자가 없습니다.</p>
-		</c:when>
-		<c:otherwise>
-			<table class="table">
-				<thead>
-					<tr>
-						<th>#</th>
-						<th>지원자 ID</th>
-						<th>메시지</th>
-						<th>상태</th>
-						<th>신청시각</th>
-						<th>선정</th>
-					</tr>
-				</thead>
-				<tbody>
-					<c:forEach var="a" items="${applicants}" varStatus="s">
-						<tr>
-							<td>${s.index + 1}</td>
-							<td><c:out value="${a.volunteerId}" /></td>
-							<td><c:out value="${a.message}" /></td>
-							<td><c:out value="${a.status}" /></td>
-							<td><fmt:formatDate value="${a.createdAt}"
-									pattern="yyyy-MM-dd HH:mm" /></td>
-							<td>
-								<form method="post" action="<c:url value='/support/select.do'/>">
-									<input type="hidden" name="articleNO"
-										value="${param.articleNO}" /> <input type="hidden"
-										name="applicationId" value="${a.applicationId}" />
-									<button type="submit" class="btn btn-primary"
-										${a.status ne 'APPLIED' ? 'disabled' : ''}>선정</button>
-								</form>
-							</td>
-						</tr>
-					</c:forEach>
-				</tbody>
-			</table>
-		</c:otherwise>
-	</c:choose>
+
+<link rel="stylesheet" href="<c:url value='/resources/css/applicants.css'/>" />
+<script defer src="<c:url value='/resources/js/applicants.js'/>"></script>
+
+<div class="wrap">
+  <h2 class="page-header">지원자 목록</h2>
+
+  <%-- 데이터가 없을 때의 메시지 --%>
+  <c:if test="${empty applicants}">
+    <p class="alert danger">아직 지원자가 없습니다.</p>
+  </c:if>
+
+  <%--
+    [더미 데이터]
+    원래는 컨트롤러에서 전달받아야 하지만, 화면 디자인 확인을 위해 여기에 더미 데이터를 추가합니다.
+    (실제 배포 시에는 아래 코드를 삭제하고 <c:when test="${not empty applicants}"> 사용)
+  --%>
+  <div class="card">
+    <div class="table-container">
+      <table class="applicant-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>지원자 ID</th>
+            <th>메시지</th>
+            <th>상태</th>
+            <th>신청시각</th>
+            <th>액션</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>user_a</td>
+            <td>안녕하세요, 도와드리고 싶습니다!</td>
+            <td><span class="badge selected">선정됨</span></td>
+            <td>2025-09-15 10:30</td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>user_b</td>
+            <td>시간 괜찮습니다. 연락주세요.</td>
+            <td><span class="badge">신청</span></td>
+            <td>2025-09-15 11:20</td>
+            <td>
+              <form method="post" action="#">
+                <button type="submit" class="btn primary">선정</button>
+              </form>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>user_c</td>
+            <td>오후에 가능합니다.</td>
+            <td><span class="badge rejected">거절됨</span></td>
+            <td>2025-09-15 14:00</td>
+            <td>-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
