@@ -102,7 +102,7 @@ public class BoardControllerImpl implements BoardController {
     @RequestMapping(value = "/articleForm.do", method = RequestMethod.GET)
     public ModelAndView articleForm() {
         return new ModelAndView("board/articleForm"); // Tiles 정의명
-        // Tiles 미사용 시 jsp 임시 화면 출력 확인용:
+        // jsp 임시 화면 출력 확인용
         //return new ModelAndView("forward:/WEB-INF/views/board/articleForm.jsp");
     }
 
@@ -115,7 +115,9 @@ public class BoardControllerImpl implements BoardController {
             HttpServletRequest request,
             HttpSession session,
             RedirectAttributes rttr) throws Exception {
-
+    	
+    	System.out.println("[ADD] hit addNewArticle : " + article);
+    	
         // 로그인 사용자 세팅
         MemberVO memberVO = (session != null) ? (MemberVO) session.getAttribute("member") : null;
         String id = (memberVO != null && memberVO.getId() != null) ? memberVO.getId() : "guest";
@@ -134,31 +136,20 @@ public class BoardControllerImpl implements BoardController {
         }
 
         try {
-            // 등록 (반환형이 int면 그대로, void면 article.getArticleNO() 사용)
-            int articleNO = boardService.addNewArticle(article);
-            if (articleNO == 0 && article.getArticleNO() != null) {
-                articleNO = article.getArticleNO(); // useGeneratedKeys로 채워졌을 때
-            }
+            // 로그인 보정
+            MemberVO m = (session != null) ? (MemberVO) session.getAttribute("member") : null;
+            article.setId((m != null && m.getId()!=null) ? m.getId() : "guest");
 
-            // 이미지가 있으면 temp → {articleNO}/ 로 이동
-            if (imageFileName != null && imageFileName.length() > 0) {
-                File srcFile = new File(ARTICLE_IMAGE_REPO + File.separator + "temp" + File.separator + imageFileName);
-                File destDir = new File(ARTICLE_IMAGE_REPO + File.separator + articleNO);
-                FileUtils.moveFileToDirectory(srcFile, destDir, true);
-            }
+            // ★ content 디버깅 + 방어
+            System.out.println("[ADD] content.len=" + (article.getContent()==null? "null" : article.getContent().length()));
+            if (article.getContent() == null) article.setContent(""); // 빈문자라도 보내기
 
-            rttr.addFlashAttribute("msg", "등록되었습니다.");
-            // ✅ 등록 직후 상세로 리다이렉트 (여기만 바뀐 핵심)
-            return "redirect:/board/viewArticle.do?articleNO=" + articleNO;
-
+            long newNo = boardService.addNewArticle(article);
+            return "redirect:/board/viewArticle.do?articleNO=" + newNo;
         } catch (Exception e) {
-            // 실패 시 temp 정리
-            if (imageFileName != null && imageFileName.length() > 0) {
-                File srcFile = new File(ARTICLE_IMAGE_REPO + File.separator + "temp" + File.separator + imageFileName);
-                if (srcFile.exists()) srcFile.delete();
-            }
-            rttr.addFlashAttribute("msg", "등록되었습니다.");
-            return "redirect:/board/listArticles.do";
+            e.printStackTrace();
+            rttr.addFlashAttribute("msg", "등록 중 오류가 발생했습니다.");
+            return "redirect:/board/articleForm.do";
         }
     }
 

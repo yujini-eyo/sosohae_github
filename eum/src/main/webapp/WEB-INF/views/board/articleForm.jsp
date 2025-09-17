@@ -5,11 +5,11 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
 <!-- 분리된 CSS/JS -->
-<link rel="stylesheet" href="<c:url value='/resources/css/articleForm2.css'/>" />
-<%-- <link rel="stylesheet" href="<c:url value='/resources/css/articleForm.css'/>" /> --%>
+<link rel="stylesheet" href="<c:url value='/resources/css/articleForm.css'/>" />
 <script defer src="<c:url value='/resources/js/articleForm.js'/>"></script>
 
 <!-- 본문만: Tiles 레이아웃이 <html> 헤더/푸터를 감쌉니다 -->
+
 <main class="wrap">
   <h1>도움 요청</h1>
 
@@ -133,10 +133,10 @@
       </div>
       <div class="bd">
         <!-- 아래 textarea는 사용자가 쓰는 상세내용 -->
-        <textarea id="content" name="content" rows="8" placeholder="상세 요청 내용을 작성해 주세요. 예) 병원 동행, 접수/수납 도움, 예상 소요 1시간 등"></textarea>
+        <textarea id="contentDetail" rows="8" placeholder="상세 요청 내용을 작성해 주세요. 예) 병원 동행, 접수/수납 도움, 예상 소요 1시간 등"></textarea>
 
         <!-- 서버 제출용 필드들 -->
-        <textarea id="content" name="content" hidden></textarea>
+        <textarea id="contentHidden" name="content" hidden></textarea>
         <input type="file" name="imageFile" accept="image/*" />
         
         <!-- ✅ 여기 추가: 폼 위저드 값들을 서버로 넘기기 위한 hidden 필드 -->

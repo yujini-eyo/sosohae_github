@@ -8,6 +8,8 @@
     --text-light: #999;
     --border-color: #E0E0E0;
     --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    /* 모바일 탭바가 있다면 높이 변수 정의 */
+    --tabbar-h: 56px; 
 }
 
 body {
@@ -222,4 +224,97 @@ textarea:focus {
 /* 숨기기/보이기 */
 .hide {
     display: none;
+}
+
+/* =========================
+   반응형 (모바일)
+   ========================= */
+@media (max-width: 600px) {
+    /* 모바일에서는 메인 컨테이너 패딩 조절 */
+    .wrap {
+        margin: 20px 0;
+        padding: 0 16px;
+    }
+    
+    /* 폼 제목 여백 조절 */
+    h1 {
+        margin-bottom: 12px;
+    }
+
+    /* 카드 패딩 조절 */
+    .card {
+        padding: 16px 20px;
+    }
+
+    /* 그리드 레이아웃을 1열로 변경 */
+    .grid {
+        grid-template-columns: repeat(2, 1fr); /* 2열 유지, 더 좁은 화면에서는 아래 1열로 */
+    }
+
+    .cols-4, .cols-3 {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* 버튼 크기 조절 */
+    .btn {
+        padding: 10px 12px;
+        font-size: 0.9em;
+    }
+
+    /* 제목 입력 필드와 버튼을 수직으로 배치 */
+    .field {
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+    }
+    .field #regen {
+        width: 100%;
+    }
+
+    /* 하단 고정 바 패딩 조절 */
+    .dock .bar {
+        padding: 0 16px;
+    }
+}
+
+/* =========================
+   반응형 (모바일)
+   ========================= */
+@media (max-width: 600px) {
+    .wrap {
+        margin: 20px 0;
+        padding: 0 16px;
+    }
+    .article-view {
+        padding: 16px 20px;
+    }
+    .actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .actions a.btn, .actions button.btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .actions form {
+        width: 100%;
+        flex-direction: column;
+    }
+    .actions input[type="text"] {
+        min-width: unset;
+        width: 100%;
+    }
+    .tbl th, .tbl td {
+        font-size: 0.9rem;
+    }
+}
+
+/* =========================
+   푸터/탭바 가림 방지 (메인 화면 CSS에서 가져옴)
+   ========================= */
+/* 고정 탭바가 있다면, 콘텐츠 끝까지 스크롤되도록 바닥 여유 공간 확보 */
+@media (max-width: 900px) {
+    .wrap {
+        padding-bottom: calc(var(--tabbar-h) + max(16px, env(safe-area-inset-bottom)));
+    }
 }

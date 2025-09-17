@@ -1,0 +1,273 @@
+/* 전역 스타일: 기존 디자인 테마 유지 */
+:root {
+    --bg-color: #FBF7F2; /* 연한 베이지 */
+    --card-color: #FFFFFF; /* 카드 배경 */
+    --accent-color: #FFDDAA; /* 강조색 (연한 오렌지) */
+    --text-dark: #333;
+    --text-medium: #666;
+    --text-light: #999;
+    --border-color: #E0E0E0;
+    --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+body {
+    background-color: var(--bg-color);
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    color: var(--text-dark);
+}
+
+/* 카드 스타일 */
+.card {
+    background-color: var(--card-color);
+    border-radius: 15px;
+    box-shadow: var(--box-shadow);
+    padding: 24px 30px;
+}
+
+/* 메인 컨테이너 */
+.wrap {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* =========================
+   게시글 상세 페이지 레이아웃
+   ========================= */
+
+.article-view {
+    /* 기존 카드 스타일 적용 */
+    padding: 24px 30px;
+    margin-bottom: 24px;
+    background-color: var(--card-color);
+    border-radius: 15px;
+    box-shadow: var(--box-shadow);
+}
+
+/* 글 헤더 */
+.article-header {
+    margin-bottom: 20px;
+}
+
+.article-header h1 {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--text-dark);
+    margin: 0 0 8px 0;
+}
+
+.article-header .meta {
+    font-size: 0.9rem;
+    color: var(--text-medium);
+}
+
+/* 본문 내용 */
+.article-content {
+    white-space: pre-wrap; /* 줄바꿈 보존 */
+    line-height: 1.6;
+    margin: 16px 0 24px;
+    font-size: 1rem;
+    color: var(--text-dark);
+}
+
+/* 첨부 이미지 */
+.article-view figure {
+    margin: 16px 0;
+}
+
+.article-view img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+}
+
+/* 하단 액션 버튼 영역 */
+.actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+.actions form {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.actions input[type="text"] {
+    min-width: 260px;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+/* =========================
+   지원자 목록
+   ========================= */
+
+.applicant-list {
+    margin-top: 24px;
+}
+
+.applicant-list h2 {
+    font-size: 1.2rem;
+    margin: 0 0 12px;
+    font-weight: bold;
+}
+
+.applicant-list .no-applicants {
+    padding: 12px;
+    border: 1px dashed #ddd;
+    border-radius: 8px;
+    color: var(--text-medium);
+    text-align: center;
+}
+
+.applicant-list .tbl {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tbl th, .tbl td {
+    text-align: left;
+    padding: 12px;
+    font-size: 0.95rem;
+    vertical-align: top;
+}
+
+.tbl th {
+    border-bottom: 1px solid #eee;
+    font-weight: 600;
+}
+
+.tbl td {
+    border-bottom: 1px solid #f5f5f5;
+    color: var(--text-dark);
+}
+
+/* 상태 배지 */
+.badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.badge.selected {
+    background-color: #e6f7ff;
+    border: 1px solid #91d5ff;
+    color: #003a8c;
+}
+
+/* =========================
+   버튼 및 알림창 (공통 스타일)
+   ========================= */
+
+.btn {
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn.primary {
+    background-color: #ffb86c;
+    border-color: #ffb86c;
+    color: #222;
+}
+
+.btn.secondary {
+    background: #f5f5f5;
+    border-color: #a3a3a3;
+    color: #222;
+}
+
+.btn.ghost {
+    background: #fff;
+    border-color: #ddd;
+    color: #333;
+}
+
+.btn.help {
+    background-color: #54c2a8;
+    border-color: #54c2a8;
+    color: #fff;
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.alert.success {
+    background-color: #f0fff4;
+    border: 1px solid #a7f3d0;
+    color: #1e4620;
+}
+
+.alert.danger {
+    background-color: #fff5f5;
+    border: 1px solid #fecaca;
+    color: #921c1c;
+}
+
+/* =========================
+   반응형 (모바일)
+   ========================= */
+@media (max-width: 600px) {
+    .wrap {
+        margin: 20px 0;
+        padding: 0 16px;
+    }
+    .article-view {
+        padding: 16px 20px;
+    }
+    .actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .actions a.btn, .actions button.btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .actions form {
+        width: 100%;
+        flex-direction: column;
+    }
+    .actions input[type="text"] {
+        min-width: unset;
+        width: 100%;
+    }
+    .tbl th, .tbl td {
+        font-size: 0.9rem;
+    }
+}
+
+/* --- 테이블처럼 보이게 하는 주요 변경 사항 --- */
+
+.article-body-container {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden; /* 자식 요소의 둥근 모서리가 컨테이너 밖으로 나오지 않게 함 */
+    margin-bottom: 24px;
+}
+
+.article-view .article-header {
+    margin: 0;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.article-view .article-content {
+    margin: 0;
+    padding: 20px;
+}

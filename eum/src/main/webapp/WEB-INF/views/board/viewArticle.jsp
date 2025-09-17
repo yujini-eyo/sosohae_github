@@ -16,6 +16,10 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 --%>
 
+<!-- 분리된 CSS/JS -->
+<link rel="stylesheet" href="<c:url value='/resources/css/viewArticle.css'/>" />
+<script defer src="<c:url value='/resources/js/viewArticle.js'/>"></script>
+
 <%-- 현재 로그인 사용자 ID (세션에 member가 없으면 null) --%>
 <c:set var="me"
 	value="${sessionScope.member != null ? sessionScope.member.id : null}" />
@@ -29,37 +33,38 @@
 </c:if>
 
 <section class="article-view">
-	<%-- 1) 글 헤더(제목/메타) --%>
-	<header class="article-header" style="margin-bottom: 16px">
-		<h1 style="margin: 0 0 8px 0">
-			<c:out value="${article.title}" />
-		</h1>
-		<div class="meta" style="color: #666; font-size: 0.9rem">
-			글번호 #
-			<c:out value="${article.articleNO}" />
-			· 작성자 <strong><c:out value="${article.id}" /></strong> · 작성일
-			<fmt:formatDate value="${article.writeDate}"
-				pattern="yyyy-MM-dd HH:mm" />
-			<%-- (선택) 상태/선정자 표시: board_article.state/selectedVolunteerId 를 사용 중이면 주석 해제
-      · 상태 <c:out value="${article.state}"/>
-      <c:if test="${not empty article.selectedVolunteerId}">
-        · 선정자 <c:out value="${article.selectedVolunteerId}"/>
-      </c:if>
-      --%>
-		</div>
-	</header>
+	<%-- 1) 글 헤더(제목/메타)와 3) 본문(개행 보존)을 감싸는 새로운 컨테이너 추가 --%>
+	<div class="article-body-container">
+		<header class="article-header">
+			<h1 style="margin: 0 0 8px 0">
+				<c:out value="${article.title}" />
+			</h1>
+			<div class="meta" style="color: #666; font-size: 0.9rem">
+				글번호 #
+				<c:out value="${article.articleNO}" />
+				· 작성자 <strong><c:out value="${article.id}" /></strong> · 작성일
+				<fmt:formatDate value="${article.writeDate}"
+					pattern="yyyy-MM-dd HH:mm" />
+			</div>
+		</header>
 
-	<%-- 2) 첨부 이미지(있을 때만) --%>
-	<c:if test="${not empty article.imageFileName}">
-		<figure style="margin: 16px 0">
-			<img alt="첨부 이미지"
-				style="max-width: 100%; height: auto; border-radius: 12px"
-				src="<c:url value='/board/download.do'>
-                  <c:param name='imageFileName' value='${article.imageFileName}'/>
-                  <c:param name='articleNO' value='${article.articleNO}'/>
-                </c:url>" />
-		</figure>
-	</c:if>
+		<%-- 2) 첨부 이미지(있을 때만) --%>
+		<c:if test="${not empty article.imageFileName}">
+			<figure style="margin: 16px 0">
+				<img alt="첨부 이미지"
+					style="max-width: 100%; height: auto; border-radius: 12px"
+					src="<c:url value='/board/download.do'>
+											<c:param name='imageFileName' value='${article.imageFileName}'/>
+											<c:param name='articleNO' value='${article.articleNO}'/>
+										</c:url>" />
+			</figure>
+		</c:if>
+
+<%-- 		<article class="article-content"
+			style="white-space: pre-wrap; line-height: 1.6; margin: 16px 0 24px">
+			<c:out value="${article.content}" />
+		</article>
+	</div> --%>
 
 	<%-- 3) 본문 (개행 보존) --%>
 	<article class="article-content"
@@ -181,56 +186,3 @@
 		</section>
 	</c:if>
 </section>
-
-<%-- (선택) 간단 스타일: 프로젝트 공용 CSS 있으면 삭제해도 무방 --%>
-<style>
-.btn {
-	display: inline-block;
-	padding: 8px 12px;
-	border-radius: 8px;
-	text-decoration: none;
-	border: 1px solid #ddd
-}
-
-.btn.primary {
-	border-color: #ffb86c;
-	background: #ffb86c;
-	color: #222
-}
-
-.btn.secondary {
-	border-color: #a3a3a3;
-	background: #f5f5f5;
-	color: #222
-}
-
-.btn.ghost {
-	background: #fff;
-	color: #333
-}
-
-.btn.help {
-	border-color: #54c2a8;
-	background: #54c2a8;
-	color: #fff
-}
-
-.alert {
-	padding: 10px 12px;
-	border-radius: 8px
-}
-
-.alert.success {
-	background: #f0fff4;
-	border: 1px solid #a7f3d0
-}
-
-.alert.danger {
-	background: #fff5f5;
-	border: 1px solid #fecaca
-}
-
-.tbl th, .tbl td {
-	font-size: 0.95rem
-}
-</style>
