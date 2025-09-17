@@ -5,7 +5,8 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
 <!-- 분리된 CSS/JS -->
-<link rel="stylesheet" href="<c:url value='/resources/css/articleForm.css'/>" />
+<link rel="stylesheet" href="<c:url value='/resources/css/articleForm2.css'/>" />
+<%-- <link rel="stylesheet" href="<c:url value='/resources/css/articleForm.css'/>" /> --%>
 <script defer src="<c:url value='/resources/js/articleForm.js'/>"></script>
 
 <!-- 본문만: Tiles 레이아웃이 <html> 헤더/푸터를 감쌉니다 -->
