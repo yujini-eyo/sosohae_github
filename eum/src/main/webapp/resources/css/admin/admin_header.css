@@ -1,0 +1,94 @@
+:root{
+  --admin-header-h: 64px;
+  --admin-maxw: 1200px;
+
+  /* 색 토큰(전역 없을 경우 폴백) */
+  --admin-text: #3b2f2a;
+  --admin-muted: #6e5d55;
+  --admin-brand1: #FFE8C2;
+  --admin-brand2: #fff7e9;
+  --admin-br: #FADFCB;
+  --admin-primary: #F6A96D;
+  --admin-primary-600: #e98c45;
+}
+
+/* 고정 헤더 → 본문 밀어내기 (body에 클래스 추가; JS가 붙임) */
+body.admin-has-fixed-header {
+  padding-top: var(--admin-header-h);
+}
+
+/* ===== 헤더 프레임 ===== */
+.admin-header{
+  position: fixed; inset: 0 0 auto 0; z-index: 2000;
+  height: var(--admin-header-h); min-height: var(--admin-header-h);
+  background: linear-gradient(180deg, var(--admin-brand1) 0%, var(--admin-brand2) 120%);
+  border-bottom: 1px solid var(--admin-br);
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  color: var(--admin-text);
+  overflow: hidden;
+}
+.admin-header__inner{
+  max-width: var(--admin-maxw); height: 100%;
+  margin: 0 auto; padding: 0 16px;
+  display: flex; align-items: center; gap: 14px;
+}
+
+/* 좌/중/우 배치 */
+.admin-btn-icon{
+  width: 36px; height: 36px; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--admin-br);
+  cursor: pointer; font-size: 18px; color: var(--admin-text);
+}
+.admin-btn-icon:hover{ background:#fff3e3; }
+
+.admin-brand{
+  font-weight: 900; font-size: 20px; letter-spacing: .5px;
+  color: var(--admin-text); text-decoration: none;
+  padding: 8px 10px; border-radius: 8px;
+}
+.admin-brand:hover{ background:#ffe7c9; }
+
+/* 가운데 내비는 좌측 아이콘·브랜드 다음, 오른쪽 메타 전에 */
+.admin-topnav{
+  display: flex; align-items: center; gap: 10px;
+  margin-left: 8px;
+  white-space: nowrap; overflow-x: auto; scrollbar-width: none;
+}
+.admin-topnav::-webkit-scrollbar{ display:none; }
+.admin-topnav a{
+  font-weight: 700; font-size: 14px; text-decoration: none;
+  color: var(--admin-text); padding: 8px 10px; border-radius: 10px;
+}
+.admin-topnav a:hover{ background:#ffe7c9; }
+
+/* 우측 메타 */
+.admin-meta{
+  margin-left: auto;
+  display: inline-flex; align-items: center; gap: 8px;
+  white-space: nowrap;
+}
+.admin-link-name{
+  font-weight: 800; text-decoration: none; color: var(--admin-text);
+}
+.admin-link-name:hover{ color: var(--admin-primary); text-decoration: underline; }
+.admin-clock{ font-size: 13px; color: var(--admin-muted); }
+.admin-dot{ color: #c7b9ad; }
+
+.admin-btn{
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 32px; padding: 0 12px; border-radius: 999px;
+  font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer;
+  background: var(--admin-primary); color: #fff; border: 0;
+}
+.admin-btn:hover{ background: var(--admin-primary-600); }
+.admin-btn-ghost{
+  background:#fff; color: var(--admin-text) !important; border: 1px solid var(--admin-br);
+}
+.admin-btn-ghost:hover{ background:#fff3e3; }
+
+/* 반응형 */
+@media (max-width: 900px){
+  :root{ --admin-header-h: 60px; }
+  .admin-topnav { display:none; } /* 좁으면 상단 내비는 숨기고 드로어/사이드바로 사용 */
+}

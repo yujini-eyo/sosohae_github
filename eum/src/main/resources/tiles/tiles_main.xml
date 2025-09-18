@@ -32,6 +32,13 @@
     <put-attribute name="title" value="공지사항 • EuM:" />
     <put-attribute name="body"  value="/WEB-INF/views/notice.jsp" />
   </definition>
+  
+  <!-- 공지사항 상세 -->
+<definition name="noticeView" extends="baseLayout">
+    <put-attribute name="title" value="공지사항 보기 • EuM"/>
+    <put-attribute name="body"  value="/WEB-INF/views/noticeView.jsp"/>
+</definition>
+  
 
 
   <!-- (옵션) 폼 페이지가 이 컨트롤러에서 렌더된다면 정의 추가

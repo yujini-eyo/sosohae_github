@@ -19,7 +19,8 @@
       <!-- 툴바 -->
       <div class="toolbar">
         <c:if test="${not empty login && login.role == 'ADMIN'}">
-          <a class="btn primary" href="<c:url value='/notice/writeForm.do'/>">
+          <!-- ▼ 여기만 수정 -->
+          <a class="btn primary" href="<c:url value='/admin/board/adminWriteForm.do'/>">
             <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i> 글쓰기
           </a>
         </c:if>
@@ -49,9 +50,11 @@
                       <c:out value="${n.title}" />
                     </a>
                   </td>
+
                   <td class="td-date" data-label="작성일">
                     <fmt:formatDate value="${n.writeDate}" pattern="yyyy.MM.dd"/>
                   </td>
+
                   <td class="td-views" data-label="조회수">
                     <c:choose>
                       <c:when test="${not empty n.viewCnt}">

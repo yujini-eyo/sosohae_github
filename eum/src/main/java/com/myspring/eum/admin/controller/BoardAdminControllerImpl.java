@@ -23,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
@@ -220,7 +221,7 @@ public class BoardAdminControllerImpl implements BoardAdminController {
     /* ================== 공지 목록(공개) ================== */
 
     /** 주 경로: /eum/notice.do (컨텍스트가 /eum일 때) */
-    @RequestMapping(value="/notice.do", method=RequestMethod.GET)
+    @RequestMapping(value = {"/notice", "/notice/", "/notice.do"}, method = RequestMethod.GET)
     public ModelAndView noticeList(HttpServletRequest request,
                                    HttpServletResponse response,
                                    Model model) throws Exception {
@@ -228,14 +229,18 @@ public class BoardAdminControllerImpl implements BoardAdminController {
         String q       = request.getParameter("q");
         String sort    = request.getParameter("sort");
         String pageStr = request.getParameter("page");
+        String sizeStr = request.getParameter("size");
 
         int page = 1;
-        try {
-            if (pageStr != null && pageStr.length() > 0) {
-                page = Integer.parseInt(pageStr);
-            }
-        } catch (Exception ignore) {}
+        try { if (pageStr != null && pageStr.length() > 0) page = Integer.parseInt(pageStr); } catch (Exception ignore) {}
+        if (page < 1) page = 1;
+
         int size = 10;
+        try { if (sizeStr != null && sizeStr.length() > 0) size = Integer.parseInt(sizeStr); } catch (Exception ignore) {}
+        if (size < 1) size = 10;         // 최소 1
+        if (size > 100) size = 100;      // 과도한 페이지 크기 방지
+
+        if (sort == null || sort.isEmpty()) sort = "recent";
 
         List<AdminArticleVO> noticeList = boardAdminService.getNoticeList(q, sort, page, size);
         int total = boardAdminService.getNoticeTotal(q);
@@ -245,18 +250,56 @@ public class BoardAdminControllerImpl implements BoardAdminController {
         model.addAttribute("page",  Integer.valueOf(page));
         model.addAttribute("size",  Integer.valueOf(size));
         model.addAttribute("q",     q == null ? "" : q);
-        model.addAttribute("sort",  (sort == null || sort.length() == 0) ? "recent" : sort);
+        model.addAttribute("sort",  sort);
 
-        // ✅ 여기! admin 폴더가 아닌 일반 경로로 렌더링
         // /WEB-INF/views/notice.jsp
         return new ModelAndView("notice");
     }
 
-    /** 호환 별칭: /notice/list.do -> 동일 화면 (필요 없으면 삭제해도 됨) */
-	/*
-	 * @RequestMapping(value="/notice/list.do", method=RequestMethod.GET) public
-	 * ModelAndView noticeListAlias(HttpServletRequest request, HttpServletResponse
-	 * response, Model model) throws Exception { return noticeList(request,
-	 * response, model); }
-	 */
+    /* 상세(공개): /notice/view, /notice/view.do */
+    @RequestMapping(value = {"/notice/view", "/notice/view.do"}, method = RequestMethod.GET)
+    public ModelAndView noticeView(@RequestParam("articleNO") int articleNO) throws Exception {
+        AdminArticleVO vo = boardAdminService.adminselectArticleByNo(articleNO);
+        if (vo == null) {
+            // 없으면 목록으로
+            return new ModelAndView("redirect:/notice.do");
+        }
+        // 필요시 조회수 증가
+        // boardAdminService.increaseViewCnt(articleNO);
+
+        ModelAndView mav = new ModelAndView("noticeView"); // /WEB-INF/views/noticeView.jsp
+        mav.addObject("article", vo);
+        return mav; // ← 반드시 mav 반환
+    }
+
+    /* 목록(JSON): /notice/list.json */
+    @RequestMapping(
+        value = "/notice/list.json",
+        method = RequestMethod.GET,
+        produces = "application/json; charset=UTF-8"
+    )
+    @ResponseBody
+    public Map<String, Object> noticeListJson(
+            @RequestParam(value="q",     required=false) String q,
+            @RequestParam(value="sort",  required=false, defaultValue="recent") String sort,
+            @RequestParam(value="page",  required=false, defaultValue="1") int page,
+            @RequestParam(value="size",  required=false, defaultValue="10") int size
+    ) throws Exception {
+        if (page < 1) page = 1;
+        if (size < 1) size = 10;
+        if (size > 100) size = 100;
+
+        List<AdminArticleVO> items = boardAdminService.getNoticeList(q, sort, page, size);
+        int total = boardAdminService.getNoticeTotal(q);
+
+        Map<String,Object> res = new HashMap<>();
+        res.put("items", items);
+        res.put("total", total);
+        res.put("page", page);
+        res.put("size", size);
+        res.put("sort", sort);
+        res.put("q", q == null ? "" : q);
+        return res;
+    }
+
 }
