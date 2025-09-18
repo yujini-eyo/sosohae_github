@@ -2,79 +2,69 @@ package com.myspring.eum.support.vo;
 
 import java.sql.Timestamp;
 
+/** support_application 테이블 1:1 매핑 VO */
 public class SupportApplicationVO {
-	 private int applicationId;
-	    private int articleNo;
-	    private String volunteerId;
-	    private String status; // ENUM 타입은 String으로 처리
-	    private String message;
-	    private Timestamp createdAt;
-	    private Timestamp updatedAt;
-	    
-	    // 조인해서 가져올 추가 정보 (필요 시)
-	    private String volunteerNickname;
+	private Long applicationId; // BIGINT PK (application_id)
+	private Integer articleNO; // INT FK (board_article.articleNO)
+	private String volunteerId; // VARCHAR(50)
+	private String status; // VARCHAR(20): APPLIED/SELECTED/REJECTED/WITHDRAWN
+	private String message; // VARCHAR(500)
+	private Timestamp createdAt; // TIMESTAMP
+	private Timestamp updatedAt; // TIMESTAMP
 
-		public int getApplicationId() {
-			return applicationId;
-		}
+	public Long getApplicationId() {
+		return applicationId;
+	}
 
-		public void setApplicationId(int applicationId) {
-			this.applicationId = applicationId;
-		}
+	public void setApplicationId(Long applicationId) {
+		this.applicationId = applicationId;
+	}
 
-		public int getArticleNo() {
-			return articleNo;
-		}
+	public Integer getArticleNO() {
+		return articleNO;
+	}
 
-		public void setArticleNo(int articleNo) {
-			this.articleNo = articleNo;
-		}
+	public void setArticleNO(Integer articleNO) {
+		this.articleNO = articleNO;
+	}
 
-		public String getVolunteerId() {
-			return volunteerId;
-		}
+	public String getVolunteerId() {
+		return volunteerId;
+	}
 
-		public void setVolunteerId(String volunteerId) {
-			this.volunteerId = volunteerId;
-		}
+	public void setVolunteerId(String volunteerId) {
+		this.volunteerId = volunteerId;
+	}
 
-		public String getStatus() {
-			return status;
-		}
+	public String getStatus() {
+		return status;
+	}
 
-		public void setStatus(String status) {
-			this.status = status;
-		}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
-		public String getMessage() {
-			return message;
-		}
+	public String getMessage() {
+		return message;
+	}
 
-		public void setMessage(String message) {
-			this.message = message;
-		}
+	public void setMessage(String message) {
+		this.message = message;
+	}
 
-		public Timestamp getCreatedAt() {
-			return createdAt;
-		}
+	public Timestamp getCreatedAt() {
+		return createdAt;
+	}
 
-		public void setCreatedAt(Timestamp createdAt) {
-			this.createdAt = createdAt;
-		}
+	public void setCreatedAt(Timestamp createdAt) {
+		this.createdAt = createdAt;
+	}
 
-		public Timestamp getUpdatedAt() {
-			return updatedAt;
-		}
+	public Timestamp getUpdatedAt() {
+		return updatedAt;
+	}
 
-		public void setUpdatedAt(Timestamp updatedAt) {
-			this.updatedAt = updatedAt;
-		}
-
-		public String getVolunteerNickname() {
-			return volunteerNickname;
-		}
-
-		public void setVolunteerNickname(String volunteerNickname) {
-			this.volunteerNickname = volunteerNickname;
-		} 
+	public void setUpdatedAt(Timestamp updatedAt) {
+		this.updatedAt = updatedAt;
+	}
 }

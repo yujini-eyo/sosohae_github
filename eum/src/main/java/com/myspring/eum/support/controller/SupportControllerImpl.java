@@ -1,13 +1,19 @@
+// SupportController.java
+// 역할: HTTP 요청 처리, 로그인 확인, 플래시 메시지, PRG 리다이렉트
 package com.myspring.eum.support.controller;
 
 import java.util.Collections;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.myspring.eum.board.service.BoardService;
+import com.myspring.eum.board.vo.ArticleVO;
+import com.myspring.eum.member.vo.MemberVO;
+import com.myspring.eum.support.service.SupportService;
+import com.myspring.eum.support.vo.SupportApplicationVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,115 +21,103 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.myspring.eum.member.vo.MemberVO;
-import com.myspring.eum.support.service.SupportService;
-import com.myspring.eum.support.vo.SupportApplicationVO;
-
 @Controller("supportController")
 @RequestMapping("/support")
-public class SupportControllerImpl implements SupportController {
+public class SupportControllerImpl {
 
 	@Autowired
 	private SupportService supportService;
 
+	@Autowired
+	private BoardService boardService;
+
+	// 세션에서 현재 로그인한 사용자 id 얻기 (프로젝트의 MemberVO 구조에 맞게 간단 구현)
 	private String currentUserId(HttpSession session) {
-		MemberVO member = (session != null) ? (MemberVO) session.getAttribute("member") : null;
-		return (member != null && member.getId() != null) ? member.getId() : null;
-	}
-
-	/** 지원자 목록 (요청자 전용) - 파라미터 없으면 JSP만 포워드 */
-	@Override
-	@RequestMapping(value = "/applicants.do", method = RequestMethod.GET)
-	public ModelAndView applicants(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-	    String articleNoParam = request.getParameter("articleNO");
-
-	    // 1) 파라미터 없거나 공백이면: JSP만 포워드(서비스 미호출)
-	    if (articleNoParam == null || articleNoParam.trim().isEmpty()) {
-	        // Tiles 안 쓰고 JSP만 확인
-	        //return new ModelAndView("forward:/WEB-INF/views/support/applicants.jsp");
-
-	        // 만약 Tiles 정의를 테스트하고 싶다면 위 한 줄 대신 아래 한 줄:
-	         return new ModelAndView("support/applicants");
-	    }
-
-	    // 2) 파라미터가 있으면 정상 처리
-	    int articleNo = Integer.parseInt(articleNoParam);
-	    String requesterId = currentUserId(request.getSession());
-
-	    ModelAndView mv = new ModelAndView("support/applicants"); // Tiles 정의명
-	    mv.addObject("applicants", supportService.listApplicants(articleNo, requesterId));
-	    mv.addObject("articleNO", articleNo);
-	    return mv;
-	}
-
-
-	/** 지원 신청 */
-	@Override
-	@RequestMapping(value = "/apply.do", method = RequestMethod.POST)
-	public ModelAndView apply(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		int articleNo = Integer.parseInt(request.getParameter("articleNO"));
-		String message = request.getParameter("message");
-		String uid = currentUserId(request.getSession());
-		supportService.apply(articleNo, uid, message);
-		return new ModelAndView("redirect:/board/viewArticle.do?articleNO=" + articleNo);
-	}
-
-	/** 신청 취소 */
-	@Override
-	@RequestMapping(value = "/cancel.do", method = RequestMethod.POST)
-	public ModelAndView cancel(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		long applicationId = Long.parseLong(request.getParameter("applicationId"));
-		String uid = currentUserId(request.getSession());
-		supportService.cancel(applicationId, uid);
-		String redirect = request.getParameter("redirect");
-		if (redirect != null && redirect.startsWith("/")) {
-			return new ModelAndView("redirect:" + redirect);
+		Object member = (session != null) ? session.getAttribute("member") : null;
+		try {
+			return (member != null) ? (String) member.getClass().getMethod("getId").invoke(member) : null;
+		} catch (Exception ignore) {
+			return null;
 		}
-		int articleNo = Integer.parseInt(request.getParameter("articleNO"));
-		return new ModelAndView("redirect:/board/viewArticle.do?articleNO=" + articleNo);
 	}
 
-	/** 지원자 선정 (요청자 전용) */
-	@Override
-	@RequestMapping(value = "/select.do", method = RequestMethod.POST)
-	public ModelAndView select(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		long applicationId = Long.parseLong(request.getParameter("applicationId"));
-		String requesterId = currentUserId(request.getSession());
-		supportService.select(applicationId, requesterId);
-		int articleNo = Integer.parseInt(request.getParameter("articleNO"));
-		return new ModelAndView("redirect:/support/applicants.do?articleNO=" + articleNo);
+	// [POST] 지원하기
+	@RequestMapping(value = "/apply.do", method = RequestMethod.POST)
+	public String apply(@RequestParam int articleNO, @RequestParam(required = false) String message,
+			HttpServletRequest request, RedirectAttributes rttr) {
+		String me = currentUserId(request.getSession());
+		if (me == null) { // 로그인 필요
+			rttr.addFlashAttribute("msg", "로그인 후 지원할 수 있습니다.");
+			return "redirect:/member/loginForm.do";
+		}
+		try {
+			supportService.apply(articleNO, me, message);
+			rttr.addFlashAttribute("msg", "지원이 접수되었습니다.");
+		} catch (DuplicateKeyException e) { // 이미 지원한 경우
+			rttr.addFlashAttribute("msg", "이미 지원한 글입니다.");
+		}
+		// PRG: 상세로 리다이렉트
+		return "redirect:/board/viewArticle.do?articleNO=" + articleNO;
 	}
 
-	@Override
+	// [GET] 내 지원 목록
 	@RequestMapping(value = "/myApplications.do", method = RequestMethod.GET)
-	public ModelAndView myApplications(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	    ModelAndView mv = new ModelAndView("support/myApplications");
-
-	    try {
-	        String volunteerId = currentUserId(request.getSession());
-	        List<SupportApplicationVO> myApps = supportService.listMyApplications(volunteerId); // 아직 미구현이어도 OK
-	        mv.addObject("applications", myApps);
-	        mv.addObject("debug", "service OK (size=" + (myApps != null ? myApps.size() : 0) + ")");
-	    } catch (Exception e) {
-	        // 서비스/매퍼 미구현이어도 JSP는 열리도록 빈 리스트 + 디버그 메시지 전달
-	        mv.addObject("applications", Collections.emptyList());
-	        mv.addObject("debug", "service ERROR: " + e.getClass().getSimpleName());
-	    }
-
-	    return mv;
+	public ModelAndView myApplications(HttpServletRequest request) {
+		String me = currentUserId(request.getSession());
+		ModelAndView mv = new ModelAndView("support/myApplications");
+		List<SupportApplicationVO> list = (me != null) ? supportService.listMyApplications(me)
+				: java.util.Collections.<SupportApplicationVO>emptyList();
+		mv.addObject("applications", list);
+		return mv;
 	}
 
-	@Override
+	// [POST] 선정(글 작성자용 — 권한 체크는 JSP에서 작성자만 버튼 보이도록 처리)
+	@RequestMapping(value = "/select.do", method = RequestMethod.POST)
+	public String select(@RequestParam long applicationId, @RequestParam int articleNO, RedirectAttributes rttr) {
+		supportService.select(applicationId);
+		rttr.addFlashAttribute("msg", "지원자를 선정했습니다.");
+		return "redirect:/board/viewArticle.do?articleNO=" + articleNO;
+	}
+
+	// [POST] 거절
+	@RequestMapping(value = "/reject.do", method = RequestMethod.POST)
+	public String reject(@RequestParam long applicationId, @RequestParam int articleNO, RedirectAttributes rttr) {
+		supportService.reject(applicationId);
+		rttr.addFlashAttribute("msg", "지원을 거절했습니다.");
+		return "redirect:/board/viewArticle.do?articleNO=" + articleNO;
+	}
+
+	// [POST] 철회(지원자 본인)
+	@RequestMapping(value = "/withdraw.do", method = RequestMethod.POST)
+	public String withdraw(@RequestParam long applicationId, @RequestParam int articleNO, RedirectAttributes rttr) {
+		supportService.withdraw(applicationId);
+		rttr.addFlashAttribute("msg", "지원 신청을 취소했습니다.");
+		return "redirect:/board/viewArticle.do?articleNO=" + articleNO;
+	}
+
+	// 지원자 목록 페이지
+	@RequestMapping(value = "/applicants.do", method = RequestMethod.GET)
+	public ModelAndView applicants(@RequestParam(value = "articleNO", required = false) Integer articleNO) {
+
+		List<SupportApplicationVO> applications = (articleNO != null) ? supportService.listByArticle(articleNO)
+				: Collections.<SupportApplicationVO>emptyList();
+		if (applications == null)
+			applications = Collections.<SupportApplicationVO>emptyList();
+
+		ModelAndView mv = new ModelAndView("support/applicants");
+		mv.addObject("applications", applications);
+		mv.addObject("articleNO", articleNO);
+		mv.addObject("hasParam", articleNO != null);
+		return mv;
+	}
+
+	// 요청 내역 페이지
 	@RequestMapping(value = "/myRequests.do", method = RequestMethod.GET)
-	public ModelAndView myRequests(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	    String requesterId = currentUserId(request.getSession());
-	    // 서비스에서 요청 글 목록을 가져오는 메서드를 호출해야 합니다.
-	    // List<BoardArticleVO> myReqs = supportService.listMyRequests(requesterId); 
-
-	    ModelAndView mv = new ModelAndView("support/myRequests");
-	    // mv.addObject("requests", myReqs);
-
-	    return mv;
+	public ModelAndView myRequests(HttpServletRequest request) {
+		List<ArticleVO> requests = Collections.<ArticleVO>emptyList(); // 더미 렌더링
+		ModelAndView mv = new ModelAndView("support/myRequests"); // Tiles 이름 or JSP 논리명
+		mv.addObject("requests", requests);
+		mv.addObject("me", null);
+		return mv;
 	}
 }

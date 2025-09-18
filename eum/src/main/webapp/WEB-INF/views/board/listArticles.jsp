@@ -1,95 +1,119 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
-<%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"  %>
-<%@ taglib prefix="fn"  uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
-<!-- 분리된 CSS/JS -->
 <link rel="stylesheet" href="<c:url value='/resources/css/board.css'/>" />
 <script defer src="<c:url value='/resources/js/board.js'/>"></script>
 
-<!-- Tiles 레이아웃이 <html>/<head>/<body>를 감쌉니다. 본문만 작성 -->
-<section id="main" class="board" aria-labelledby="boardTitle">
-  <header class="board-header">
-    <div>
-      <h1 id="boardTitle" class="board-title">도움 매칭 게시판</h1>
-      <p class="desc">요청 글 목록입니다. 제목을 클릭하면 상세 보기로 이동합니다.</p>
-    </div>
+<!--
+  기대하는 Model 속성
+  - list : List<ArticleVO> — 필터 결과 목록
+  - p    : Map<String,Object> — 선택 필터(값 유지용: p.svcType, p.region, p.urgency, p.q)
+-->
 
-    <!-- 간단 필터/액션 (서버연동 전, 기본 버튼만 동작) -->
-    <div class="toolbar" aria-label="검색 및 액션">
-      <div class="filters">
-        <label class="field" aria-label="검색어">
-          🔎
-          <input id="search" type="search" placeholder="제목, 작성자 검색" autocomplete="off" />
-        </label>
-      </div>
-      <div class="cta">
-        <button class="btn ghost" id="resetBtn" type="button">초기화</button>
-        <a class="btn primary" href="<c:url value='/board/articleForm.do'/>">글쓰기</a>
-      </div>
-    </div>
-  </header>
+<div class="board-list">
 
-  <div class="table-wrap">
-    <table aria-describedby="desc-req">
-      <caption id="desc-req" class="sr-only" style="position:absolute;left:-9999px;">도움 요청 목록</caption>
-      <thead>
-        <tr>
-          <th scope="col">번호</th>
-          <th scope="col">제목</th>
-          <th scope="col">작성자</th>
-          <th scope="col">작성일</th>
-          <th scope="col">도와주기</th>
-          <!-- <th scope="col">액션</th> -->
-        </tr>
-      </thead>
-      <tbody id="tbody-req">
-        <c:choose>
-          <c:when test="${not empty articlesList}">
-            <c:forEach var="a" items="${articlesList}">
-              <tr>
-                <td data-label="번호"><c:out value="${a.articleNO}"/></td>
-                <td data-label="제목" style="text-align:left">
-                  <a class="row-link"
-                     href="<c:url value='/board/viewArticle.do'><c:param name='articleNO' value='${a.articleNO}'/></c:url>">
-                    <c:out value="${a.title}"/>
-                  </a>
-                </td>
-                <td data-label="작성자"><c:out value="${a.id}"/></td>
-                <td data-label="작성일">
-                  <c:choose>
-                    <c:when test="${not empty a.writeDate}">
-                      <fmt:formatDate value="${a.writeDate}" pattern="yyyy-MM-dd HH:mm"/>
-                    </c:when>
-                    <c:otherwise>-</c:otherwise>
-                  </c:choose>
-                </td>
-                <td data-label="액션">
-                  <div class="row-actions">
-                    <a class="btn primary" style="padding:8px 12px"
-                       href="<c:url value='/board/viewArticle.do'><c:param name='articleNO' value='${a.articleNO}'/></c:url>">상세</a>
-                  </div>
-               <%--  <td data-label="이미지">
-                  <c:choose>
-                    <c:when test="${not empty a.imageFileName}">첨부</c:when>
-                    <c:otherwise>-</c:otherwise>
-                  </c:choose>
-                </td> --%>
-                </td>
-              </tr>
-            </c:forEach>
-          </c:when>
-          <c:otherwise>
-            <tr>
-              <td colspan="6" style="padding:22px">등록된 글이 없습니다.</td>
-            </tr>
-          </c:otherwise>
-        </c:choose>
-      </tbody>
-    </table>
-  </div>
+	<!-- ===== 필터 폼 ===== -->
+	<form method="get" action="<c:url value='/board/listArticles.do'/>"
+		class="filters">
 
-  <!-- (선택) 페이징 자리 -->
-  <nav class="pagination" id="pagination-req" aria-label="페이지"></nav>
-</section>
+		<!-- 유형 -->
+		<label class="sr-only" for="svcType">유형</label> <select name="svcType"
+			id="svcType">
+			<option value="">유형 전체</option>
+			<option value="동행" <c:if test="${p.svcType=='동행'}">selected</c:if>>동행</option>
+			<option value="장보기" <c:if test="${p.svcType=='장보기'}">selected</c:if>>장보기</option>
+			<option value="산책/보행"
+				<c:if test="${p.svcType=='산책/보행'}">selected</c:if>>산책/보행</option>
+			<option value="말벗" <c:if test="${p.svcType=='말벗'}">selected</c:if>>말벗</option>
+			<option value="정리정돈"
+				<c:if test="${p.svcType=='정리정돈'}">selected</c:if>>정리정돈</option>
+			<option value="기타" <c:if test="${p.svcType=='기타'}">selected</c:if>>기타</option>
+		</select>
+
+		<!-- 지역 -->
+		<label class="sr-only" for="region">지역</label> <select name="region"
+			id="region">
+			<option value="">지역 전체</option>
+			<option value="서울" <c:if test="${p.region=='서울'}">selected</c:if>>서울</option>
+			<option value="대전 동구"
+				<c:if test="${p.region=='대전 동구'}">selected</c:if>>대전 동구</option>
+			<option value="대전 중구"
+				<c:if test="${p.region=='대전 중구'}">selected</c:if>>대전 중구</option>
+			<option value="대전 서구"
+				<c:if test="${p.region=='대전 서구'}">selected</c:if>>대전 서구</option>
+			<option value="대전 유성구"
+				<c:if test="${p.region=='대전 유성구'}">selected</c:if>>대전 유성구</option>
+			<option value="대전 대덕구"
+				<c:if test="${p.region=='대전 대덕구'}">selected</c:if>>대전 대덕구</option>
+		</select>
+
+		<!-- 긴급도 -->
+		<label class="sr-only" for="urgency">긴급도</label> <select
+			name="urgency" id="urgency">
+			<option value="">긴급 전체</option>
+			<option value="일반" <c:if test="${p.urgency=='일반'}">selected</c:if>>일반</option>
+			<option value="긴급" <c:if test="${p.urgency=='긴급'}">selected</c:if>>긴급</option>
+		</select>
+
+		<!-- 검색어 -->
+		<label class="sr-only" for="q">검색어</label> <input type="text" id="q"
+			name="q" value="${p.q}" placeholder="제목/내용 검색" />
+
+		<button class="btn primary">검색</button>
+		<!-- 초기화 버튼(필요시) -->
+		<a class="btn" href="<c:url value='/board/listArticles.do'/>">초기화</a>
+	</form>
+
+	<hr />
+
+	<!-- ===== 목록 렌더 ===== -->
+	<c:choose>
+		<c:when test="${empty list}">
+			<p class="muted">표시할 게시글이 없습니다.</p>
+		</c:when>
+		<c:otherwise>
+			<ul class="articles">
+				<c:forEach var="a" items="${list}" varStatus="st">
+					<li class="item">
+						<!-- 공지 배지 --> <c:if test="${a.isNotice}">
+							<span class="badge">공지</span>
+						</c:if> <!-- 제목: 상세 링크 --> <a class="title"
+						href="<c:url value='/board/viewArticle.do'>
+                        <c:param name='articleNO' value='${a.articleNO}'/>
+                    </c:url>">
+							<c:out value="${a.title}" />
+					</a> <!-- 메타: 유형/지역/요청시각/긴급/포인트/작성일 -->
+						<div class="meta">
+							<c:if test="${not empty a.svcType}">
+								<span class="chip">유형: <c:out value="${a.svcType}" /></span>
+							</c:if>
+							<c:if test="${not empty a.region}">
+								<span class="chip">지역: <c:out value="${a.region}" /></span>
+							</c:if>
+							<c:if test="${not empty a.reqAt}">
+								<span class="chip"> 요청시각: <fmt:formatDate
+										value="${a.reqAt}" pattern="MM/dd HH:mm" />
+								</span>
+							</c:if>
+							<c:if test="${not empty a.urgency}">
+								<span class="chip">긴급도: <c:out value="${a.urgency}" /></span>
+							</c:if>
+							<c:if test="${a.points ne null}">
+								<span class="chip">포인트: <c:out value="${a.points}" />P
+								</span>
+							</c:if>
+							<span class="time"> <fmt:formatDate value="${a.writeDate}"
+									pattern="yyyy-MM-dd" />
+							</span>
+						</div>
+
+					</li>
+				</c:forEach>
+			</ul>
+		</c:otherwise>
+	</c:choose>
+	<a href="<c:url value='/board/articleForm.do'/>" class="btn primary">글쓰기</a>
+</div>
+

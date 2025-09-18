@@ -22,7 +22,4 @@ public interface BoardService {
     void modArticle(ArticleVO article) throws Exception;
 
     void removeArticle(Integer articleNO) throws Exception;
-
-    // (선택) 향후 VO 기반 수정으로 전환하고 싶다면 아래 시그니처 추가:
-    // void modArticle(ArticleVO article) throws Exception;
 }

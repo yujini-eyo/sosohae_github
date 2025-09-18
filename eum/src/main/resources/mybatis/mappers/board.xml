@@ -4,70 +4,91 @@
 
 <mapper namespace="mapper.board">
 
-  <!-- ArticleVO 매핑 (DB: camelCase + is_notice만 스네이크) -->
-  <resultMap id="ArticleMap" type="articleVO">
-    <id     property="articleNO"     column="articleNO"/>
-    <result property="parentNO"      column="parentNO"/>
-    <result property="id"            column="id"/>
-    <result property="title"         column="title"/>
-    <result property="content"       column="content"/>
-    <result property="imageFileName" column="imageFileName"/>
-    <result property="isNotice"      column="is_notice"/>
-    <result property="writeDate"     column="writeDate"/>
-    <result property="svcType"       column="svc_type"/>
-    <result property="region"        column="region"/>
-    <result property="reqAt"         column="req_at"/>
-    <result property="urgency"       column="urgency"/>
-    <result property="points"        column="points"/>
-  </resultMap>
+	<!-- ArticleVO 매핑 (DB: camelCase + is_notice만 스네이크) -->
+	<resultMap id="ArticleMap" type="articleVO">
+		<id property="articleNO" column="articleNO" />
+		<result property="parentNO" column="parentNO" />
+		<result property="id" column="id" />
+		<result property="title" column="title" />
+		<result property="content" column="content" />
+		<result property="imageFileName" column="imageFileName" />
+		<result property="isNotice" column="is_notice" />
+		<result property="writeDate" column="writeDate" />
+		<result property="svcType" column="svc_type" />
+		<result property="region" column="region" />
+		<result property="reqAt" column="req_at" />
+		<result property="urgency" column="urgency" />
+		<result property="points" column="points" />
+	</resultMap>
 
-  <!-- 목록 -->
-  <select id="selectAllArticlesList" resultMap="ArticleMap">
-    SELECT
-      articleNO, parentNO, id, title, content, imageFileName,
-      is_notice, writeDate, svc_type, region, req_at, urgency, points
-    FROM board_article
-    ORDER BY is_notice DESC, articleNO DESC
-  </select>
+	<!-- 목록 -->
+	<select id="selectAllArticlesList" resultMap="ArticleMap">
+		SELECT
+		articleNO, parentNO, id, title, content, imageFileName,
+		is_notice, writeDate, svc_type, region, req_at, urgency, points
+		FROM board_article
+		ORDER BY is_notice DESC, articleNO DESC
+	</select>
 
-  <!-- 단건 -->
-  <select id="selectArticle" parameterType="int" resultMap="ArticleMap">
-    SELECT
-      articleNO, parentNO, id, title, content, imageFileName,
-      is_notice, writeDate, svc_type, region, req_at, urgency, points
-    FROM board_article
-    WHERE articleNO = #{value}
-  </select>
+	<!-- selectArticlesFiltered: 유형/지역/긴급/검색어에 따라 목록을 필터링 -->
+	<select id="selectArticlesFiltered" parameterType="map"
+		resultMap="ArticleMap">
+		SELECT
+		articleNO, parentNO, id, title, content, imageFileName,
+		is_notice, writeDate, svc_type, region, req_at, urgency, points
+		FROM board_article
+		<where>
+			<if test="svcType != null and svcType != ''"> AND svc_type = #{svcType}</if>
+			<if test="region  != null and region  != ''"> AND region = #{region}</if>
+			<if test="urgency != null and urgency != ''"> AND urgency = #{urgency}</if>
+			<if test="q != null and q != ''">
+				AND (title LIKE CONCAT('%',#{q},'%') OR content LIKE
+				CONCAT('%',#{q},'%'))
+			</if>
+		</where>
+		ORDER BY is_notice DESC, articleNO DESC
+	</select>
 
-  <!-- 등록 (카멜 컬럼 사용, PK 반환) -->
-  <insert id="insertNewArticle" parameterType="articleVO"
-          useGeneratedKeys="true" keyProperty="articleNO" keyColumn="articleNO">
-    INSERT INTO board_article
-      (parentNO, id, title, content, writeDate,
-       imageFileName, is_notice, svc_type, region, req_at, urgency, points)
-    VALUES
-      (#{parentNO}, #{id}, #{title}, #{content}, NOW(),
-       #{imageFileName}, #{isNotice}, #{svcType}, #{region}, #{reqAt}, #{urgency}, #{points})
-  </insert>
 
-  <!-- 수정 -->
-  <update id="updateArticle" parameterType="articleVO">
-    UPDATE board_article
-    SET
-      title         = #{title},
-      content       = #{content},
-      imageFileName = #{imageFileName},
-      is_notice     = #{isNotice},
-      svc_type      = #{svcType},
-      region        = #{region},
-      req_at        = #{reqAt},
-      urgency       = #{urgency},
-      points        = #{points}
-    WHERE articleNO = #{articleNO}
-  </update>
+	<!-- 단건 -->
+	<select id="selectArticle" parameterType="int"
+		resultMap="ArticleMap">
+		SELECT
+		articleNO, parentNO, id, title, content, imageFileName,
+		is_notice, writeDate, svc_type, region, req_at, urgency, points
+		FROM board_article
+		WHERE articleNO = #{value}
+	</select>
 
-  <!-- 삭제 -->
-  <delete id="deleteArticle" parameterType="int">
-    DELETE FROM board_article WHERE articleNO = #{value}
-  </delete>
+	<!-- 등록 (카멜 컬럼 사용, PK 반환) -->
+	<insert id="insertNewArticle" parameterType="articleVO"
+		useGeneratedKeys="true" keyProperty="articleNO" keyColumn="articleNO">
+		INSERT INTO board_article
+		(parentNO, id, title, content, writeDate,
+		imageFileName, is_notice, svc_type, region, req_at, urgency, points)
+		VALUES
+		(#{parentNO}, #{id}, #{title}, #{content}, NOW(),
+		#{imageFileName}, #{isNotice}, #{svcType}, #{region}, #{reqAt}, #{urgency}, #{points})
+	</insert>
+
+	<!-- 수정 -->
+	<update id="updateArticle" parameterType="articleVO">
+		UPDATE board_article
+		SET
+		title = #{title},
+		content = #{content},
+		imageFileName = #{imageFileName},
+		is_notice = #{isNotice},
+		svc_type = #{svcType},
+		region = #{region},
+		req_at = #{reqAt},
+		urgency = #{urgency},
+		points = #{points}
+		WHERE articleNO = #{articleNO}
+	</update>
+
+	<!-- 삭제 -->
+	<delete id="deleteArticle" parameterType="int">
+		DELETE FROM board_article WHERE articleNO = #{value}
+	</delete>
 </mapper>

@@ -12,7 +12,7 @@
 
   <%-- 데이터가 없을 때의 메시지 --%>
   <c:if test="${empty applicants}">
-    <p class="alert danger">아직 지원자가 없습니다.</p>
+    <!-- <p class="alert danger">아직 지원자가 없습니다.</p> 더미데이터 지울 때 주석 풀어주기 -->
   </c:if>
 
   <%--
