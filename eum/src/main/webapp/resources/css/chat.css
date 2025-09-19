@@ -511,3 +511,15 @@
 
 #sheetHandle{ cursor: ns-resize; touch-action:none; }
 #chatSheet.is-dragging{ transition: none !important; }
+
+/* 지도 요소를 부모(#mapCanvasDesktop / .mobile-map) 안에서 꽉 채우기 */
+#gmapDesk, #gmapMob {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  min-height: 360px;        /* 초기 높이 안전망 */
+}
+
+.map-bg { pointer-events: none; z-index: 0; }
+#gmapDesk, #gmapMob { z-index: 1; }   /* 지도를 위로 */
+
+.map-bg { display: none !important; }

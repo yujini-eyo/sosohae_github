@@ -106,5 +106,5 @@
 
 
 <!-- 이 화면 전용 JS만 defer 로드 -->
-<script src="https://maps.googleapis.com/maps/api/js?key=${googleMapApiKey}" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAIRKiu_xOA8xAM4hegCCF1S2ybwyNBezE&v=weekly" async defer></script>
 <script defer src="<c:url value='/resources/js/chat.v2.js'/>"></script>
