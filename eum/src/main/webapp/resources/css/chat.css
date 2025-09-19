@@ -412,3 +412,102 @@
 #chatApp.chat-page .sheet .content {
   padding-bottom: calc(var(--input-h) + 12px) !important;
 }
+
+#chatPanelDesk > header,
+#chatSheet > header { display:flex; align-items:center; gap:8px; }
+
+.back-to-list{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:32px; padding:0 10px; border-radius:8px; background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.12); text-decoration:none; color:inherit;
+  font-weight:700;
+}
+/* 헤더 줄 정렬 */
+.chat-head{
+  display:flex; align-items:center; gap:8px;
+}
+
+/* “<” 아이콘 전용 버튼 (텍스트 없음, 밑줄 없음) */
+.back-icon{
+  width:32px; height:32px;
+  display:inline-flex; align-items:center; justify-content:center;
+  text-decoration:none; color:inherit;
+  border-radius:8px; border:1px solid rgba(0,0,0,.06);
+  background:#fff;
+  -webkit-tap-highlight-color: transparent;
+  font-weight:700; font-size:18px;
+}
+
+/* 아이콘 그리기: 텍스트를 쓰지 않고 pseudo로만 표시 */
+.back-icon::before{
+  content:"‹";               /* 원하면 "←"로 바꿔도 됨 */
+  line-height:1;
+}
+
+.back-icon:hover{ box-shadow:0 1px 4px rgba(0,0,0,.12); }
+.back-icon:focus{ outline:2px solid #FFB88A; outline-offset:2px; }
+
+/* 채팅 화면의 패널 헤더 밑줄 제거 */
+#chatView .panel > header { border-bottom: 0 !important; background: transparent; }
+
+/* (안전) 백 아이콘은 절대 밑줄 나오지 않게 */
+#chatView .back-icon,
+#chatView .back-icon:hover,
+#chatView .back-icon:focus { text-decoration: none !important; }
+
+/* (혹시 들어갔다면) 헤더 바로 아래 hr 숨기기 */
+#chatView .panel hr { display: none; }
+
+/* === Chat 화면: 헤더 밑줄(보더/장식) 전부 OFF === */
+#chatApp.chat-page .desktop-split .panel > header,
+#chatApp.chat-page .sheet > header {
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+#chatApp.chat-page .desktop-split .panel > header::after,
+#chatApp.chat-page .sheet > header::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* === Chat 화면: a 태그 밑줄 전부 OFF(호버 포함) === */
+#chatApp.chat-page a,
+#chatApp.chat-page a:hover,
+#chatApp.chat-page a:focus {
+  text-decoration: none !important;
+  border-bottom: 0 !important;
+}
+
+/* (옵션) 목록으로 돌아가기 버튼에도 확실히 적용 */
+#chatView .back-to-list,
+#chatView .back-to-list:hover,
+#chatView .back-to-list:focus {
+  text-decoration: none !important;
+  border: 0 !important;
+}
+
+/* 바텀시트 드래그용 변수/기본 상태 */
+#chatSheet{
+  position: fixed;           /* 지도 위에 고정 */
+  left: 0; right: 0; bottom: 0;
+  /* 높이는 최대 90vh로 제한하고, 실제 보이는 높이는 translateY로 제어 */
+  max-height: 90vh;
+  transform: translateY(var(--sheet-offset, 60vh)); /* 처음엔 40vh만 보이도록 (= 60vh 내려감) */
+  will-change: transform;
+  transform: translateY(var(--sheet-offset, 60vh)) !important;
+}
+
+/* 손잡이(—)는 드래그 가능한 커서 표시 */
+#sheetHandle{
+  cursor: ns-resize;
+  touch-action: none; /* 터치 스크롤 대신 드래그 인식 */
+}
+
+/* 드래그 중에는 부드럽게 따라오게 애니메이션 제거 */
+#chatSheet.is-dragging{
+  transition: none;
+}
+
+#sheetHandle{ cursor: ns-resize; touch-action:none; }
+#chatSheet.is-dragging{ transition: none !important; }

@@ -31,6 +31,14 @@
 		class="org.mybatis.spring.SqlSessionTemplate">
 		<constructor-arg index="0" ref="sqlSessionFactory"></constructor-arg>
 	</bean>
+	
+	<!-- MyBatis 매퍼 인터페이스 자동 스캔 (ChatPollMapper 생성) -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+    	<!-- ChatPollMapper 가 존재하는 패키지 경로 -->
+    	<property name="basePackage" value="com.myspring.eum.chat.poll"/>
+    	<!-- 위에서 선언한 SqlSessionFactory 빈 이름과 일치해야 함 -->
+    	<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+	</bean>
 
 
 	<!-- <bean id="memberDAO"

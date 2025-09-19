@@ -5,11 +5,16 @@
 <tiles-definitions>
 
   <!-- baseLayout 는 tiles_main.xml 등에 이미 있음(레이아웃 JSP) -->
-  <definition name="/chat/chat" extends="baseLayout">
+  <definition name="chat/chat" extends="baseLayout">
     <put-attribute name="title" value="채팅방" />
     <!-- chat.jsp 위치를 너가 만든 경로와 일치시켜야 함 -->
     <put-attribute name="body" value="/WEB-INF/views/chat/chat.jsp" />
     <!-- header/footer가 baseLayout에서 이미 넣는 구조면 여기선 생략 -->
   </definition>
+  
+<definition name="chat/list" extends="baseLayout">
+  <put-attribute name="title" value="채팅 목록"/>
+  <put-attribute name="body"  value="/WEB-INF/views/chat/chat_list.jsp"/>
+</definition>
 
 </tiles-definitions>

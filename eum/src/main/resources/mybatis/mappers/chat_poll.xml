@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myspring.eum.chat.poll.ChatPollMapper">
+
+  <resultMap id="ChatRowMap" type="com.myspring.eum.chat.poll.ChatRow">
+    <id     column="msg_id"   property="msgId"/>
+    <result column="room_id"  property="roomId"/>
+    <result column="sender_id" property="senderId"/>
+    <result column="body"     property="body"/>
+    <result column="sent_at"  property="sentAt"/>
+  </resultMap>
+
+  <insert id="insertMessage"
+          parameterType="com.myspring.eum.chat.poll.ChatRow"
+          useGeneratedKeys="true" keyProperty="msgId" keyColumn="msg_id">
+    INSERT INTO chat_message (room_id, sender_id, body, sent_at)
+    VALUES (#{roomId}, #{senderId}, #{body}, NOW())
+  </insert>
+
+  <select id="listAfterId" resultMap="ChatRowMap">
+    SELECT msg_id, room_id, sender_id, body, sent_at
+    FROM chat_message
+    WHERE room_id = #{roomId}
+      AND msg_id  > #{afterId}
+    ORDER BY msg_id ASC
+    LIMIT 100
+  </select>
+
+  <select id="existsRoomMember" resultType="int">
+    SELECT COUNT(*) FROM chat_room_member
+    WHERE room_id = #{roomId} AND member_id = #{memberId}
+  </select>
+  
+    <!-- ✅ 내 채팅방 목록 -->
+<select id="listMyRooms" parameterType="string" resultType="map">
+  <![CDATA[
+  SELECT
+    r.room_id AS roomId,
+
+    CAST(r.type AS CHAR CHARACTER SET utf8mb4) AS type,
+
+    (
+      SELECT CAST(crm2.member_id AS CHAR CHARACTER SET utf8mb4)
+      FROM chat_room_member crm2
+      WHERE crm2.room_id = r.room_id
+        AND crm2.member_id != #{memberId}
+      LIMIT 1
+    ) AS partnerId,
+
+    /* 상대 표시 이름: nickname > name > id */
+    CAST((
+      SELECT COALESCE(u.nickname, u.name, u.id)
+      FROM chat_room_member crm3
+      JOIN member u ON u.id = crm3.member_id
+      WHERE crm3.room_id = r.room_id
+        AND crm3.member_id != #{memberId}
+      LIMIT 1
+    ) AS CHAR CHARACTER SET utf8mb4) AS partnerName,
+
+    COALESCE(MAX(m.sent_at), r.created_at) AS lastAt,
+
+    CAST((
+      SELECT body
+      FROM chat_message
+      WHERE room_id = r.room_id
+      ORDER BY msg_id DESC
+      LIMIT 1
+    ) AS CHAR CHARACTER SET utf8mb4) AS lastMsg
+
+  FROM chat_room r
+  JOIN chat_room_member crm ON crm.room_id = r.room_id
+  LEFT JOIN chat_message m   ON m.room_id   = r.room_id
+  WHERE crm.member_id = #{memberId}
+  GROUP BY r.room_id, r.type
+  ORDER BY lastAt DESC
+  ]]>
+</select>
+
+<!-- 두 사람 사이 DIRECT 방 찾기 -->
+<select id="findDirectRoomBetween" parameterType="map" resultType="long">
+  SELECT r.room_id
+  FROM chat_room r
+  JOIN chat_room_member m1 ON m1.room_id=r.room_id AND m1.member_id=#{a}
+  JOIN chat_room_member m2 ON m2.room_id=r.room_id AND m2.member_id=#{b}
+  WHERE r.type='DIRECT'
+  LIMIT 1
+</select>
+
+<!-- DIRECT 방 생성 (자동증가 키 roomId 회수) -->
+<insert id="insertDirectRoom" parameterType="map"
+        useGeneratedKeys="true" keyProperty="roomId" keyColumn="room_id">
+  INSERT INTO chat_room(type, created_at) VALUES('DIRECT', NOW())
+</insert>
+
+<!-- 멤버 추가 (중복이면 무시) -->
+<insert id="insertRoomMember" parameterType="map">
+  INSERT IGNORE INTO chat_room_member(room_id, member_id, joined_at)
+  VALUES(#{roomId}, #{memberId}, NOW())
+</insert>
+
+</mapper>

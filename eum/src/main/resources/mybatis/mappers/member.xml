@@ -17,6 +17,7 @@
     <result property="code"      column="code"/>
     <result property="notes"     column="notes"/>
     <result property="createdAt" column="created_at"/>
+    <result property="nickname"	 column="nickname"/>
 
     <!-- ★ 프로필 이미지 매핑 추가 -->
     <result property="profileImage"      column="profile_image"/>

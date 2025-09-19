@@ -47,7 +47,7 @@ public class MemberDAOImpl implements MemberDAO {
 
 	  @Override
 	  public int verifyPassword(String id, String password) throws DataAccessException {
-	    Map<String,Object> p = new HashMap<>();
+	    Map<String,Object> p = new HashMap<String,Object>();
 	    p.put("id", id);
 	    p.put("password", password); // 운영에선 해시 비교 권장
 	    Integer cnt = sqlSession.selectOne(NS + "verifyPassword", p);
@@ -56,7 +56,7 @@ public class MemberDAOImpl implements MemberDAO {
 
 	  @Override
 	  public int changePassword(String id, String newPassword) throws DataAccessException {
-	    Map<String,Object> p = new HashMap<>();
+	    Map<String,Object> p = new HashMap<String,Object>();
 	    p.put("id", id);
 	    p.put("password", newPassword); // 운영에선 해시 후 저장
 	    return sqlSession.update(NS + "updatePassword", p);

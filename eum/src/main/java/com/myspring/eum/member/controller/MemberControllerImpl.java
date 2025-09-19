@@ -108,7 +108,7 @@ public class MemberControllerImpl implements MemberController {
         }
         model.addAttribute("member", login);
 
-        Map<String, Object> ps = new HashMap<>();
+        Map<String, Object> ps = new HashMap<String, Object>();
         ps.put("current", 0); ps.put("monthGain", 0); ps.put("monthSpend", 0);
         ps.put("totalGain", 0); ps.put("totalSpend", 0); ps.put("totalHours", 0);
         ps.put("tier","나무"); ps.put("nextNeeded", 0); ps.put("goalTarget", 5); ps.put("goalNow", 0);
@@ -129,7 +129,7 @@ public class MemberControllerImpl implements MemberController {
         }
         model.addAttribute("member", login);
 
-        Map<String, Object> ps = new HashMap<>();
+        Map<String, Object> ps = new HashMap<String, Object>();
         ps.put("current", 0); ps.put("monthGain", 0); ps.put("monthSpend", 0);
         ps.put("totalGain", 0); ps.put("totalSpend", 0); ps.put("totalHours", 0);
         ps.put("tier","나무"); ps.put("nextNeeded", 1000); ps.put("goalTarget", 5); ps.put("goalNow", 0);

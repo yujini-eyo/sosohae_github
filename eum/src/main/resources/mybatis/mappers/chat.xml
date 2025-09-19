@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chat">
+
+  <!-- 내 방 목록: 로그인 사용자가 참여중인 방 + 마지막 메시지/시간 -->
+<select id="selectRoomsByMember" parameterType="map" resultType="map">
+    SELECT
+      r.room_id AS roomId,
+      COALESCE((
+        SELECT m2.name
+        FROM chat_room_member rm2
+        JOIN member m2 ON m2.id = rm2.member_id
+        WHERE rm2.room_id = r.room_id AND rm2.member_id != rm.member_id
+        LIMIT 1
+      ), '대화상대') AS name,
+      COALESCE((
+        SELECT body
+        FROM chat_message
+        WHERE room_id = r.room_id
+        ORDER BY sent_at DESC
+        LIMIT 1
+      ), '') AS lastMessage,
+      COALESCE((
+        SELECT UNIX_TIMESTAMP(sent_at) * 1000
+        FROM chat_message
+        WHERE room_id = r.room_id
+        ORDER BY sent_at DESC
+        LIMIT 1
+      ), UNIX_TIMESTAMP(r.created_at) * 1000) AS lastTs,
+      0 AS unread, 0 AS pinned, 0 AS online, 0 AS isRequest
+    FROM chat_room r
+    JOIN chat_room_member rm ON rm.room_id = r.room_id
+    WHERE rm.member_id = #{memberId}
+    ORDER BY lastTs DESC
+
+</select>
+
+  <!-- 두 회원이 함께 있는 DIRECT 방 찾기 -->
+  <select id="selectDirectRoomId" parameterType="map" resultType="long">
+    <![CDATA[
+    SELECT r.room_id
+    FROM chat_room r
+    JOIN chat_room_member rm1 ON rm1.room_id = r.room_id AND rm1.member_id = #{a}
+    JOIN chat_room_member rm2 ON rm2.room_id = r.room_id AND rm2.member_id = #{b}
+    WHERE r.type = 'DIRECT'
+    GROUP BY r.room_id
+    HAVING COUNT(*) = 2
+    LIMIT 1
+    ]]>
+  </select>
+
+  <!-- DIRECT 방 생성 (자동 키 반영: roomId) -->
+  <insert id="insertRoomDirect" parameterType="map" useGeneratedKeys="true" keyProperty="roomId">
+    <![CDATA[
+    INSERT INTO chat_room (type) VALUES ('DIRECT')
+    ]]>
+  </insert>
+
+  <!-- 방-회원 매핑 추가 (중복시 무시) -->
+  <insert id="insertRoomMember" parameterType="map">
+    <![CDATA[
+    INSERT IGNORE INTO chat_room_member (room_id, member_id)
+    VALUES (#{roomId}, #{memberId})
+    ]]>
+  </insert>
+
+  <!-- 메시지 저장 -->
+  <insert id="insertMessage" parameterType="map">
+    <![CDATA[
+    INSERT INTO chat_message (room_id, sender_id, body)
+    VALUES (#{roomId}, #{senderId}, #{body})
+    ]]>
+  </insert>
+
+  <!-- 메시지 목록 (오래된 것 → 최신 순) 페이징 -->
+  <select id="selectMessages" parameterType="map" resultType="map">
+    <![CDATA[
+    SELECT
+      msg_id    AS msgId,
+      room_id   AS roomId,
+      sender_id AS senderId,
+      body,
+      UNIX_TIMESTAMP(sent_at) * 1000 AS sentAt
+    FROM chat_message
+    WHERE room_id = #{roomId}
+    ORDER BY msg_id ASC
+    LIMIT #{size} OFFSET #{offset}
+    ]]>
+  </select>
+  
+  
+
+</mapper>

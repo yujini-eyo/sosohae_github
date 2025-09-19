@@ -13,11 +13,14 @@
          aria-label="채팅">
 
   <!-- 이 화면 전용 래퍼 (#chatApp) + 데이터 전달 -->
-  <div id="chatApp"
-       class="chat-page"
-       data-base="${contextPath}"
-       data-room="${empty param.room ? 'global' : param.room}">
-
+<div id="chatApp"
+     class="chat-page"
+     data-base="${contextPath}"
+     data-room="${param.room}"
+     data-sender="${not empty sessionScope.member.id ? sessionScope.member.id
+                   : (empty param.sender ? 'guest' : param.sender)}">
+                   
+    
     <!-- 전역 .main 과 충돌 피하려고 .chat-body 사용 -->
     <div class="chat-body">
 
@@ -25,7 +28,11 @@
       <section class="desktop-split" id="desktopSplit" aria-label="데스크톱 채팅/지도">
         <!-- 채팅 -->
         <article class="panel" id="chatPanelDesk" aria-label="채팅창">
-          <header>💬 짝꿍 이음이와 대화</header>
+          <header>
+          	<a href="${pageContext.request.contextPath}/chat/list"
+          		class="back-to-list" aria-label="채팅 목록으로">← 목록</a>
+          	<span>00 랑 대화</span>
+          </header>
           <div class="body">
             <div id="chatBoxDesk">
               <div class="msg other">안녕하세요! 무엇을 도와드릴까요?</div>
@@ -46,6 +53,7 @@
           <header>🗺️ 실시간 위치 공유</header>
           <div class="body" style="padding:0;">
             <div id="mapCanvasDesktop">
+              <div id="gmapDesk" class="gmap"></div>
               <div class="map-bg" id="mapBgDesk"></div>
               <div class="zoom-controls">
                 <button id="zoomInDesk"  type="button" aria-label="확대">+</button>
@@ -59,6 +67,7 @@
 
       <!-- 모바일: 전면 지도 + 바텀시트(채팅) -->
       <section class="mobile-map" id="mobileMap" aria-label="모바일 지도">
+        <div id="gmapMob" class="gmap"></div>
         <div class="map-bg" id="mapBgMobile"></div>
         <div class="zoom-controls">
           <button id="zoomInMob"  type="button" aria-label="확대">+</button>
@@ -68,7 +77,11 @@
 
         <div class="sheet" id="chatSheet" aria-label="채팅 시트" aria-expanded="false">
           <div class="handle" id="sheetHandle" aria-label="드래그하여 시트 높이 조절"></div>
-          <header>💬 짝꿍 이음이와 대화</header>
+          <header>
+          	<a href="${pageContext.request.contextPath}/chat/list"
+          		class="back-to-list" aria-label="채팅 목록으로">← 목록</a>
+          	<span>00 랑 대화</span>
+          </header>
 
           <!-- 메시지 스크롤 영역 -->
           <div class="content" id="chatContentMob">
@@ -83,6 +96,7 @@
             <input type="text" id="msgInputMob" placeholder="메시지를 입력하세요..." />
             <button id="sendBtnMob" type="button">전송</button>
           </div>
+          
         </div>
       </section>
 
@@ -90,5 +104,7 @@
   </div><!-- /#chatApp -->
 </section>
 
+
 <!-- 이 화면 전용 JS만 defer 로드 -->
-<script defer src="<c:url value='/resources/js/chat.js'/>"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=${googleMapApiKey}" async defer></script>
+<script defer src="<c:url value='/resources/js/chat.v2.js'/>"></script>

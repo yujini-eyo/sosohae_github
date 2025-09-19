@@ -26,6 +26,7 @@ public class MemberVO {
     private String profileImageType; /** MIME 타입 (image/jpeg | image/png) */
     private Long profileImageSize; /** 파일 크기(byte) */
     private Date profileUpdatedAt;	/** 이미지 최종 갱신 시각(DB: DATETIME) */
+    private String nickname;
 	public String getId() {
 		return id;
 	}
@@ -146,4 +147,11 @@ public class MemberVO {
 	public void setProfileUpdatedAt(Date profileUpdatedAt) {
 		this.profileUpdatedAt = profileUpdatedAt;
 	}
+	public String getNickname() {
+		return nickname;
+	}
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+	
 }
