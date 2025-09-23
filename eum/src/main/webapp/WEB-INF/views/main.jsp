@@ -11,7 +11,7 @@
     <div class="container">
       <h1>🌞 따뜻한 마음이 연결되는 곳</h1>
       <p>작은 도움이 필요한 어르신과, 마음을 나누는 이웃을 이어드립니다.</p>
-      <button class="cta" type="button" data-href="${ctx}/help/write.do">도움 요청하러 가기</button>
+      <button class="cta" type="button" data-href="${ctx}/board/articleForm.do">도움 요청하러 가기</button>
     </div>
   </section>
 
