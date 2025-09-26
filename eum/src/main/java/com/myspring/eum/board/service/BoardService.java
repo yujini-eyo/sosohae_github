@@ -8,6 +8,10 @@ public interface BoardService {
 
     /** 목록 */
     List<ArticleVO> listArticles() throws Exception;
+    // [추가]
+    int countArticles(Map<String, Object> p);
+    List<ArticleVO> selectPagedArticles(Map<String, Object> p, int offset, int size);
+    
 
     /** 등록: 생성된 articleNO 반환 (useGeneratedKeys 기반) */
     int addNewArticle(ArticleVO article) throws Exception;

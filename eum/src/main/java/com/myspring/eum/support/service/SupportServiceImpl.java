@@ -1,65 +1,65 @@
-// SupportServiceImpl.java
-// 역할: 도메인 규칙(중복 금지 등) 적용 + DAO 호출
 package com.myspring.eum.support.service;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import com.myspring.eum.board.vo.ArticleVO;
 import com.myspring.eum.support.dao.SupportDAO;
 import com.myspring.eum.support.vo.SupportApplicationVO;
 
 @Service("supportService")
-@Transactional
 public class SupportServiceImpl implements SupportService {
 
 	@Autowired
 	private SupportDAO supportDAO;
 
 	@Override
-	public long apply(int articleNO, String volunteerId, String message) {
-		// 같은 글에 같은 사람이 두 번 지원하지 못하도록 보호
-		if (supportDAO.exists(articleNO, volunteerId) > 0) {
-			throw new DuplicateKeyException("이미 지원함");
-		}
-		// 신규 지원 엔티티 조립
-		SupportApplicationVO vo = new SupportApplicationVO();
-		vo.setArticleNO(articleNO);
-		vo.setVolunteerId(volunteerId);
-		vo.setStatus("APPLIED"); // 초기 상태
-		vo.setMessage(message);
-		// 저장 후 PK 반환
-		return supportDAO.insert(vo);
+	public List<SupportApplicationVO> listApplicantsByArticle(int articleNo) {
+		List<SupportApplicationVO> list = supportDAO.findApplicantsByArticle(articleNo);
+		return (list != null) ? list : java.util.Collections.<SupportApplicationVO>emptyList();
 	}
 
 	@Override
-	public boolean exists(int articleNO, String volunteerId) {
-		return supportDAO.exists(articleNO, volunteerId) > 0;
+	public List<SupportApplicationVO> listApplicantsToOwner(String ownerId) {
+		List<SupportApplicationVO> list = supportDAO.findApplicantsToOwner(ownerId);
+		return (list != null) ? list : java.util.Collections.<SupportApplicationVO>emptyList();
 	}
 
 	@Override
-	public List<SupportApplicationVO> listByArticle(int articleNO) {
-		return supportDAO.listByArticle(articleNO);
+	public List<ArticleVO> listMyRequests(String writerId) {
+		List<ArticleVO> list = supportDAO.findArticlesByWriter(writerId);
+		return (list != null) ? list : java.util.Collections.<ArticleVO>emptyList();
 	}
 
 	@Override
 	public List<SupportApplicationVO> listMyApplications(String volunteerId) {
-		return supportDAO.findByVolunteerId(volunteerId);
+		List<SupportApplicationVO> list = supportDAO.findByVolunteerId(volunteerId);
+		return (list != null) ? list : java.util.Collections.<SupportApplicationVO>emptyList();
 	}
 
 	@Override
-	public void select(long applicationId) {
-		supportDAO.updateStatus(applicationId, "SELECTED");
+	public void apply(int articleNo, String volunteerId, String message) {
+		// 유효성 정도만 간단 체크
+		if (volunteerId == null || volunteerId.isEmpty()) {
+			throw new IllegalArgumentException("volunteerId is required");
+		}
+		supportDAO.insertApplication(articleNo, volunteerId, message);
 	}
 
 	@Override
-	public void reject(long applicationId) {
-		supportDAO.updateStatus(applicationId, "REJECTED");
+	public boolean exists(Integer articleNo, String volunteerId) {
+		if (articleNo == null || volunteerId == null || volunteerId.isEmpty())
+			return false;
+		return supportDAO.existsApplication(articleNo, volunteerId);
 	}
 
 	@Override
-	public void withdraw(long applicationId) {
-		supportDAO.updateStatus(applicationId, "WITHDRAWN");
+	public List<SupportApplicationVO> listByArticle(Integer articleNo) {
+		if (articleNo == null)
+			return java.util.Collections.<SupportApplicationVO>emptyList();
+		List<SupportApplicationVO> list = supportDAO.findApplicantsByArticle(articleNo);
+		return (list != null) ? list : java.util.Collections.<SupportApplicationVO>emptyList();
 	}
 }

@@ -24,10 +24,13 @@
 	<!-- 목록 -->
 	<select id="selectAllArticlesList" resultMap="ArticleMap">
 		SELECT
-		articleNO, parentNO, id, title, content, imageFileName,
-		is_notice, writeDate, svc_type, region, req_at, urgency, points
+		articleNO,
+		parentNO, id, title, content, imageFileName,
+		is_notice, writeDate,
+		svc_type, region, req_at, urgency, points
 		FROM board_article
-		ORDER BY is_notice DESC, articleNO DESC
+		ORDER BY
+		is_notice DESC, articleNO DESC
 	</select>
 
 	<!-- selectArticlesFiltered: 유형/지역/긴급/검색어에 따라 목록을 필터링 -->
@@ -36,7 +39,8 @@
 		SELECT
 		articleNO, parentNO, id, title, content, imageFileName,
 		is_notice, writeDate, svc_type, region, req_at, urgency, points
-		FROM board_article
+		FROM
+		board_article
 		<where>
 			<if test="svcType != null and svcType != ''"> AND svc_type = #{svcType}</if>
 			<if test="region  != null and region  != ''"> AND region = #{region}</if>
@@ -54,8 +58,10 @@
 	<select id="selectArticle" parameterType="int"
 		resultMap="ArticleMap">
 		SELECT
-		articleNO, parentNO, id, title, content, imageFileName,
-		is_notice, writeDate, svc_type, region, req_at, urgency, points
+		articleNO, parentNO, id, title, content,
+		imageFileName,
+		is_notice, writeDate, svc_type, region, req_at, urgency,
+		points
 		FROM board_article
 		WHERE articleNO = #{value}
 	</select>
@@ -63,12 +69,15 @@
 	<!-- 등록 (카멜 컬럼 사용, PK 반환) -->
 	<insert id="insertNewArticle" parameterType="articleVO"
 		useGeneratedKeys="true" keyProperty="articleNO" keyColumn="articleNO">
-		INSERT INTO board_article
+		INSERT INTO
+		board_article
 		(parentNO, id, title, content, writeDate,
-		imageFileName, is_notice, svc_type, region, req_at, urgency, points)
+		imageFileName,
+		is_notice, svc_type, region, req_at, urgency, points)
 		VALUES
 		(#{parentNO}, #{id}, #{title}, #{content}, NOW(),
-		#{imageFileName}, #{isNotice}, #{svcType}, #{region}, #{reqAt}, #{urgency}, #{points})
+		#{imageFileName},
+		#{isNotice}, #{svcType}, #{region}, #{reqAt}, #{urgency}, #{points})
 	</insert>
 
 	<!-- 수정 -->
@@ -77,10 +86,12 @@
 		SET
 		title = #{title},
 		content = #{content},
-		imageFileName = #{imageFileName},
+		imageFileName =
+		#{imageFileName},
 		is_notice = #{isNotice},
 		svc_type = #{svcType},
-		region = #{region},
+		region
+		= #{region},
 		req_at = #{reqAt},
 		urgency = #{urgency},
 		points = #{points}
@@ -89,6 +100,45 @@
 
 	<!-- 삭제 -->
 	<delete id="deleteArticle" parameterType="int">
-		DELETE FROM board_article WHERE articleNO = #{value}
+		DELETE FROM
+		board_article WHERE articleNO = #{value}
 	</delete>
+
+	<!-- 페이지네이션 -->
+	<!-- [추가] 전체 건수: 필터 값이 있으면 동일하게 반영 -->
+	<select id="countArticles" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM board_article
+		<where>
+			<if test="svcType != null and svcType != ''"> AND svc_type = #{svcType}</if>
+			<if test="region  != null and region  != ''"> AND region = #{region}</if>
+			<if test="urgency != null and urgency != ''"> AND urgency = #{urgency}</if>
+			<if test="q != null and q != ''">
+				AND (title LIKE CONCAT('%',#{q},'%')
+				OR content LIKE CONCAT('%',#{q},'%'))
+			</if>
+		</where>
+	</select>
+
+	<!-- [추가] 페이지네이션 목록: 기존 ArticleMap/정렬 규칙을 그대로 사용 -->
+	<select id="selectPagedArticles" parameterType="map"
+		resultMap="ArticleMap">
+		SELECT
+		articleNO, parentNO, id, title, content, imageFileName,
+		is_notice, writeDate, svc_type, region, req_at, urgency, points
+		FROM board_article
+		<where>
+			<if test="svcType != null and svcType != ''"> AND svc_type = #{svcType}</if>
+			<if test="region  != null and region  != ''"> AND region = #{region}</if>
+			<if test="urgency != null and urgency != ''"> AND urgency = #{urgency}</if>
+			<if test="q != null and q != ''">
+				AND (title LIKE CONCAT('%',#{q},'%')
+				OR content LIKE CONCAT('%',#{q},'%'))
+			</if>
+		</where>
+		ORDER BY is_notice DESC, articleNO DESC
+		LIMIT #{size} OFFSET #{offset}
+	</select>
+
+
 </mapper>

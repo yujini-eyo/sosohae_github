@@ -1,6 +1,7 @@
 package com.myspring.eum.board.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,18 @@ public class BoardServiceImpl implements BoardService {
         // (옵션) 자식/이미지 테이블 등이 있다면 여기서 함께 정리
         // boardDAO.deleteImagesByArticle(articleNO);
         // boardDAO.deleteRepliesByParent(articleNO);
+    }
+
+    // [추가]
+    @Override
+    public int countArticles(Map<String, Object> p) {
+        return boardDAO.countArticles(p);
+    }
+
+    // [추가]
+    @Override
+    public List<ArticleVO> selectPagedArticles(Map<String, Object> p, int offset, int size) {
+        return boardDAO.selectPagedArticles(p, offset, size);
     }
 
     // (선택) VO 기반 수정으로 마이그레이션하려면 DAO/mapper도 VO 파라미터로 맞추고 아래 추가:

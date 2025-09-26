@@ -1,66 +1,117 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="mapper.support">
-	<!-- action-mybatis.xml 에 반드시 추가: <typeAlias alias="supportVO" type="com.myspring.eum.support.vo.SupportApplicationVO"/> -->
 
-	<!-- DB 컬럼 → VO 프로퍼티 매핑 -->
-	<resultMap id="SupportMap" type="supportVO">
-		<id property="applicationId" column="application_id" />
-		<result property="articleNO" column="articleNO" />
-		<result property="volunteerId" column="volunteer_id" />
-		<result property="status" column="status" />
-		<result property="message" column="message" />
-		<result property="createdAt" column="created_at" />
-		<result property="updatedAt" column="updated_at" />
+	<!-- ========== 공통 resultMap ========== -->
+	<resultMap id="SupportApplicationMap"
+		type="com.myspring.eum.support.vo.SupportApplicationVO">
+		<id column="application_id" property="applicationId" />
+		<result column="articleNO" property="articleNo" />
+		<result column="volunteer_id" property="volunteerId" />
+		<result column="status" property="status" />
+		<result column="message" property="message" />
+		<result column="created_at" property="createdAt" />
+		<result column="updated_at" property="updatedAt" />
+		<!-- 조인 컬럼(선택) -->
+		<result column="title" property="articleTitle" />
+		<result column="owner_id" property="ownerId" />
 	</resultMap>
 
-	<!-- INSERT: PK 자동 생성(application_id) → applicationId 로 채워짐 -->
-	<insert id="insert" parameterType="supportVO"
-		useGeneratedKeys="true" keyProperty="applicationId"
-		keyColumn="application_id">
-		INSERT INTO support_application (articleNO, volunteer_id, status, message)
-		VALUES (#{articleNO}, #{volunteerId}, #{status}, #{message})
+	<!-- ========== 1) 특정 글의 신청자 목록 (applicants.jsp) ========== -->
+	<select id="findApplicantsByArticle" parameterType="int"
+		resultMap="SupportApplicationMap">
+		SELECT
+		sa.*,
+		ba.title,
+		ba.id AS owner_id
+		FROM
+		support_application sa
+		JOIN board_article ba ON ba.articleNO =
+		sa.articleNO
+		WHERE sa.articleNO = #{value}
+		ORDER BY sa.created_at
+		DESC
+	</select>
+
+	<!-- ========== 2) 내 글들에 달린 전체 신청자 (myApplicants.jsp) ========== -->
+	<select id="findApplicantsToOwner" parameterType="string"
+		resultMap="SupportApplicationMap">
+		SELECT
+		sa.*,
+		ba.title,
+		ba.id AS owner_id
+		FROM
+		support_application sa
+		JOIN board_article ba ON ba.articleNO =
+		sa.articleNO
+		WHERE ba.id = #{ownerId}
+		ORDER BY sa.created_at DESC
+	</select>
+
+	<!-- ========== 3) 내가 쓴 글 목록 (myRequests.jsp) ========== -->
+	<!-- 이미 boardMapper에 있을 수 있지만, 여기에도 안전하게 제공 -->
+	<select id="findArticlesByWriter" parameterType="string"
+		resultType="com.myspring.eum.board.vo.ArticleVO">
+		SELECT
+		articleNO AS articleNO,
+		parent_no AS parentNO,
+		id,
+		title,
+		content,
+		write_date AS writeDate,
+		svc_type AS svcType,
+		region,
+		req_at AS reqAt,
+		urgency,
+		points,
+		is_notice AS isNotice,
+		image_fileName AS
+		imageFileName,
+		view_cnt AS viewCnt
+		FROM board_article
+		WHERE id =
+		#{writerId}
+		ORDER BY write_date DESC
+	</select>
+
+	<!-- (옵션) 자주 쓰는 쿼리: 내가 지원한 목록 - 이전 오류 보정용 -->
+	<select id="findByVolunteerId" parameterType="string"
+		resultMap="SupportApplicationMap">
+		SELECT
+		sa.*,
+		ba.title,
+		ba.id AS owner_id
+		FROM
+		support_application sa
+		JOIN board_article ba ON ba.articleNO =
+		sa.articleNO
+		WHERE sa.volunteer_id = #{volunteerId}
+		ORDER BY
+		sa.created_at DESC
+	</select>
+
+	<!-- 지원 신청 INSERT -->
+	<insert id="insertApplication" parameterType="map">
+		INSERT INTO
+		support_application
+		(articleNO, volunteer_id, status, message,
+		created_at, updated_at)
+		VALUES
+		(#{articleNo}, #{volunteerId}, 'APPLIED',
+		#{message},
+		CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 	</insert>
 
-	<!-- 중복 지원 존재 여부 -->
-	<select id="existsByArticleAndVolunteer" parameterType="map"
+	<!-- 지원 내역 존재 여부 -->
+	<select id="existsApplication" parameterType="map"
 		resultType="int">
-		SELECT COUNT(*)
+		SELECT COUNT(1)
 		FROM support_application
-		WHERE articleNO = #{articleNO} AND volunteer_id = #{volunteerId}
+		WHERE articleNO = #{articleNo}
+		AND volunteer_id = #{volunteerId}
 	</select>
 
-	<!-- 글별 신청자 목록 (APPLIED 우선 정렬) -->
-	<select id="listByArticle" parameterType="int"
-		resultMap="SupportMap">
-		SELECT application_id, articleNO, volunteer_id, status, message, created_at,
-		updated_at
-		FROM support_application
-		WHERE articleNO = #{value}
-		ORDER BY status='APPLIED' DESC, created_at DESC
-	</select>
-
-	<!-- 내 신청 목록 -->
-	<select id="findByVolunteerId" parameterType="string"
-		resultMap="SupportMap">
-		SELECT application_id, articleNO, volunteer_id, status, message, created_at,
-		updated_at
-		FROM support_application
-		WHERE volunteer_id = #{value}
-		ORDER BY created_at DESC
-	</select>
-
-	<!-- 상태 변경 -->
-	<update id="updateStatus" parameterType="map">
-		UPDATE support_application
-		SET status = #{status}
-		WHERE application_id = #{applicationId}
-	</update>
-
-	<!-- 단건 삭제(선택) -->
-	<delete id="deleteById" parameterType="long">
-		DELETE FROM support_application WHERE application_id = #{value}
-	</delete>
 </mapper>

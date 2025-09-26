@@ -1,20 +1,20 @@
-// SupportDAO.java
-// 역할: 매퍼 호출 메서드 인터페이스 정의 (서비스에서 호출)
 package com.myspring.eum.support.dao;
 
 import java.util.List;
+import com.myspring.eum.board.vo.ArticleVO;
 import com.myspring.eum.support.vo.SupportApplicationVO;
 
 public interface SupportDAO {
-	long insert(SupportApplicationVO vo); // 지원 등록
+	List<SupportApplicationVO> findApplicantsByArticle(int articleNo);
 
-	int exists(int articleNO, String volunteerId); // 중복 체크
+	List<SupportApplicationVO> findApplicantsToOwner(String ownerId);
 
-	List<SupportApplicationVO> listByArticle(int articleNO); // 글별 신청자 목록
+	List<ArticleVO> findArticlesByWriter(String writerId);
 
-	List<SupportApplicationVO> findByVolunteerId(String volunteerId); // 내 신청 목록
+	int insertApplication(int articleNo, String volunteerId, String message);
 
-	int updateStatus(long applicationId, String status); // 상태 변경
+	boolean existsApplication(int articleNo, String volunteerId);
+	// (옵션) 내가 지원한 목록 — 다른 화면에서 재사용
+	List<SupportApplicationVO> findByVolunteerId(String volunteerId);
 
-	int deleteById(long applicationId); // 삭제
 }

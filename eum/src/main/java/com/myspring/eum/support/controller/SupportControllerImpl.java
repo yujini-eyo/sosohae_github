@@ -1,8 +1,5 @@
-// SupportController.java
-// 역할: HTTP 요청 처리, 로그인 확인, 플래시 메시지, PRG 리다이렉트
 package com.myspring.eum.support.controller;
 
-import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -12,6 +9,7 @@ import com.myspring.eum.board.vo.ArticleVO;
 import com.myspring.eum.member.vo.MemberVO;
 import com.myspring.eum.support.service.SupportService;
 import com.myspring.eum.support.vo.SupportApplicationVO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
@@ -21,6 +19,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+/**
+ * 지원(Support) 관련 화면 컨트롤러 - /support/applicants.do : 특정 글(articleNO)의 지원자 목록 -
+ * /support/myApplicants.do : 내가 올린 모든 글에 달린 지원자 통합 목록 - /support/myRequests.do
+ * : 내가 올린 글 목록 - /support/apply.do : 특정 글에 지원(POST)
+ *
+ * Tiles 뷰 키: "support/applicants", "support/myApplicants", "support/myRequests"
+ */
 @Controller("supportController")
 @RequestMapping("/support")
 public class SupportControllerImpl {
@@ -28,96 +33,102 @@ public class SupportControllerImpl {
 	@Autowired
 	private SupportService supportService;
 
-	@Autowired
+	// 선택 의존성: 글 소유자 확인 등에 사용 중이라면 유지, 아니면 제거 가능
+	@Autowired(required = false)
 	private BoardService boardService;
 
-	// 세션에서 현재 로그인한 사용자 id 얻기 (프로젝트의 MemberVO 구조에 맞게 간단 구현)
+	/** 세션에서 로그인 사용자 id 조회 (프로젝트 컨벤션에 맞게 MemberVO 사용) */
 	private String currentUserId(HttpSession session) {
-		Object member = (session != null) ? session.getAttribute("member") : null;
-		try {
-			return (member != null) ? (String) member.getClass().getMethod("getId").invoke(member) : null;
-		} catch (Exception ignore) {
+		if (session == null)
 			return null;
+		Object m = session.getAttribute("member");
+		if (m instanceof MemberVO) {
+			String id = ((MemberVO) m).getId();
+			return (id != null && !id.isEmpty()) ? id : null;
 		}
+		return null;
 	}
 
+	// =========================================================
 	// [POST] 지원하기
+	// =========================================================
 	@RequestMapping(value = "/apply.do", method = RequestMethod.POST)
-	public String apply(@RequestParam int articleNO, @RequestParam(required = false) String message,
-			HttpServletRequest request, RedirectAttributes rttr) {
+	public String apply(@RequestParam("articleNO") int articleNO,
+			@RequestParam(value = "message", required = false) String message, HttpServletRequest request,
+			RedirectAttributes rttr) {
 		String me = currentUserId(request.getSession());
-		if (me == null) { // 로그인 필요
+		if (me == null) {
 			rttr.addFlashAttribute("msg", "로그인 후 지원할 수 있습니다.");
 			return "redirect:/member/loginForm.do";
 		}
+
 		try {
+			// SupportService에 apply(articleNO, volunteerId, message) 구현 필요
 			supportService.apply(articleNO, me, message);
-			rttr.addFlashAttribute("msg", "지원이 접수되었습니다.");
-		} catch (DuplicateKeyException e) { // 이미 지원한 경우
+			rttr.addFlashAttribute("msg", "지원이 완료되었습니다.");
+		} catch (DuplicateKeyException e) {
 			rttr.addFlashAttribute("msg", "이미 지원한 글입니다.");
+		} catch (Exception e) {
+			rttr.addFlashAttribute("msg", "지원 처리 중 오류가 발생했습니다.");
 		}
-		// PRG: 상세로 리다이렉트
+
 		return "redirect:/board/viewArticle.do?articleNO=" + articleNO;
 	}
 
-	// [GET] 내 지원 목록
-	@RequestMapping(value = "/myApplications.do", method = RequestMethod.GET)
-	public ModelAndView myApplications(HttpServletRequest request) {
-		String me = currentUserId(request.getSession());
-		ModelAndView mv = new ModelAndView("support/myApplications");
-		List<SupportApplicationVO> list = (me != null) ? supportService.listMyApplications(me)
-				: java.util.Collections.<SupportApplicationVO>emptyList();
-		mv.addObject("applications", list);
-		return mv;
-	}
-
-	// [POST] 선정(글 작성자용 — 권한 체크는 JSP에서 작성자만 버튼 보이도록 처리)
-	@RequestMapping(value = "/select.do", method = RequestMethod.POST)
-	public String select(@RequestParam long applicationId, @RequestParam int articleNO, RedirectAttributes rttr) {
-		supportService.select(applicationId);
-		rttr.addFlashAttribute("msg", "지원자를 선정했습니다.");
-		return "redirect:/board/viewArticle.do?articleNO=" + articleNO;
-	}
-
-	// [POST] 거절
-	@RequestMapping(value = "/reject.do", method = RequestMethod.POST)
-	public String reject(@RequestParam long applicationId, @RequestParam int articleNO, RedirectAttributes rttr) {
-		supportService.reject(applicationId);
-		rttr.addFlashAttribute("msg", "지원을 거절했습니다.");
-		return "redirect:/board/viewArticle.do?articleNO=" + articleNO;
-	}
-
-	// [POST] 철회(지원자 본인)
-	@RequestMapping(value = "/withdraw.do", method = RequestMethod.POST)
-	public String withdraw(@RequestParam long applicationId, @RequestParam int articleNO, RedirectAttributes rttr) {
-		supportService.withdraw(applicationId);
-		rttr.addFlashAttribute("msg", "지원 신청을 취소했습니다.");
-		return "redirect:/board/viewArticle.do?articleNO=" + articleNO;
-	}
-
-	// 지원자 목록 페이지
+	// =========================================================
+	// [GET] 특정 글의 지원자 목록 — applicants.jsp
+	// URL 예: /support/applicants.do?articleNO=123
+	// =========================================================
 	@RequestMapping(value = "/applicants.do", method = RequestMethod.GET)
-	public ModelAndView applicants(@RequestParam(value = "articleNO", required = false) Integer articleNO) {
+	public ModelAndView applicants(@RequestParam("articleNO") Integer articleNO, HttpSession session,
+			RedirectAttributes rttr) {
+		// (선택) 글 소유자 권한 체크가 필요하면 boardService 이용해 owner 비교
+		// if (boardService != null) { ... }
 
-		List<SupportApplicationVO> applications = (articleNO != null) ? supportService.listByArticle(articleNO)
-				: Collections.<SupportApplicationVO>emptyList();
-		if (applications == null)
-			applications = Collections.<SupportApplicationVO>emptyList();
+		List<SupportApplicationVO> applicants = supportService.listApplicantsByArticle(articleNO);
 
 		ModelAndView mv = new ModelAndView("support/applicants");
-		mv.addObject("applications", applications);
 		mv.addObject("articleNO", articleNO);
-		mv.addObject("hasParam", articleNO != null);
+		mv.addObject("applicants", applicants);
+		mv.addObject("hasParam", true);
 		return mv;
 	}
 
-	// 요청 내역 페이지
+	// =========================================================
+	// [GET] 내 글들에 달린 전체 지원자 — myApplicants.jsp
+	// =========================================================
+	@RequestMapping(value = "/myApplicants.do", method = RequestMethod.GET)
+	public ModelAndView myApplicants(HttpServletRequest request, RedirectAttributes rttr) {
+		String me = currentUserId(request.getSession());
+		if (me == null) {
+			rttr.addFlashAttribute("msg", "로그인이 필요합니다.");
+			return new ModelAndView("redirect:/member/loginForm.do");
+		}
+
+		List<SupportApplicationVO> applicants = supportService.listApplicantsToOwner(me);
+
+		ModelAndView mv = new ModelAndView("support/myApplicants");
+		mv.addObject("applicants", applicants);
+		mv.addObject("me", me);
+		return mv;
+	}
+
+	// =========================================================
+	// [GET] 내가 올린 요청 글 목록 — myRequests.jsp
+	// =========================================================
 	@RequestMapping(value = "/myRequests.do", method = RequestMethod.GET)
-	public ModelAndView myRequests(HttpServletRequest request) {
-		List<ArticleVO> requests = Collections.<ArticleVO>emptyList(); // 더미 렌더링
-		ModelAndView mv = new ModelAndView("support/myRequests"); // Tiles 이름 or JSP 논리명
+	public ModelAndView myRequests(HttpServletRequest request, RedirectAttributes rttr) {
+		String me = currentUserId(request.getSession());
+		if (me == null) {
+			rttr.addFlashAttribute("msg", "로그인이 필요합니다.");
+			return new ModelAndView("redirect:/member/loginForm.do");
+		}
+
+		List<ArticleVO> requests = supportService.listMyRequests(me);
+
+		ModelAndView mv = new ModelAndView("support/myRequests");
 		mv.addObject("requests", requests);
-		mv.addObject("me", null);
+		mv.addObject("me", me);
 		return mv;
 	}
 }

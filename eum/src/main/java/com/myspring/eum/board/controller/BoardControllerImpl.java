@@ -65,18 +65,84 @@ public class BoardControllerImpl implements BoardController {
 	 */
 
 	/** 목록 */
+//	@Override
+//	@RequestMapping(value = "/listArticles.do", method = { RequestMethod.GET, RequestMethod.POST })
+//	public ModelAndView listArticles(HttpServletRequest request, HttpServletResponse response) throws Exception {
+//		List<ArticleVO> articlesList = boardService.listArticles();
+//		ModelAndView mav = new ModelAndView("board/listArticles"); // Tiles 정의명
+//		mav.addObject("list", articlesList);
+//
+//		String msg = request.getParameter("msg");
+//		if (msg != null && !msg.isEmpty())
+//			mav.addObject("msg", msg);
+//
+//		return mav;
+//	}
+
+	/** 목록 (DB 페이징) */
 	@Override
 	@RequestMapping(value = "/listArticles.do", method = { RequestMethod.GET, RequestMethod.POST })
 	public ModelAndView listArticles(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		List<ArticleVO> articlesList = boardService.listArticles();
-		ModelAndView mav = new ModelAndView("board/listArticles"); // Tiles 정의명
-		mav.addObject("list", articlesList);
 
+		// 1) page/size 파라미터
+		int page = parseIntOrDefault(request.getParameter("page"), 1);
+		int size = parseIntOrDefault(request.getParameter("size"), 10);
+		size = Math.max(1, Math.min(size, 50));
+
+		// 2) (선택) 필터 파라미터 수집 — 당장은 null로 둬도 동작함
+		java.util.Map<String, Object> p = new java.util.HashMap<>();
+		String svcType = request.getParameter("svcType");
+		String region = request.getParameter("region");
+		String urgency = request.getParameter("urgency");
+		String q = request.getParameter("q");
+		if (svcType != null && !svcType.isBlank())
+			p.put("svcType", svcType);
+		if (region != null && !region.isBlank())
+			p.put("region", region);
+		if (urgency != null && !urgency.isBlank())
+			p.put("urgency", urgency);
+		if (q != null && !q.isBlank())
+			p.put("q", q);
+
+		// 3) 총 개수/페이지 계산
+		int total = boardService.countArticles(p.isEmpty() ? null : p);
+		int totalPages = (total == 0) ? 1 : ((total + size - 1) / size);
+		int currPage = Math.max(1, Math.min(page, totalPages));
+		int offset = (currPage - 1) * size;
+
+		// 4) 현재 페이지 목록 조회
+		java.util.List<com.myspring.eum.board.vo.ArticleVO> list = boardService
+				.selectPagedArticles(p.isEmpty() ? null : p, offset, size);
+
+		// 5) Model 구성 (Tiles 정의명은 그대로)
+		ModelAndView mav = new ModelAndView("board/listArticles");
+		mav.addObject("list", list);
+		mav.addObject("p", p);
+		mav.addObject("page", currPage);
+		mav.addObject("size", size);
+		mav.addObject("total", total);
+		mav.addObject("totalPages", totalPages);
+		mav.addObject("hasPrev", currPage > 1);
+		mav.addObject("hasNext", currPage < totalPages);
+		mav.addObject("prevPage", Math.max(1, currPage - 1));
+		mav.addObject("nextPage", Math.min(totalPages, currPage + 1));
+		mav.addObject("startNo", total - offset); // 역순 번호 표시용(옵션)
+
+		// 기존 메시지 유지
 		String msg = request.getParameter("msg");
 		if (msg != null && !msg.isEmpty())
 			mav.addObject("msg", msg);
 
 		return mav;
+	}
+
+	// 같은 컨트롤러 클래스 안에 유틸 추가
+	private int parseIntOrDefault(String s, int defVal) {
+		try {
+			return (s != null) ? Integer.parseInt(s) : defVal;
+		} catch (NumberFormatException e) {
+			return defVal;
+		}
 	}
 
 	/** 이미지 목록(옵션) */
@@ -185,8 +251,8 @@ public class BoardControllerImpl implements BoardController {
 		// 네 서비스 메서드가 listApplicants(articleNO, authorId) 라면 그대로,
 		// 내가 제안했던 시그니처(listByArticle(articleNO))를 쓰면 그걸로 바꿔도 됩니다.
 		if (me != null && me.equals(article.getId())) {
-			//mv.addObject("applicants", supportService.listApplicants(articleNO, me));
-		    mv.addObject("applicants", supportService.listByArticle(articleNO));
+			// mv.addObject("applicants", supportService.listApplicants(articleNO, me));
+			mv.addObject("applicants", supportService.listByArticle(articleNO));
 		}
 
 		return mv;

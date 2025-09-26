@@ -10,6 +10,10 @@ import com.myspring.eum.board.vo.ArticleVO;
 
 public interface BoardDAO {
 	List<ArticleVO> selectAllArticlesList();
+	 // [추가] 페이징용
+    int countArticles(Map<String, Object> p);
+    List<ArticleVO> selectPagedArticles(Map<String, Object> p, int offset, int size);
+    
     int insertNewArticle(ArticleVO article);
     ArticleVO selectArticle(Integer articleNO);
     void updateArticle(ArticleVO article) throws Exception;

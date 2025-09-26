@@ -114,6 +114,45 @@
 			</ul>
 		</c:otherwise>
 	</c:choose>
-	<a href="<c:url value='/board/articleForm.do'/>" class="btn primary">글쓰기</a>
+
+	<!-- 페이지네이션 UI -->
+	<c:if test="${total > 0}">
+		<nav class="pagination">
+			<ul>
+				<li class="${!hasPrev ? 'disabled' : ''}"><a
+					href="<c:url value='/board/listArticles.do'>
+                   <c:param name='page' value='${prevPage}'/>
+                   <c:param name='size' value='${size}'/>
+                 </c:url>">&laquo;</a>
+				</li>
+
+				<c:forEach var="i" begin="${page-5 > 1 ? page-5 : 1}"
+					end="${page+5 < totalPages ? page+5 : totalPages}">
+					<li class="${i == page ? 'active' : ''}"><a
+						href="<c:url value='/board/listArticles.do'>
+                     <c:param name='page' value='${i}'/>
+                     <c:param name='size' value='${size}'/>
+                   </c:url>">${i}</a>
+					</li>
+				</c:forEach>
+
+				<li class="${!hasNext ? 'disabled' : ''}"><a
+					href="<c:url value='/board/listArticles.do'>
+                   <c:param name='page' value='${nextPage}'/>
+                   <c:param name='size' value='${size}'/>
+                 </c:url>">&raquo;</a>
+				</li>
+			</ul>
+			<div class="pagestat">
+				<span>${page} / ${totalPages}</span> <span>총 ${total}건</span>
+			</div>
+		</nav>
+	</c:if>
+
+
+
+	<div class="write-btn-box right">
+		<a href="<c:url value='/board/articleForm.do'/>" class="btn primary">글쓰기</a>
+	</div>
 </div>
 

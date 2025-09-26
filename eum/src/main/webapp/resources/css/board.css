@@ -183,6 +183,13 @@ html,body{
   color: var(--muted);
 }
 
+/* ===== Write button box ===== */
+.write-btn-box{
+  display: flex;
+  justify-content: center;   /* 기본: 가운데 정렬 */
+  margin-top: 20px;
+}
+
 /* ===== Responsive tweaks ===== */
 @media (max-width: 680px){
   .filters{
