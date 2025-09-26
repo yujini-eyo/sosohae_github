@@ -13,7 +13,7 @@
         data-signup="/member/signupForm.do"
         data-helpwrite="/help/write.do"
         data-boardlist="/board/listArticles.do"
-        data-chat="/chat.do"
+        data-chat="/chat/list.do"
         data-mypage="/member/mypage.do">
 
   <!-- 데스크톱/태블릿만 보이도록: footer-desktop 클래스를 내부 래퍼에만 부여 -->

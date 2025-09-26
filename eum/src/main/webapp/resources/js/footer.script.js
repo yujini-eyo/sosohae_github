@@ -50,7 +50,7 @@
   function linkSignup()    { return url(getData("signup",     "/member/signupForm.do")); }
   function linkHelpWrite() { return url(getData("helpwrite",  "/help/write.do")); }
   function linkBoardList() { return url(getData("boardlist",  "/board/listArticles.do")); }
-  function linkChat()      { return url(getData("chat",       "/chat.do")); }
+  function linkChat()      { return url(getData("chat",       "/chat/list.do")); }
   function linkMypage()    { return url(getData("mypage",     "/member/mypage.do")); }
 
   /* ===== 인증 상태 */
