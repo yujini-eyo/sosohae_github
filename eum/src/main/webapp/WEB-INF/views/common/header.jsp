@@ -65,7 +65,7 @@
       <a href="<c:url value='/board/listArticles.do'/>">도움 주기</a>
       <a href="<c:url value='/board/articleForm.do'/>">도움 요청하기</a>
       <a href="<c:url value='/member/mypage.do'/>">도움 요청하기</a>      
-      <a href="<c:url value='/chat.do'/>">채팅</a>
+      <a href="<c:url value='/chat/list.do'/>">채팅</a>
     </nav>
   </noscript>
 </aside>

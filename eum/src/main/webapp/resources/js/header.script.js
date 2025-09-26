@@ -183,7 +183,7 @@
       + '<a href="'+url('/board/listArticles.do')+'">도움 주기</a>'
       + '<a href="'+url('/member/mypage.do')+'">내 정보</a>'
       + '<a href="'+url('/member/point.do')+'">포인트</a>'
-      + '<a href="'+url('/chat/list.do')+'">채팅 리스트</a>';
+      + '<a href="'+url('/chat/list.do')+'">채팅</a>';
   }
   function renderLeftNav(){
     var left = LA(); if (!left) return;
@@ -204,7 +204,7 @@
     	'<a href="'+url('/board/articleForm.do')+'">도움 요청하기</a>' +
         '<a href="'+url('/board/listArticles.do')+'">도움 주기</a>' +
         '<a href="'+url('/member/mypage.do')+'">내 정보</a>' +
-        '<a href="'+url('/chat/list.do')+'">채팅 리스트</a>' +
+        '<a href="'+url('/chat/list.do')+'">채팅</a>' +
         '<a href="'+ getLogoutLink() +'">로그아웃</a>'
       : common +
         '<a href="'+getLoginLink()+'">로그인</a>' +
