@@ -64,7 +64,30 @@
 			value="/WEB-INF/views/admin/member/lookup.jsp" />
 	</definition>
 
+<definition name="/admin/member/list" template="/WEB-INF/views/layouts/adminLayout.jsp">
+<put-attribute name="title" value="회원 관리"/>
+<put-attribute name="body" value="/WEB-INF/views/admin/member/list.jsp"/>
+</definition>
 
+
+<definition name="/admin/inquiry/view" template="/WEB-INF/views/layouts/adminLayout.jsp">
+<put-attribute name="title" value="1:1 문의"/>
+<put-attribute name="body" value="/WEB-INF/views/admin/inquiry/view.jsp"/>
+</definition>
+
+<definition name="admin/inquiry/list" extends="layout1.base">
+  <put-attribute name="title" value="1:1 문의 목록"/>
+  <put-attribute name="body"  value="/WEB-INF/views/admin/inquiry/list.jsp"/>
+</definition>
+
+<definition name="/admin/main-lite" template="/WEB-INF/views/layouts/adminLayout.jsp">
+<put-attribute name="title" value="관리자 메인(라이트)"/>
+<put-attribute name="body" value="/WEB-INF/views/admin/main-lite.jsp"/>
+</definition>
+<definition name="/admin/inquiry/view-lite" template="/WEB-INF/views/layouts/adminLayout.jsp">
+<put-attribute name="title" value="1:1 문의(라이트)"/>
+<put-attribute name="body" value="/WEB-INF/views/admin/inquiry/view-lite.jsp"/>
+</definition>
 
 
 

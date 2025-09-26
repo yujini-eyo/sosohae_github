@@ -1,31 +1,24 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%
-  // 기대 모델: page(Page<MemberVO>), q(PageRequest)
-%>
 
 <div class="container">
-  <h2>회원 목록</h2>
+  <h2>1:1 문의 목록</h2>
 
-  <form method="get" action="${pageContext.request.contextPath}/admin/auth/listMembers.do" class="form-inline" style="margin-bottom:10px;">
+  <form method="get" action="${pageContext.request.contextPath}/admin/inquiry/list.do" class="form-inline" style="margin-bottom:10px;">
     <select name="field">
       <option value="">전체</option>
-      <option value="id"    ${q.field == 'id' ? 'selected' : ''}>ID</option>
-      <option value="name"  ${q.field == 'name' ? 'selected' : ''}>이름</option>
-      <option value="email" ${q.field == 'email' ? 'selected' : ''}>이메일</option>
+      <option value="member_id" ${q.field == 'member_id' ? 'selected' : ''}>회원ID</option>
+      <option value="title"     ${q.field == 'title' ? 'selected' : ''}>제목</option>
     </select>
     <input type="text" name="keyword" value="${q.keyword}" placeholder="검색어"/>
     <select name="status">
       <option value="">상태 전체</option>
-      <option value="ACTIVE"   ${q.status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
-      <option value="INACTIVE" ${q.status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
+      <option value="OPEN"     ${q.status == 'OPEN' ? 'selected' : ''}>OPEN</option>
+      <option value="ANSWERED" ${q.status == 'ANSWERED' ? 'selected' : ''}>ANSWERED</option>
     </select>
     <select name="sort">
-      <option value="created_at" ${q.sort == 'created_at' ? 'selected' : ''}>가입일</option>
-      <option value="last_login" ${q.sort == 'last_login' ? 'selected' : ''}>마지막 로그인</option>
-      <option value="name"       ${q.sort == 'name' ? 'selected' : ''}>이름</option>
-      <option value="email"      ${q.sort == 'email' ? 'selected' : ''}>이메일</option>
-      <option value="points"     ${q.sort == 'points' ? 'selected' : ''}>포인트</option>
+      <option value="created_at"  ${q.sort == 'created_at' ? 'selected' : ''}>등록일</option>
+      <option value="answered_at" ${q.sort == 'answered_at' ? 'selected' : ''}>답변일</option>
     </select>
     <select name="order">
       <option value="DESC" ${q.order != 'ASC' ? 'selected' : ''}>내림차순</option>
@@ -38,19 +31,19 @@
   <table border="1" cellpadding="6" cellspacing="0" width="100%">
     <thead>
     <tr>
-      <th>ID</th><th>이름</th><th>이메일</th><th>상태</th><th>포인트</th><th>가입일</th><th>마지막 로그인</th>
+      <th>ID</th><th>회원ID</th><th>제목</th><th>상태</th><th>등록일</th><th>답변일</th><th>보기</th>
     </tr>
     </thead>
     <tbody>
-    <c:forEach var="m" items="${page.rows}">
+    <c:forEach var="r" items="${page.rows}">
       <tr>
-        <td>${m.id}</td>
-        <td>${m.name}</td>
-        <td>${m.email}</td>
-        <td>${m.status}</td>
-        <td>${m.points}</td>
-        <td>${m.createdAt}</td>
-        <td>${m.lastLogin}</td>
+        <td>${r.inquiryId}</td>
+        <td>${r.memberId}</td>
+        <td>${r.title}</td>
+        <td>${r.status}</td>
+        <td>${r.createdAt}</td>
+        <td>${r.answeredAt}</td>
+        <td><a href="${pageContext.request.contextPath}/admin/inquiry/view.do?id=${r.inquiryId}">상세</a></td>
       </tr>
     </c:forEach>
     <c:if test="${empty page.rows}">
