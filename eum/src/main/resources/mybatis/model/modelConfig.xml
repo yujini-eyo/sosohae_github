@@ -22,6 +22,7 @@
 		<typeAlias
 			type="com.myspring.eum.support.vo.SupportApplicationVO"
 			alias="supportVO" />
-
+		<typeAlias type="com.myspring.eum.admin.inquiry.vo.InquiryVO"
+			alias="InquiryVO" />
 	</typeAliases>
 </configuration>
