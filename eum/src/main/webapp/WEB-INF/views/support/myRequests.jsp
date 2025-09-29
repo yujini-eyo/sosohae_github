@@ -3,18 +3,50 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
-<link rel="stylesheet" href="<c:url value='/resources/css/myRequests.css'/>" />
+<link rel="stylesheet"
+	href="<c:url value='/resources/css/myRequests.css'/>" />
 <script defer src="<c:url value='/resources/js/myRequests.js'/>"></script>
 
-<div class="wrap">
+<div class="req-list">
+	<c:choose>
+		<c:when test="${not empty requests}">
+			<c:forEach var="a" items="${requests}">
+				<a class="req-item"
+					href="<c:url value='/support/applicants.do?articleNO=${a.articleNO}'/>">
+					<div class="req-item-header">
+						<div class="req-title">
+							<c:out value="${a.title}" />
+						</div>
+						<div class="req-applicants">
+							지원자 <span class="req-applicants-count">보기</span>
+						</div>
+					</div>
+					<div class="req-meta">
+						작성일:
+						<fmt:formatDate value="${a.writeDate}" pattern="yyyy-MM-dd HH:mm" />
+					</div>
+				</a>
+			</c:forEach>
+		</c:when>
+		<c:otherwise>
+			<div class="req-item">
+				<div class="req-title">아직 작성한 요청이 없습니다.</div>
+			</div>
+		</c:otherwise>
+	</c:choose>
+</div>
+
+
+
+<%-- <div class="wrap">
 	<h2 class="page-header">내 요청</h2>
   <div class="card">
     <div class="req-list">
-      <%--
+      
         [더미 데이터]
         아래는 화면 디자인 확인을 위한 더미 데이터 목록입니다.
         (실제 배포 시에는 삭제하고 <c:forEach> 태그 사용)
-      --%>
+     
       <a href="#" class="req-item">
         <div class="req-item-header">
           <div class="req-title">전등 교체 도와주실 분 구해요</div>
@@ -40,4 +72,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> --%>

@@ -4,19 +4,52 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
-<link rel="stylesheet" href="<c:url value='/resources/css/myApplications.css'/>" />
+<link rel="stylesheet"
+	href="<c:url value='/resources/css/myApplications.css'/>" />
 <script defer src="<c:url value='/resources/js/myApplications.js'/>"></script>
 
 <div class="wrap">
-  <h2 class="page-header">내 신청 내역</h2>
-  <div class="card">
-    <div class="app-list">
-      <%--
+	<h2 class="page-header">내 신청 내역</h2>
+	<div class="card">
+		<div class="app-list">
+			<c:choose>
+				<c:when test="${not empty applications}">
+					<c:forEach var="ap" items="${applications}">
+						<a class="app-item"
+							href="<c:url value='/board/viewArticle.do?articleNO=${ap.articleNo}'/>">
+							<div class="app-item-header">
+								<div class="app-title">
+									<c:out value="${ap.articleTitle}" />
+								</div>
+								<div class="app-status">
+									<c:out value="${ap.status}" />
+								</div>
+							</div>
+							<div class="app-content">
+								<c:out value="${ap.message}" />
+							</div>
+							<div class="app-meta">
+								신청일시:
+								<fmt:formatDate value="${ap.createdAt}"
+									pattern="yyyy-MM-dd HH:mm" />
+							</div>
+						</a>
+					</c:forEach>
+				</c:when>
+				<c:otherwise>
+					<div class="app-item">
+						<div class="app-title">아직 신청한 내역이 없습니다.</div>
+					</div>
+				</c:otherwise>
+			</c:choose>
+		</div>
+
+		<%--
         [더미 데이터]
         아래는 화면 디자인 확인을 위한 더미 데이터 목록입니다.
         (실제 배포 시에는 삭제하고 <c:forEach> 태그 사용)
       --%>
-      <a href="#" class="app-item">
+		<!--  <a href="#" class="app-item">
         <div class="app-item-header">
           <div class="app-title">마트 심부름 요청</div>
           <div class="app-status">선정됨</div>
@@ -46,4 +79,4 @@
       </a>
     </div>
   </div>
-</div>
+</div> -->

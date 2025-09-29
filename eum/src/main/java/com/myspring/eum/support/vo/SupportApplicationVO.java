@@ -5,12 +5,14 @@ import java.sql.Timestamp;
 /** support_application 테이블 1:1 매핑 VO */
 public class SupportApplicationVO {
 	private Long applicationId; // BIGINT PK (application_id)
-	private Integer articleNO; // INT FK (board_article.articleNO)
+	private Integer articleNo; // INT FK (board_article.articleNO)
 	private String volunteerId; // VARCHAR(50)
 	private String status; // VARCHAR(20): APPLIED/SELECTED/REJECTED/WITHDRAWN
 	private String message; // VARCHAR(500)
 	private Timestamp createdAt; // TIMESTAMP
 	private Timestamp updatedAt; // TIMESTAMP
+	private String articleTitle; // ba.title AS title -> resultMap에서 property=articleTitle
+	private String ownerId; // ba.id AS owner_id -> resultMap에서 property=ownerId
 
 	public Long getApplicationId() {
 		return applicationId;
@@ -21,11 +23,11 @@ public class SupportApplicationVO {
 	}
 
 	public Integer getArticleNO() {
-		return articleNO;
+		return articleNo;
 	}
 
 	public void setArticleNO(Integer articleNO) {
-		this.articleNO = articleNO;
+		this.articleNo = articleNO;
 	}
 
 	public String getVolunteerId() {
@@ -66,5 +68,21 @@ public class SupportApplicationVO {
 
 	public void setUpdatedAt(Timestamp updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	public String getArticleTitle() {
+		return articleTitle;
+	}
+
+	public void setArticleTitle(String articleTitle) {
+		this.articleTitle = articleTitle;
+	}
+
+	public String getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
 	}
 }

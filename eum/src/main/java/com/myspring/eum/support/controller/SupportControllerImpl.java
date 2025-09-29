@@ -80,17 +80,25 @@ public class SupportControllerImpl {
 	// URL 예: /support/applicants.do?articleNO=123
 	// =========================================================
 	@RequestMapping(value = "/applicants.do", method = RequestMethod.GET)
-	public ModelAndView applicants(@RequestParam("articleNO") Integer articleNO, HttpSession session,
-			RedirectAttributes rttr) {
-		// (선택) 글 소유자 권한 체크가 필요하면 boardService 이용해 owner 비교
-		// if (boardService != null) { ... }
+	public ModelAndView applicants(@RequestParam(value = "articleNO", required = false) Integer articleNO,
+			HttpServletRequest request, RedirectAttributes rttr) {
+		String me = currentUserId(request.getSession());
+		if (me == null) {
+			rttr.addFlashAttribute("msg", "로그인이 필요합니다.");
+			return new ModelAndView("redirect:/member/loginForm.do");
+		}
+		if (articleNO == null) {
+			rttr.addFlashAttribute("msg", "잘못된 접근입니다. 글 번호가 없습니다.");
+			return new ModelAndView("redirect:/support/myRequests.do");
+		}
 
-		List<SupportApplicationVO> applicants = supportService.listApplicantsByArticle(articleNO);
+		java.util.List<com.myspring.eum.support.vo.SupportApplicationVO> list = supportService
+				.listApplicantsByArticle(articleNO);
 
 		ModelAndView mv = new ModelAndView("support/applicants");
+		mv.addObject("applicants", (list != null) ? list : java.util.Collections.emptyList());
 		mv.addObject("articleNO", articleNO);
-		mv.addObject("applicants", applicants);
-		mv.addObject("hasParam", true);
+		mv.addObject("me", me);
 		return mv;
 	}
 
@@ -131,4 +139,21 @@ public class SupportControllerImpl {
 		mv.addObject("me", me);
 		return mv;
 	}
+
+	// [GET] 내가 지원한 내역 — myApplications.jsp
+	@RequestMapping(value = "/myApplications.do", method = RequestMethod.GET)
+	public ModelAndView myApplications(HttpServletRequest request, RedirectAttributes rttr) {
+		String me = currentUserId(request.getSession());
+		if (me == null) {
+			rttr.addFlashAttribute("msg", "로그인이 필요합니다.");
+			return new ModelAndView("redirect:/member/loginForm.do");
+		}
+		java.util.List<com.myspring.eum.support.vo.SupportApplicationVO> list = supportService.listMyApplications(me);
+
+		ModelAndView mv = new ModelAndView("support/myApplications");
+		mv.addObject("applications", (list != null) ? list : java.util.Collections.emptyList());
+		mv.addObject("me", me);
+		return mv;
+	}
+
 }

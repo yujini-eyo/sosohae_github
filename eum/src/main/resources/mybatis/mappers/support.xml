@@ -9,7 +9,7 @@
 	<resultMap id="SupportApplicationMap"
 		type="com.myspring.eum.support.vo.SupportApplicationVO">
 		<id column="application_id" property="applicationId" />
-		<result column="articleNO" property="articleNo" />
+		<result column="article_no" property="articleNo" />
 		<result column="volunteer_id" property="volunteerId" />
 		<result column="status" property="status" />
 		<result column="message" property="message" />
@@ -52,30 +52,29 @@
 	</select>
 
 	<!-- ========== 3) 내가 쓴 글 목록 (myRequests.jsp) ========== -->
-	<!-- 이미 boardMapper에 있을 수 있지만, 여기에도 안전하게 제공 -->
+	<!-- ArticleVO로 자동 매핑하려면 스네이크→카멜 컬럼은 alias 필요 -->
 	<select id="findArticlesByWriter" parameterType="string"
 		resultType="com.myspring.eum.board.vo.ArticleVO">
 		SELECT
 		articleNO AS articleNO,
-		parent_no AS parentNO,
+		parentNO AS parentNO,
 		id,
 		title,
 		content,
-		write_date AS writeDate,
+		imageFileName AS imageFileName,
+		is_notice AS isNotice,
+		writeDate AS writeDate,
 		svc_type AS svcType,
 		region,
 		req_at AS reqAt,
 		urgency,
-		points,
-		is_notice AS isNotice,
-		image_fileName AS
-		imageFileName,
-		view_cnt AS viewCnt
+		points
 		FROM board_article
-		WHERE id =
-		#{writerId}
-		ORDER BY write_date DESC
+		WHERE id = #{writerId}
+		ORDER BY
+		writeDate DESC
 	</select>
+
 
 	<!-- (옵션) 자주 쓰는 쿼리: 내가 지원한 목록 - 이전 오류 보정용 -->
 	<select id="findByVolunteerId" parameterType="string"
@@ -110,7 +109,8 @@
 		resultType="int">
 		SELECT COUNT(1)
 		FROM support_application
-		WHERE articleNO = #{articleNo}
+		WHERE articleNO =
+		#{articleNo}
 		AND volunteer_id = #{volunteerId}
 	</select>
 
