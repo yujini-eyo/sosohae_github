@@ -1,0 +1,59 @@
+  :root{
+      --bg:#FFF8F2; --card:#FFFFFF; --ink:#4A3C35; --ink-weak:#7A6D66;
+      --accent:#FFB86C; --accent-ink:#3a2a20; --line:#E9DFD8; --radius:18px;
+      --shadow:0 6px 18px rgba(0,0,0,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; padding:24px; background:var(--bg); color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"SUIT","Noto Sans KR",Segoe UI,Roboto,Helvetica,Arial,"Apple SD Gothic Neo","맑은 고딕",sans-serif;
+    }
+    .wrap{max-width:980px; margin:0 auto}
+    .hd{
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+      margin:0 0 14px;
+    }
+    .hd h1{font-size:22px; margin:0}
+    .refresh{
+      appearance:none; border:1px solid var(--line); background:#fff; color:var(--accent-ink);
+      padding:10px 14px; border-radius:12px; cursor:pointer; box-shadow:var(--shadow);
+    }
+    .refresh:hover{border-color:var(--accent);}
+
+    .card{
+      background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+      box-shadow:var(--shadow); padding:16px;
+    }
+
+    .status{
+      text-align:center; font-size:14px; color:var(--ink-weak); padding:8px 0 14px;
+    }
+    .status .spinner{
+      display:inline-block; width:16px; height:16px; border:2px solid #ddd; border-top-color:var(--accent);
+      border-radius:50%; animation:spin 1s linear infinite; vertical-align:-3px; margin-right:6px;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .table-wrap{overflow:auto; border-radius:12px; border:1px solid var(--line)}
+    table{
+      width:100%; border-collapse:separate; border-spacing:0; min-width:640px; background:#fff;
+    }
+    thead th{
+      position:sticky; top:0; background:#fff7ee; color:var(--accent-ink);
+      font-weight:700; text-align:center; padding:12px; border-bottom:1px solid var(--line);
+    }
+    tbody td{
+      padding:12px; border-bottom:1px solid var(--line); text-align:center;
+      white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
+    }
+    tbody tr:hover{background:#fffaf3}
+    tbody td.title{
+      text-align:left; max-width:520px;
+    }
+    a.rowlink{
+      color:var(--ink); text-decoration:none;
+    }
+    a.rowlink:hover{color:#000; text-decoration:underline}
+    .empty{padding:24px; text-align:center; color:var(--ink-weak)}
+    .error{padding:12px 14px; border-radius:12px; background:#fff0f0; color:#a71919; border:1px solid #ffd0d0; margin-bottom:12px}

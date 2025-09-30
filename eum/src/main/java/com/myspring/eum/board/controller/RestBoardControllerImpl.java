@@ -27,22 +27,21 @@ public class RestBoardControllerImpl {
 	private BoardService boardService;
 	@Autowired
 	private ArticleVO articleVO;
-	
-	@RequestMapping(value = "/board/listArticlesJson.do", method = RequestMethod.GET, 
-			produces = "application/json")
+
+	@RequestMapping(value = "/board/listArticlesJson.do", method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<List<ArticleVO>> listArticles() throws Exception {
-		logger.info("listArticles ¸Þ¼­µå È£Ãâ");
+		logger.info("listArticles ï¿½Þ¼ï¿½ï¿½ï¿½ È£ï¿½ï¿½");
 		List articlesList = boardService.listArticles();
-		
-		return new ResponseEntity(articlesList,HttpStatus.OK);
+
+		return new ResponseEntity(articlesList, HttpStatus.OK);
 	}
-	
-	@RequestMapping(value= "/board/listArticlesJsonView.do", method = {RequestMethod.GET, RequestMethod.POST})
+
+	@RequestMapping(value = "/board/listArticlesJsonView.do", method = { RequestMethod.GET, RequestMethod.POST })
 	public ModelAndView yungyo(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+
 		ModelAndView mav = new ModelAndView("/board/listArticlesJsonView");
 		return mav;
-		
+
 	}
-	
+
 }
