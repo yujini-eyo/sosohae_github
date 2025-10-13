@@ -1,0 +1,44 @@
+https://start.spring.io 사이트에서 환경설정
+
+* mustache(jsp 역할) 생성 -> controller 생성 -> controller 에서 메서드 생성
+
+* layouts 만들기 (tiles 대신하기)
+templates 하위에 directory -> layouts 생성
+layouts/header.mustache 생성
+layouts/footer.mustache
+
+header.mustache -> bootstrap 사이트 에서 teamplate와 navbar 코드 가져오기
+{{>layouts/header}} =>layouts 가져오는 코드
+
+* 데이터베이스 가져오기
+ArticlesController 생성
+templates/articles/new.mustache 생성
+
+* DTO 만들기 (이클립스의 VO 같은것)
+dto 패키지 생성
+dto 패키지 안에 ArticleForm.java 생성
+
+ private String title;
+ private String content;
+작성 후 우클릭 Constructor 로 생성자 만들기
+우클릭 toString 으로 toString 메서드 만들기
+
+(JPA : Java Persistence API
+자바언어로 DB에 명령을 내리는 도구
+데이터를 객체 지향적을 관리할 수 있다.)
+
+com.example.firstproject.entity / Article.java 생성 (@Entity)
+칼럼 선언 후 생성자와 toStirng 추가
+
+package com.example.firstproject.repository 에 interface ArticleRepository 생성
+
+application.properties 파일에 코드 추가
+server.servlet.encoding.force=true
+spring.h2.console.enabled=true
+
+주소접속
+localhost:8080/h2-console
+
+콘솔창에서 ctrl+f 로 jdbc 찾고
+jdbc:h2:mem:058220e9-f3ea-4e27-968c-f718d16a0683 복사 (예시 서버 재시작시 초기화 됨)
+jdbc Url 에 복붙

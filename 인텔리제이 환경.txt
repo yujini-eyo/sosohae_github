@@ -1,0 +1,101 @@
+인텔리제이 사이트 출력 절차 (정리본)
+1) 환경 준비
+
+JDK 17, Gradle 8.x 이상
+
+의존성:
+
+https://start.spring.io 사이트에서 환경설정
+
+spring-boot-starter-web
+
+spring-boot-starter-mustache
+
+spring-boot-starter-data-jpa
+
+com.h2database:h2
+
+2) 뷰 (Mustache) 구성
+
+src/main/resources/templates/ 하위에 페이지 파일 생성
+
+레이아웃 디렉토리: templates/layouts/
+
+header.mustache, footer.mustache 작성
+
+Bootstrap 템플릿/네비게이션 코드 header에 삽입
+
+각 페이지에서 include:
+
+{{>layouts/header}}	레이아웃 적용 코드
+
+{{>layouts/footer}}	레이아웃 적용 코드
+
+3) 컨트롤러 생성
+
+예: ArticlesController 생성
+
+라우트 작성
+
+GET /articles/new → templates/articles/new.mustache 반환
+
+POST /articles → DB 저장 후 리다이렉트
+
+4) DTO (Form 객체) 생성
+
+패키지: com.example.firstproject.dto
+
+클래스: ArticleForm
+
+필드: title, content
+
+생성자 / toString / getter / setter
+
+5) 엔티티 & 리포지토리
+
+패키지: com.example.firstproject.entity
+
+Article 클래스 생성
+
+@Entity + @Id, @GeneratedValue
+
+칼럼: title, content
+
+패키지: com.example.firstproject.repository
+
+ArticleRepository 인터페이스
+
+JpaRepository<Article, Long> 상속
+
+6) 설정 파일
+
+application.properties
+
+서버 인코딩:
+server.servlet.encoding.force=true
+
+H2 콘솔 활성화:
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+
+H2 DB URL 고정:
+spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+
+JPA 설정:
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+7) 실행 & 확인
+
+애플리케이션 실행 (IntelliJ ▶ 버튼 또는 ./gradlew bootRun)
+
+브라우저 접속:
+
+뷰 확인: http://localhost:8080/articles/new
+
+H2 콘솔: http://localhost:8080/h2-console
+
+JDBC URL: jdbc:h2:mem:testdb
+
+👉 요약:
+(의존성 준비) → (Mustache 레이아웃/페이지 작성) → (컨트롤러 라우팅) → (DTO 작성) → (엔티티 & JPA 리포지토리) → (application.properties 설정) → (실행 & H2 콘솔 확인)
